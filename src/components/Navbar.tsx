@@ -116,8 +116,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
                   FGC MUSHIN
                 </span>
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.14em', color: 'var(--accent-teal)' }}>
-                  FOURSQUARE
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
+                  DISTRICT HEADQUARTERS
                 </span>
               </div>
             </a>
@@ -245,7 +245,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div style={{ marginBottom: '2.5rem' }}>
               <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
                 <Sparkles size={13} />
-                <span>Welcome to FGC Mushin</span>
+                <span>Welcome to FGC Mushin DHQ</span>
               </div>
               <h2 className="heading-h2 font-serif" style={{ fontSize: '2.4rem', lineHeight: 1.15, color: 'var(--text-primary)' }}>
                 Making Jesus known to <span className="italic-serif">Everyone,</span> Everywhere.

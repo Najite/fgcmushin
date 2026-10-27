@@ -1,12 +1,13 @@
 import type { Sermon, Ministry, ChurchEvent } from '../types';
 
 export const CHURCH_INFO = {
-  name: 'FGC Mushin',
-  fullName: 'Foursquare Gospel Church, Mushin',
+  name: 'FGC Mushin DHQ',
+  fullName: 'Foursquare Gospel Church Mushin District Headquarters',
   tagline: 'Jesus Christ, the Same Yesterday, Today, and Forever',
   motto: 'Jesus the Savior • Jesus the Healer • Jesus the Baptizer with the Holy Spirit • Jesus the Soon-Coming King',
   submotto: 'Everyone is welcome. Everyone has a next best step. Everyone can make a difference.',
-  address: 'Sanctuary Cathedral, Mushin, Lagos, Nigeria',
+  address: '4, Obarinmola Adedoyin Street, Mushin, Idi Oro, Lagos, Nigeria',
+  shortAddress: '4, Obarinmola Adedoyin St, Idi-Oro, Mushin',
   times: [
     { name: '1st Celebration Service', time: '7:30 AM', description: 'Early glory worship, children church & word' },
     { name: '2nd Celebration Service', time: '9:30 AM', description: 'Full choir worship, teens church & online broadcast' },
@@ -132,7 +133,7 @@ export const UPCOMING_EVENTS: ChurchEvent[] = [
     title: 'Celebration Baptism Sunday',
     date: 'Sunday, Nov 15, 2026',
     time: 'During 7:30 AM & 9:30 AM Services',
-    location: 'Sanctuary Cathedral',
+    location: 'District Headquarters Cathedral',
     category: 'Community',
     description: 'Celebrating public declarations of new life in Jesus! If you want to take your next step, sign up today.'
   },
@@ -141,9 +142,9 @@ export const UPCOMING_EVENTS: ChurchEvent[] = [
     title: 'Community Care & Food Outreach',
     date: 'Saturday, Nov 21, 2026',
     time: '8:30 AM – 1:00 PM',
-    location: 'FGC Mushin Fellowship Grounds',
+    location: 'District Headquarters Grounds, Idi-Oro',
     category: 'Outreach',
-    description: 'Distributing food and essential supplies to families and neighbors across the Mushin community.'
+    description: 'Distributing food and essential supplies to families and neighbors across Mushin and surrounding communities.'
   },
   {
     id: 'newcomers-lunch',
@@ -152,7 +153,7 @@ export const UPCOMING_EVENTS: ChurchEvent[] = [
     time: '11:45 AM – 1:00 PM',
     location: 'Cathedral Fellowship Hall',
     category: 'Community',
-    description: 'New to FGC Mushin? Meet our pastoral leadership and ministers for fellowship, hear our vision, and get connected.'
+    description: 'New to Foursquare Gospel Church Mushin District Headquarters? Meet our pastoral leadership and ministers for fellowship, hear our vision, and get connected.'
   }
 ];
 
@@ -171,6 +172,6 @@ export const VISITOR_FAQS = [
   },
   {
     q: 'Where do I park and go when I arrive?',
-    a: 'Turn on your hazard lights when you enter the church gates! Our friendly ushering and protocol team will guide you to dedicated first-time guest parking spaces.'
+    a: 'Turn on your hazard lights when you enter the church gates at 4, Obarinmola Adedoyin Street, Idi-Oro! Our friendly ushering and protocol team will guide you to dedicated first-time guest parking spaces.'
   }
 ];

@@ -55,13 +55,18 @@ export const Footer: React.FC<FooterProps> = ({
                   }}
                 />
               </div>
-              <span style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                FGC MUSHIN
-              </span>
+              <div>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', display: 'block', lineHeight: 1.1 }}>
+                  FGC MUSHIN
+                </span>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
+                  District Headquarters
+                </span>
+              </div>
             </div>
 
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-              Foursquare Gospel Church, Mushin — Jesus Christ, the Same Yesterday, Today, and Forever. A vibrant family following Jesus together.
+              Foursquare Gospel Church Mushin District Headquarters — Jesus Christ, the Same Yesterday, Today, and Forever. A vibrant family following Jesus together.
             </p>
 
             {/* Social Icons Inline SVGs */}
@@ -166,7 +171,7 @@ export const Footer: React.FC<FooterProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <MapPin size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
                 <div>
-                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Sanctuary Campus</div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>District Headquarters</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{CHURCH_INFO.address}</div>
                 </div>
               </div>
@@ -256,7 +261,7 @@ export const Footer: React.FC<FooterProps> = ({
           }}
         >
           <div>
-            &copy; {new Date().getFullYear()} Foursquare Gospel Church, Mushin. All rights reserved.
+            &copy; {new Date().getFullYear()} Foursquare Gospel Church Mushin District Headquarters. All rights reserved.
           </div>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <span>Privacy Policy</span>

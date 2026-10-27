@@ -6,7 +6,7 @@ export const Marquee: React.FC = () => {
     { text: 'JESUS OUR HEALER', isOutline: false },
     { text: 'JESUS OUR BAPTIZER', isOutline: true },
     { text: 'JESUS OUR SOON-COMING KING', isOutline: false },
-    { text: 'FGC MUSHIN', isOutline: true },
+    { text: 'MUSHIN DISTRICT HQ', isOutline: true },
     { text: 'EVERYONE IS WELCOME', isOutline: false }
   ];
 

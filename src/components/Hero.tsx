@@ -85,7 +85,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
         <div className="animate-hero-eyebrow" style={{ marginBottom: '1.75rem' }}>
           <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 10px rgba(0, 118, 129, 0.12)' }}>
             <span className="hero-beacon-dot"></span>
-            <span>FOURSQUARE GOSPEL CHURCH • MUSHIN</span>
+            <span>FOURSQUARE GOSPEL CHURCH • MUSHIN DISTRICT HEADQUARTERS</span>
           </div>
         </div>
 
@@ -231,22 +231,23 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontWeight: 700 }}>
-                  Sanctuary Cathedral
+                  District Headquarters
                 </div>
                 <button
                   onClick={handleCopyAddress}
-                  title="Click to copy address"
+                  title="Click to copy full address"
                   style={{
-                    fontSize: '0.925rem',
+                    fontSize: '0.875rem',
                     fontWeight: 700,
                     color: copied ? '#059669' : 'var(--text-primary)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    textAlign: 'left'
                   }}
                 >
-                  <span>Mushin, Lagos, Nigeria</span>
+                  <span>4, Obarinmola Adedoyin St, Idi-Oro, Mushin</span>
                   {copied ? <Check size={14} color="#059669" /> : <Copy size={13} color="var(--accent-teal)" />}
                 </button>
               </div>

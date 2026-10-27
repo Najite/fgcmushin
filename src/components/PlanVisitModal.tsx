@@ -97,7 +97,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
           {!hasSubmitted ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', lineHeight: 1.6 }}>
-                Let us know you’re coming! We’ll have a VIP parking spot reserved, a dedicated host to show you around, and a welcome gift + fresh coffee waiting at the Welcome Center.
+                Let us know you’re coming! We’ll have a VIP parking spot reserved at 4, Obarinmola Adedoyin Street, a dedicated host to show you around, and a warm welcome waiting at the Welcome Center.
               </p>
 
               {/* Step 1: Choose Gathering Time */}
@@ -311,7 +311,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
                   <Car size={18} color="var(--accent-teal)" />
-                  <span>Turn your hazard lights on at the entrance for VIP parking.</span>
+                  <span>Turn your hazard lights on at 4, Obarinmola Adedoyin Street for VIP parking.</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
                   <Coffee size={18} color="var(--accent-gold)" />

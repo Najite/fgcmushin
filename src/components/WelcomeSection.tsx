@@ -134,7 +134,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
             </h3>
 
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
-              Seriously. Every week at FGC Mushin, believers, seekers, and families from all walks of life come together to experience the life-transforming power and peace of Jesus Christ.
+              Seriously. Every week at FGC Mushin District Headquarters, believers, seekers, and families from all walks of life come together to experience the life-transforming power and peace of Jesus Christ.
             </p>
 
             <p style={{ color: 'var(--text-muted)', fontSize: '0.975rem', lineHeight: 1.7 }}>
