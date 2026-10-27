@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -22,6 +22,68 @@ export const App: React.FC = () => {
   const [isGivingOpen, setIsGivingOpen] = useState(false);
   const [isPrayerOpen, setIsPrayerOpen] = useState(false);
   const [activeVideoSermon, setActiveVideoSermon] = useState<Sermon | null>(null);
+
+  useEffect(() => {
+    const revealVisibleElements = () => {
+      const items = document.querySelectorAll('.reveal-item:not(.is-revealed)');
+      const triggerBottom = window.innerHeight * 0.95;
+      items.forEach((item) => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top <= triggerBottom) {
+          item.classList.add('is-revealed');
+        }
+      });
+    };
+
+    // Run immediately on mount
+    revealVisibleElements();
+
+    // Check again after layout settle
+    const timer1 = setTimeout(revealVisibleElements, 250);
+    const timer2 = setTimeout(revealVisibleElements, 600);
+
+    // Fallback safety: ensure all items reveal after 2s so content is never stuck hidden
+    const safetyTimer = setTimeout(() => {
+      document.querySelectorAll('.reveal-item:not(.is-revealed)').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+    }, 2000);
+
+    // IntersectionObserver for native smooth triggers
+    let observer: IntersectionObserver | null = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              observer?.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          rootMargin: '80px 0px 80px 0px',
+          threshold: 0
+        }
+      );
+
+      document.querySelectorAll('.reveal-item:not(.is-revealed)').forEach((el) => {
+        observer?.observe(el);
+      });
+    }
+
+    window.addEventListener('scroll', revealVisibleElements, { passive: true });
+    window.addEventListener('resize', revealVisibleElements, { passive: true });
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(safetyTimer);
+      if (observer) observer.disconnect();
+      window.removeEventListener('scroll', revealVisibleElements);
+      window.removeEventListener('resize', revealVisibleElements);
+    };
+  }, []);
 
   const handleSelectSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);

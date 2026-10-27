@@ -13,6 +13,7 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
 
   return (
     <div
+      className="modal-backdrop-animate"
       style={{
         position: 'fixed',
         inset: 0,
@@ -28,7 +29,7 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
       onClick={onClose}
     >
       <div
-        className="double-bezel"
+        className="double-bezel modal-dialog-animate"
         style={{
           maxWidth: '900px',
           width: '100%',

@@ -14,7 +14,7 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
     <section id="ministries" className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max">
         {/* Header Tagline & Title */}
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        <div className="reveal-item" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
             <Sparkles size={14} />
             <span>COMMUNITY FOR ALL GENERATIONS</span>
@@ -35,10 +35,10 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
             gap: '1.75rem'
           }}
         >
-          {MINISTRIES.map((ministry) => (
+          {MINISTRIES.map((ministry, idx) => (
             <div
               key={ministry.id}
-              className="double-bezel"
+              className={`double-bezel reveal-item reveal-stagger-${(idx % 4) + 1}`}
               style={{ cursor: 'pointer', background: '#FAF8F5' }}
               onClick={() => setSelectedMinistry(ministry)}
             >
@@ -126,6 +126,7 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
       {/* Ministry Detail Modal in Light Theme */}
       {selectedMinistry && (
         <div
+          className="modal-backdrop-animate"
           style={{
             position: 'fixed',
             inset: 0,
@@ -140,7 +141,7 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
           onClick={() => setSelectedMinistry(null)}
         >
           <div
-            className="double-bezel"
+            className="double-bezel modal-dialog-animate"
             style={{
               maxWidth: '680px',
               width: '100%',

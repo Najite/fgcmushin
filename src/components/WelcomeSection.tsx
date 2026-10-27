@@ -11,7 +11,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
     <section id="welcome" className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max">
         {/* Top Header Tag */}
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        <div className="reveal-item" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
             <Users size={14} />
             <span>WE’RE PEOPLE JUST LIKE YOU</span>
@@ -40,7 +40,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           }}
         >
           {/* Left: Double-Bezel Nested Photo Frame with Rotating Circular Badge */}
-          <div style={{ position: 'relative' }}>
+          <div className="reveal-item reveal-stagger-1" style={{ position: 'relative' }}>
             <div className="double-bezel" style={{ background: '#FAF8F5' }}>
               <div
                 className="double-bezel-inner"
@@ -121,7 +121,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
 
           {/* Right: Authentic Narrative & Values */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="reveal-item reveal-stagger-2" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h3
               style={{
                 fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
@@ -174,7 +174,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           }}
         >
           {/* Pillar 1 */}
-          <div className="double-bezel">
+          <div className="double-bezel reveal-item reveal-stagger-1">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
@@ -202,7 +202,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
 
           {/* Pillar 2 */}
-          <div className="double-bezel">
+          <div className="double-bezel reveal-item reveal-stagger-2">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
@@ -230,7 +230,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
 
           {/* Pillar 3 */}
-          <div className="double-bezel">
+          <div className="double-bezel reveal-item reveal-stagger-3">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{

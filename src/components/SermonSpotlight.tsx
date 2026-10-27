@@ -21,7 +21,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
     <section id="sermons" className="section-padding" style={{ position: 'relative', background: '#F4EFEB' }}>
       <div className="container-max">
         {/* Section Header */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', marginBottom: '3rem' }}>
+        <div className="reveal-item" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', marginBottom: '3rem' }}>
           <div>
             <div className="eyebrow-pill" style={{ marginBottom: '0.85rem' }}>
               <BookOpen size={14} />
@@ -37,7 +37,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
         </div>
 
         {/* Featured Sermon 16:9 Hero Card (Light Theme Doppelrand) */}
-        <div className="double-bezel" style={{ marginBottom: '3rem', background: '#FFFFFF' }}>
+        <div className="double-bezel reveal-item reveal-stagger-1" style={{ marginBottom: '3rem', background: '#FFFFFF' }}>
           <div
             className="double-bezel-inner"
             style={{
@@ -185,7 +185,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
         </div>
 
         {/* Recent Message Series Switcher Grid */}
-        <div>
+        <div className="reveal-item reveal-stagger-2">
           <div style={{ fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
             Previous Messages in Archive
           </div>

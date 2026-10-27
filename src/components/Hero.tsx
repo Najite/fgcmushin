@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, ArrowUpRight, MapPin, Clock, Check, Copy } from 'lucide-react';
+import { Play, ArrowUpRight, MapPin, Clock, Check, Copy, ChevronDown } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface HeroProps {
@@ -21,11 +21,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
       id="top"
       style={{
         position: 'relative',
-        minHeight: '90vh',
+        minHeight: '92vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '6rem 1.5rem 5rem',
+        padding: '6.5rem 1.5rem 4rem',
         overflow: 'hidden'
       }}
     >
@@ -41,18 +41,19 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
         <img
           src="/images/hero-sunlit.jpg"
           alt="Haven Church sunlit morning sanctuary"
+          className="animate-hero-bg"
           style={{
             width: '100%',
             height: '100%',
             objectFit: 'cover',
             objectPosition: 'center 30%',
-            filter: 'brightness(1.02) contrast(1.02)',
-            transform: 'scale(1.02)'
+            filter: 'brightness(1.02) contrast(1.02)'
           }}
         />
 
-        {/* Luminous Light Atmospheric Gradient */}
+        {/* Luminous Light Atmospheric Gradient with gentle sunbeam pulse */}
         <div
+          className="animate-hero-sunbeam"
           style={{
             position: 'absolute',
             inset: 0,
@@ -80,17 +81,17 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           textAlign: 'center'
         }}
       >
-        {/* Eyebrow Badge (Brooklake Style Light Pill) */}
-        <div style={{ marginBottom: '1.75rem' }}>
-          <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 8px rgba(0, 118, 129, 0.1)' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-teal)', display: 'inline-block' }}></span>
+        {/* Eyebrow Badge (Brooklake Style Light Pill with Pulsing Beacon) */}
+        <div className="animate-hero-eyebrow" style={{ marginBottom: '1.75rem' }}>
+          <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 10px rgba(0, 118, 129, 0.12)' }}>
+            <span className="hero-beacon-dot"></span>
             <span>IN OUR CITY AS IT IS IN HEAVEN</span>
           </div>
         </div>
 
-        {/* Grand Headline with Editorial Contrast Typography */}
+        {/* Grand Headline with Editorial Contrast Typography & Gentle Shimmer */}
         <h1
-          className="heading-display"
+          className="heading-display animate-hero-title"
           style={{
             fontSize: 'clamp(2.6rem, 6.5vw, 5.4rem)',
             maxWidth: '1020px',
@@ -99,11 +100,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
             lineHeight: 1.08
           }}
         >
-          Making Jesus known to <span className="italic-serif">Everyone,</span> Everywhere.
+          Making Jesus known to <span className="italic-serif hero-shimmer-text">Everyone,</span> Everywhere.
         </h1>
 
         {/* Subtitle Inspired by Brooklake & Motivation */}
         <p
+          className="animate-hero-sub"
           style={{
             fontSize: 'clamp(1.1rem, 1.8vw, 1.35rem)',
             color: 'var(--text-secondary)',
@@ -118,6 +120,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
 
         {/* Dual Island Action Buttons */}
         <div
+          className="animate-hero-cta"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -152,7 +155,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
 
         {/* Double-Bezel Floating Gathering Times Bar in Light Theme */}
         <div
-          className="double-bezel"
+          className="double-bezel animate-hero-card"
           style={{
             maxWidth: '800px',
             width: '100%',
@@ -240,13 +243,41 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
               </div>
             </div>
 
-            {/* Quick Badge */}
+            {/* Quick Badge with live pulse */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="eyebrow-pill gold" style={{ fontSize: '0.725rem', padding: '0.35rem 0.85rem' }}>
+                <span className="hero-beacon-dot" style={{ background: '#B45309', width: '6px', height: '6px' }}></span>
                 <span>Haven Kids Open</span>
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Subtle Floating Scroll-Down Cue */}
+        <div className="animate-hero-scroll" style={{ marginTop: '2.5rem' }}>
+          <a
+            href="#welcome"
+            className="hero-scroll-float"
+            style={{
+              display: 'inline-flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.35rem',
+              color: 'var(--text-muted)',
+              fontSize: '0.725rem',
+              letterSpacing: '0.14em',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              transition: 'color 0.2s ease',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+          >
+            <span>Scroll to Explore</span>
+            <ChevronDown size={16} />
+          </a>
         </div>
       </div>
     </section>

@@ -377,6 +377,213 @@ img {
   background: rgba(0, 0, 0, 0.28);
 }
 
+/* ==========================================================================
+   Motion Choreography (GPU-Accelerated Composite-Only Animation System)
+   ========================================================================== */
+
+/* Hero Staged Entrance Keyframes */
+@keyframes heroFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes heroCardSpring {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes heroImageZoom {
+  0% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1.02);
+  }
+}
+
+@keyframes heroSunbeamPulse {
+  0%, 100% {
+    opacity: 0.65;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+@keyframes heroBeaconPulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 118, 129, 0.45);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(0, 118, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(0, 118, 129, 0);
+  }
+}
+
+@keyframes textShimmerWave {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes floatBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* Hero Staged Classes */
+.animate-hero-bg {
+  animation: heroImageZoom 2.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-hero-sunbeam {
+  animation: heroSunbeamPulse 6s ease-in-out infinite;
+}
+
+.hero-beacon-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-teal);
+  display: inline-block;
+  animation: heroBeaconPulse 2s infinite;
+}
+
+.hero-shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #007681 0%,
+    #007681 35%,
+    #B45309 50%,
+    #007681 65%,
+    #007681 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: textShimmerWave 6s ease-in-out infinite 1.2s;
+}
+
+.animate-hero-eyebrow {
+  animation: heroFadeIn 0.6s var(--ease-spring) 0.1s both;
+}
+
+.animate-hero-title {
+  animation: heroFadeUp 0.8s var(--ease-spring) 0.2s both;
+}
+
+.animate-hero-sub {
+  animation: heroFadeUp 0.75s var(--ease-spring) 0.35s both;
+}
+
+.animate-hero-cta {
+  animation: heroFadeUp 0.75s var(--ease-spring) 0.48s both;
+}
+
+.animate-hero-card {
+  animation: heroCardSpring 0.85s var(--ease-spring) 0.62s both;
+}
+
+.animate-hero-scroll {
+  animation: heroFadeIn 0.8s var(--ease-spring) 0.85s both;
+}
+
+.hero-scroll-float {
+  animation: floatBounce 2.4s ease-in-out infinite 1s;
+}
+
+/* Viewport Scroll Reveal Classes */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s var(--ease-spring), transform 0.75s var(--ease-spring);
+  will-change: opacity, transform;
+}
+
+.reveal-item.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-stagger-1 { transition-delay: 0.1s; }
+.reveal-stagger-2 { transition-delay: 0.2s; }
+.reveal-stagger-3 { transition-delay: 0.3s; }
+.reveal-stagger-4 { transition-delay: 0.4s; }
+
+/* Modal Entrance Spring Animation */
+@keyframes modalBackdropFade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes modalSpringIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-backdrop-animate {
+  animation: modalBackdropFade 0.25s ease-out both;
+}
+
+.modal-dialog-animate {
+  animation: modalSpringIn 0.35s var(--ease-spring) both;
+}
+
+/* Accordion Smooth Disclosure */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s var(--ease-spring);
+}
+
+.accordion-panel.is-open {
+  grid-template-rows: 1fr;
+}
+
+.accordion-panel-inner {
+  overflow: hidden;
+}
+
 /* Reduced Motion Respect */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -385,4 +592,10 @@ img {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
+

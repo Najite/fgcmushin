@@ -39,6 +39,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
 
   return (
     <div
+      className="modal-backdrop-animate"
       style={{
         position: 'fixed',
         inset: 0,
@@ -54,7 +55,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
       onClick={handleReset}
     >
       <div
-        className="double-bezel"
+        className="double-bezel modal-dialog-animate"
         style={{
           maxWidth: '620px',
           width: '100%',

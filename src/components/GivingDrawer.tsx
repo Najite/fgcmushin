@@ -35,6 +35,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
 
   return (
     <div
+      className="modal-backdrop-animate"
       style={{
         position: 'fixed',
         inset: 0,
@@ -49,7 +50,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
       onClick={handleReset}
     >
       <div
-        className="double-bezel"
+        className="double-bezel modal-dialog-animate"
         style={{
           maxWidth: '560px',
           width: '100%',

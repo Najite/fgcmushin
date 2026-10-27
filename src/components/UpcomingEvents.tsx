@@ -18,7 +18,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
     <section id="events" className="section-padding" style={{ position: 'relative', background: '#FAF8F5' }}>
       <div className="container-max">
         {/* Section Header */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', marginBottom: '3rem' }}>
+        <div className="reveal-item" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', marginBottom: '3rem' }}>
           <div>
             <div className="eyebrow-pill" style={{ marginBottom: '0.85rem' }}>
               <Calendar size={14} />
@@ -53,10 +53,10 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
 
         {/* Clean Row-based Event Stream in Light Theme */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          {filteredEvents.map((evt) => (
+          {filteredEvents.map((evt, idx) => (
             <div
               key={evt.id}
-              className="double-bezel"
+              className={`double-bezel reveal-item reveal-stagger-${(idx % 3) + 1}`}
               style={{
                 background: '#FFFFFF',
                 boxShadow: 'var(--shadow-card)'

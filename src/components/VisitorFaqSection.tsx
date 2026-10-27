@@ -16,7 +16,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
   return (
     <section className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max" style={{ maxWidth: '920px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        <div className="reveal-item" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
             <HelpCircle size={14} />
             <span>WHAT TO EXPECT</span>
@@ -33,11 +33,15 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
           {VISITOR_FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div key={index} className="double-bezel" style={{ background: '#FAF8F5' }}>
+              <div
+                key={index}
+                className={`double-bezel reveal-item reveal-stagger-${(index % 4) + 1}`}
+                style={{ background: '#FAF8F5' }}
+              >
                 <div
                   className="double-bezel-inner"
                   style={{
-                    background: isOpen ? '#FFFFFF' : '#FFFFFF',
+                    background: '#FFFFFF',
                     transition: 'all 0.3s ease'
                   }}
                 >
@@ -75,11 +79,13 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                     </div>
                   </button>
 
-                  {isOpen && (
-                    <div style={{ padding: '0 2rem 1.75rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
-                      {faq.a}
+                  <div className={`accordion-panel ${isOpen ? 'is-open' : ''}`}>
+                    <div className="accordion-panel-inner">
+                      <div style={{ padding: '0 2rem 1.75rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
+                        {faq.a}
+                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
             );
@@ -88,7 +94,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
 
         {/* Bottom invitation card */}
         <div
-          className="double-bezel"
+          className="double-bezel reveal-item reveal-stagger-2"
           style={{
             background: 'var(--accent-teal-subtle)',
             borderColor: 'rgba(0, 118, 129, 0.25)'

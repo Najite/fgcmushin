@@ -38,6 +38,7 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
 
   return (
     <div
+      className="modal-backdrop-animate"
       style={{
         position: 'fixed',
         inset: 0,
@@ -52,7 +53,7 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
       onClick={handleReset}
     >
       <div
-        className="double-bezel"
+        className="double-bezel modal-dialog-animate"
         style={{
           maxWidth: '560px',
           width: '100%',
