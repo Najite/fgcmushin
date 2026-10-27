@@ -37,7 +37,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
         </div>
 
         {/* Featured Sermon 16:9 Hero Card (Light Theme Doppelrand) */}
-        <div className="double-bezel reveal-item reveal-stagger-1" style={{ marginBottom: '3rem', background: '#FFFFFF' }}>
+        <div className="double-bezel reveal-scale-card reveal-stagger-1" style={{ marginBottom: '3rem', background: '#FFFFFF' }}>
           <div
             className="double-bezel-inner"
             style={{
@@ -47,8 +47,9 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
               background: '#FFFFFF'
             }}
           >
-            {/* 16:9 Thumbnail with Rotating "WATCH SERMON" Play Overlay */}
+            {/* 16:9 Thumbnail with Rotating "WATCH SERMON" Play Overlay & Curtain Unveil */}
             <div
+              className="reveal-curtain-photo"
               style={{
                 position: 'relative',
                 minHeight: '340px',

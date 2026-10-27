@@ -39,8 +39,8 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
             marginBottom: '4.5rem'
           }}
         >
-          {/* Left: Double-Bezel Nested Photo Frame with Rotating Circular Badge */}
-          <div className="reveal-item reveal-stagger-1" style={{ position: 'relative' }}>
+          {/* Left: Double-Bezel Nested Photo Frame with Rotating Circular Badge & Curtain Unveil */}
+          <div className="reveal-curtain-photo reveal-stagger-1" style={{ position: 'relative' }}>
             <div className="double-bezel" style={{ background: '#FAF8F5' }}>
               <div
                 className="double-bezel-inner"
@@ -174,7 +174,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           }}
         >
           {/* Pillar 1 */}
-          <div className="double-bezel reveal-item reveal-stagger-1">
+          <div className="double-bezel reveal-scale-card reveal-stagger-1">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
@@ -202,7 +202,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
 
           {/* Pillar 2 */}
-          <div className="double-bezel reveal-item reveal-stagger-2">
+          <div className="double-bezel reveal-scale-card reveal-stagger-2">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
@@ -230,7 +230,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
 
           {/* Pillar 3 */}
-          <div className="double-bezel reveal-item reveal-stagger-3">
+          <div className="double-bezel reveal-scale-card reveal-stagger-3">
             <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{

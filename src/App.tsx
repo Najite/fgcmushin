@@ -24,8 +24,10 @@ export const App: React.FC = () => {
   const [activeVideoSermon, setActiveVideoSermon] = useState<Sermon | null>(null);
 
   useEffect(() => {
+    const REVEAL_SELECTOR = '.reveal-item:not(.is-revealed), .reveal-curtain-photo:not(.is-revealed), .reveal-drift-left:not(.is-revealed), .reveal-scale-card:not(.is-revealed), .reveal-fade-up:not(.is-revealed)';
+
     const revealVisibleElements = () => {
-      const items = document.querySelectorAll('.reveal-item:not(.is-revealed)');
+      const items = document.querySelectorAll(REVEAL_SELECTOR);
       const windowHeight = window.innerHeight;
       const triggerThreshold = windowHeight * 0.90;
       items.forEach((item) => {
@@ -60,7 +62,7 @@ export const App: React.FC = () => {
         }
       );
 
-      document.querySelectorAll('.reveal-item:not(.is-revealed)').forEach((el) => {
+      document.querySelectorAll(REVEAL_SELECTOR).forEach((el) => {
         observer?.observe(el);
       });
     }

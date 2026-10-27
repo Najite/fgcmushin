@@ -51,12 +51,12 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
           </div>
         </div>
 
-        {/* Clean Row-based Event Stream in Light Theme */}
+        {/* Clean Row-based Event Stream in Light Theme with Horizontal Timeline Drift */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {filteredEvents.map((evt, idx) => (
             <div
               key={evt.id}
-              className={`double-bezel reveal-item reveal-stagger-${(idx % 3) + 1}`}
+              className={`double-bezel reveal-drift-left reveal-stagger-${(idx % 3) + 1}`}
               style={{
                 background: '#FFFFFF',
                 boxShadow: 'var(--shadow-card)'

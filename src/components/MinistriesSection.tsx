@@ -38,7 +38,7 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
           {MINISTRIES.map((ministry, idx) => (
             <div
               key={ministry.id}
-              className={`double-bezel reveal-item reveal-stagger-${(idx % 4) + 1}`}
+              className={`double-bezel reveal-scale-card reveal-stagger-${(idx % 4) + 1}`}
               style={{ cursor: 'pointer', background: '#FAF8F5' }}
               onClick={() => setSelectedMinistry(ministry)}
             >

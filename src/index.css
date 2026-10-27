@@ -514,19 +514,35 @@ img {
   animation: heroFadeDown 420ms cubic-bezier(0.23, 1, 0.32, 1) 0.15s both;
 }
 
-/* Beat 2: Heading line 1 rises */
-.hero-headline-line-1 {
+/* Beat 2 & 3: Editorial Masked Typography (Words rise out of invisible horizon) */
+.hero-mask-wrap {
   display: block;
-  animation: heroFadeUp 480ms cubic-bezier(0.16, 1, 0.3, 1) 0.38s both;
+  overflow: hidden;
+  padding-bottom: 4px;
 }
 
-/* Beat 3: Heading line 2 lands with italic accent */
-.hero-headline-line-2 {
-  display: block;
-  animation: heroFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 0.60s both;
+@keyframes heroMaskedUp {
+  0% {
+    opacity: 0;
+    transform: translateY(115%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Beat 4: Subtitle narrative arrives */
+.hero-masked-text-1 {
+  display: block;
+  animation: heroMaskedUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.hero-masked-text-2 {
+  display: block;
+  animation: heroMaskedUp 0.70s cubic-bezier(0.16, 1, 0.3, 1) 0.58s both;
+}
+
+/* Beat 4: Subtitle narrative arrives with subtle letter tracking */
 .animate-hero-sub {
   animation: heroFadeUp 440ms cubic-bezier(0.23, 1, 0.32, 1) 0.88s both;
 }
@@ -550,8 +566,13 @@ img {
   animation: floatBounce 2.4s ease-in-out infinite 1.8s;
 }
 
-/* Viewport Scroll Reveal Classes - Snappy with 140ms Rhythm */
-.reveal-item {
+/* ==========================================================================
+   Diverse Viewport Animation Archetypes (Rich, Varied Approaches)
+   ========================================================================== */
+
+/* Archetype A: Classic Vertical Float (Headers, Text Blocks) */
+.reveal-item,
+.reveal-fade-up {
   opacity: 0;
   transform: translateY(22px);
   transition:
@@ -560,9 +581,75 @@ img {
   will-change: opacity, transform;
 }
 
-.reveal-item.is-revealed {
+.reveal-item.is-revealed,
+.reveal-fade-up.is-revealed {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Archetype B: Cinematic Curtain Image Unveil (Photography & Sermon Media) */
+.reveal-curtain-photo {
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: clip-path;
+}
+
+.reveal-curtain-photo.is-revealed {
+  clip-path: inset(0 0 0 0);
+}
+
+.reveal-curtain-photo img {
+  transform: scale(1.08);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-curtain-photo.is-revealed img {
+  transform: scale(1);
+}
+
+/* Archetype C: Horizontal Timeline Drift (Upcoming Events & Calendar Streams) */
+.reveal-drift-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition:
+    opacity 0.52s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.52s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-drift-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Archetype D: Depth Scale & Focus Settle (Pillars & Ministry Bento Cards) */
+.reveal-scale-card {
+  opacity: 0;
+  transform: scale(0.93) translateY(16px);
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s ease;
+  will-change: opacity, transform;
+}
+
+.reveal-scale-card.is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Micro-interaction physics */
+.double-bezel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(21, 26, 33, 0.08);
+}
+
+.btn-island:hover .btn-icon-bubble {
+  transform: translate(2px, -2px) scale(1.08);
+}
+
+.rotating-badge-container:hover .rotating-text-svg {
+  animation-duration: 8s;
 }
 
 .reveal-stagger-1 { transition-delay: 0.04s; }

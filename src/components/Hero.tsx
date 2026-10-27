@@ -89,7 +89,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           </div>
         </div>
 
-        {/* Grand Headline with Orchestrated Lyrical Stagger & Shimmer */}
+        {/* Grand Headline with Editorial Horizon Mask Reveal & Shimmer */}
         <h1
           className="heading-display"
           style={{
@@ -100,11 +100,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
             lineHeight: 1.1
           }}
         >
-          <span className="hero-headline-line-1">
-            Making Jesus known to
+          <span className="hero-mask-wrap">
+            <span className="hero-masked-text-1">
+              Making Jesus known to
+            </span>
           </span>
-          <span className="hero-headline-line-2">
-            <span className="italic-serif hero-shimmer-text">Everyone,</span> Everywhere.
+          <span className="hero-mask-wrap">
+            <span className="hero-masked-text-2">
+              <span className="italic-serif hero-shimmer-text">Everyone,</span> Everywhere.
+            </span>
           </span>
         </h1>
 
