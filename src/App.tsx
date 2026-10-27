@@ -26,30 +26,23 @@ export const App: React.FC = () => {
   useEffect(() => {
     const revealVisibleElements = () => {
       const items = document.querySelectorAll('.reveal-item:not(.is-revealed)');
-      const triggerBottom = window.innerHeight * 0.95;
+      const windowHeight = window.innerHeight;
+      const triggerThreshold = windowHeight * 0.90;
       items.forEach((item) => {
         const rect = item.getBoundingClientRect();
-        if (rect.top <= triggerBottom) {
+        if (rect.top <= triggerThreshold && rect.bottom >= 0) {
           item.classList.add('is-revealed');
         }
       });
     };
 
-    // Run immediately on mount
+    // Run on mount for any items in initial view
     revealVisibleElements();
 
-    // Check again after layout settle
-    const timer1 = setTimeout(revealVisibleElements, 250);
-    const timer2 = setTimeout(revealVisibleElements, 600);
+    // Re-check once layout stabilizes
+    const timer1 = setTimeout(revealVisibleElements, 200);
 
-    // Fallback safety: ensure all items reveal after 2s so content is never stuck hidden
-    const safetyTimer = setTimeout(() => {
-      document.querySelectorAll('.reveal-item:not(.is-revealed)').forEach((el) => {
-        el.classList.add('is-revealed');
-      });
-    }, 2000);
-
-    // IntersectionObserver for native smooth triggers
+    // IntersectionObserver for native composite triggers
     let observer: IntersectionObserver | null = null;
     if (typeof IntersectionObserver !== 'undefined') {
       observer = new IntersectionObserver(
@@ -62,8 +55,8 @@ export const App: React.FC = () => {
           });
         },
         {
-          rootMargin: '80px 0px 80px 0px',
-          threshold: 0
+          rootMargin: '0px 0px -50px 0px',
+          threshold: 0.08
         }
       );
 
@@ -77,8 +70,6 @@ export const App: React.FC = () => {
 
     return () => {
       clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(safetyTimer);
       if (observer) observer.disconnect();
       window.removeEventListener('scroll', revealVisibleElements);
       window.removeEventListener('resize', revealVisibleElements);

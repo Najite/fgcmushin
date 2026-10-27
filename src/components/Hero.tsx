@@ -89,18 +89,23 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           </div>
         </div>
 
-        {/* Grand Headline with Editorial Contrast Typography & Gentle Shimmer */}
+        {/* Grand Headline with Orchestrated Lyrical Stagger & Shimmer */}
         <h1
-          className="heading-display animate-hero-title"
+          className="heading-display"
           style={{
             fontSize: 'clamp(2.6rem, 6.5vw, 5.4rem)',
             maxWidth: '1020px',
             color: 'var(--text-primary)',
             marginBottom: '1.5rem',
-            lineHeight: 1.08
+            lineHeight: 1.1
           }}
         >
-          Making Jesus known to <span className="italic-serif hero-shimmer-text">Everyone,</span> Everywhere.
+          <span className="hero-headline-line-1">
+            Making Jesus known to
+          </span>
+          <span className="hero-headline-line-2">
+            <span className="italic-serif hero-shimmer-text">Everyone,</span> Everywhere.
+          </span>
         </h1>
 
         {/* Subtitle Inspired by Brooklake & Motivation */}
