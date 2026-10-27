@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Heart, Send, Shield } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import { submitPrayerRequest } from '../lib/supabase';
+
 interface PrayerRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,12 +15,28 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
   const [request, setRequest] = useState('');
   const [isConfidential, setIsConfidential] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!request) return;
+
+    setIsSubmitting(true);
+    try {
+      await submitPrayerRequest({
+        fullName: name.trim() || 'Anonymous',
+        email: email.trim() || undefined,
+        category: 'General Intercession',
+        request: request.trim(),
+        isConfidential
+      });
+    } catch (err) {
+      console.warn('Prayer request submission note:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     confetti({
       particleCount: 50,
@@ -191,10 +209,11 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="btn-island btn-teal"
-                style={{ width: '100%', justifyContent: 'center', padding: '0.9rem', fontSize: '1rem', marginTop: '0.5rem' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '0.9rem', fontSize: '1rem', marginTop: '0.5rem', opacity: isSubmitting ? 0.75 : 1 }}
               >
-                <span>Submit Prayer Request</span>
+                <span>{isSubmitting ? 'Sending to Pastoral Team...' : 'Submit Prayer Request'}</span>
                 <Send size={16} />
               </button>
             </form>

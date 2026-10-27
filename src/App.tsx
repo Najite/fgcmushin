@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -14,14 +14,42 @@ import { PlanVisitModal } from './components/PlanVisitModal';
 import { SermonVideoModal } from './components/SermonVideoModal';
 import { PrayerRequestModal } from './components/PrayerRequestModal';
 import { GivingDrawer } from './components/GivingDrawer';
+import { AdminPortal } from './components/AdminPortal';
 import type { Sermon, ChurchEvent } from './types';
-import { FEATURED_SERMON } from './data/churchData';
+import type { ChurchSettingsRow } from './types/database';
+import { FEATURED_SERMON, RECENT_SERMONS, UPCOMING_EVENTS } from './data/churchData';
+import { getChurchSettings, getSermons, getEvents } from './lib/supabase';
 
 export const App: React.FC = () => {
   const [isPlanVisitOpen, setIsPlanVisitOpen] = useState(false);
   const [isGivingOpen, setIsGivingOpen] = useState(false);
   const [isPrayerOpen, setIsPrayerOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [activeVideoSermon, setActiveVideoSermon] = useState<Sermon | null>(null);
+
+  // Live Supabase dynamic data with bundled defaults fallback
+  const [sermons, setSermons] = useState<Sermon[]>(RECENT_SERMONS);
+  const [events, setEvents] = useState<ChurchEvent[]>(UPCOMING_EVENTS);
+  const [churchSettings, setChurchSettings] = useState<ChurchSettingsRow | null>(null);
+
+  const loadSupabaseData = useCallback(async () => {
+    try {
+      const [settings, fetchedSermons, fetchedEvents] = await Promise.all([
+        getChurchSettings(),
+        getSermons(),
+        getEvents()
+      ]);
+      if (settings) setChurchSettings(settings);
+      if (fetchedSermons && fetchedSermons.length > 0) setSermons(fetchedSermons);
+      if (fetchedEvents && fetchedEvents.length > 0) setEvents(fetchedEvents);
+    } catch (err) {
+      console.warn('Supabase data load note:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSupabaseData();
+  }, [loadSupabaseData]);
 
   useEffect(() => {
     const REVEAL_SELECTOR = '.reveal-item:not(.is-revealed), .reveal-curtain-photo:not(.is-revealed), .reveal-drift-left:not(.is-revealed), .reveal-scale-card:not(.is-revealed), .reveal-fade-up:not(.is-revealed)';
@@ -38,13 +66,9 @@ export const App: React.FC = () => {
       });
     };
 
-    // Run on mount for any items in initial view
     revealVisibleElements();
-
-    // Re-check once layout stabilizes
     const timer1 = setTimeout(revealVisibleElements, 200);
 
-    // IntersectionObserver for native composite triggers
     let observer: IntersectionObserver | null = null;
     if (typeof IntersectionObserver !== 'undefined') {
       observer = new IntersectionObserver(
@@ -89,6 +113,8 @@ export const App: React.FC = () => {
     setIsPlanVisitOpen(true);
   };
 
+  const featuredSermon = sermons.length > 0 ? sermons[0] : FEATURED_SERMON;
+
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: 'var(--bg-deep)' }}>
       {/* Subtle Analog Texture Filter Overlay */}
@@ -97,14 +123,19 @@ export const App: React.FC = () => {
       {/* Top 4-Color Church Emblem Gradient Ribbon */}
       <div className="top-color-ribbon" aria-hidden="true" />
 
-      {/* Top Banner Notice */}
-      <AnnouncementBar onOpenPlanVisit={() => setIsPlanVisitOpen(true)} />
+      {/* Top Banner Notice with Supabase Live Sync */}
+      <AnnouncementBar
+        onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
+        announcementText={churchSettings?.announcement_text || undefined}
+        isActive={churchSettings?.announcement_active ?? true}
+      />
 
       {/* Island Floating Navbar */}
       <Navbar
         onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
         onOpenGiving={() => setIsGivingOpen(true)}
         onOpenPrayer={() => setIsPrayerOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
         onSelectSection={handleSelectSection}
       />
 
@@ -112,7 +143,7 @@ export const App: React.FC = () => {
         {/* Cinematic Sanctuary Hero Section */}
         <Hero
           onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
-          onOpenVideoModal={() => setActiveVideoSermon(FEATURED_SERMON)}
+          onOpenVideoModal={() => setActiveVideoSermon(featuredSermon)}
         />
 
         {/* Continuous Typographic Ticker Marquee */}
@@ -126,6 +157,7 @@ export const App: React.FC = () => {
 
         {/* Featured Message & Archive */}
         <SermonSpotlight
+          sermons={sermons}
           onPlaySermon={(sermon) => setActiveVideoSermon(sermon)}
         />
 
@@ -136,6 +168,7 @@ export const App: React.FC = () => {
 
         {/* Upcoming Events Calendar Stream */}
         <UpcomingEvents
+          events={events}
           onRSVP={handleRSVPEvent}
         />
 
@@ -145,11 +178,12 @@ export const App: React.FC = () => {
         />
       </main>
 
-      {/* Multi-column Sanctuary Footer */}
+      {/* Multi-column Sanctuary Footer with Staff CMS entry */}
       <Footer
         onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
         onOpenGiving={() => setIsGivingOpen(true)}
         onOpenPrayer={() => setIsPrayerOpen(true)}
+        onOpenAdmin={() => setIsAdminOpen(true)}
         onSelectSection={handleSelectSection}
       />
 
@@ -181,6 +215,16 @@ export const App: React.FC = () => {
       <GivingDrawer
         isOpen={isGivingOpen}
         onClose={() => setIsGivingOpen(false)}
+      />
+
+      {/* Staff & Pastoral Content Management Portal (CMS) */}
+      <AdminPortal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        sermons={sermons}
+        events={events}
+        churchSettings={churchSettings}
+        onDataRefresh={loadSupabaseData}
       />
     </div>
   );

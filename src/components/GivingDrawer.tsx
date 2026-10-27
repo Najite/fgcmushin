@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, ShieldCheck, Check, ArrowUpRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import { submitGivingRecord } from '../lib/supabase';
+
 interface GivingDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -12,13 +14,27 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
   const [frequency, setFrequency] = useState<'One-Time' | 'Recurring'>('One-Time');
   const [fund, setFund] = useState('Tithes & Offerings');
   const [completed, setCompleted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
   const presets = [25, 50, 100, 250, 500];
 
-  const handleGive = (e: React.FormEvent) => {
+  const handleGive = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await submitGivingRecord({
+        amount: Number(amount) || 0,
+        fund,
+        frequency
+      });
+    } catch (err) {
+      console.warn('Giving record submission note:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+
     confetti({
       particleCount: 70,
       spread: 75,
@@ -201,10 +217,11 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="btn-island btn-teal"
-                style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.05rem', marginTop: '0.5rem' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.05rem', marginTop: '0.5rem', opacity: isSubmitting ? 0.75 : 1 }}
               >
-                <span>Give ${amount} {frequency === 'Recurring' ? '/ Month' : 'Now'}</span>
+                <span>{isSubmitting ? 'Recording Donation...' : `Give $${amount} ${frequency === 'Recurring' ? '/ Month' : 'Now'}`}</span>
                 <ArrowUpRight size={17} />
               </button>
 

@@ -5,11 +5,25 @@ import type { Sermon } from '../types';
 
 interface SermonSpotlightProps {
   onPlaySermon: (sermon: Sermon) => void;
+  sermons?: Sermon[];
 }
 
-export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }) => {
-  const [activeSermon, setActiveSermon] = useState<Sermon>(FEATURED_SERMON);
+export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, sermons }) => {
+  const sermonList = sermons && sermons.length > 0 ? sermons : RECENT_SERMONS;
+  const initialSermon = sermons && sermons.length > 0 ? sermons[0] : FEATURED_SERMON;
+
+  const [activeSermon, setActiveSermon] = useState<Sermon>(initialSermon);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  React.useEffect(() => {
+    if (sermons && sermons.length > 0) {
+      // Keep current active if still in list, otherwise select first
+      const exists = sermons.find(s => s.id === activeSermon.id);
+      if (!exists) {
+        setActiveSermon(sermons[0]);
+      }
+    }
+  }, [sermons]);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -197,7 +211,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon }
               gap: '1.5rem'
             }}
           >
-            {RECENT_SERMONS.map((sermon) => {
+            {sermonList.map((sermon) => {
               const isCurrent = activeSermon.id === sermon.id;
               return (
                 <div

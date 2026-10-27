@@ -5,14 +5,17 @@ import type { ChurchEvent } from '../types';
 
 interface UpcomingEventsProps {
   onRSVP: (event: ChurchEvent) => void;
+  events?: ChurchEvent[];
 }
 
-export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
+export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }) => {
   const [filter, setFilter] = useState<'All' | 'Worship' | 'Community' | 'Outreach'>('All');
 
+  const eventList = events && events.length > 0 ? events : UPCOMING_EVENTS;
+
   const filteredEvents = filter === 'All'
-    ? UPCOMING_EVENTS
-    : UPCOMING_EVENTS.filter((e) => e.category === filter);
+    ? eventList
+    : eventList.filter((e) => e.category === filter);
 
   const getCategoryClass = (category: string) => {
     switch (category.toLowerCase()) {

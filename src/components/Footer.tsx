@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Clock, ArrowUpRight } from 'lucide-react';
+import { MapPin, Clock, ArrowUpRight, Lock } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface FooterProps {
@@ -7,13 +7,15 @@ interface FooterProps {
   onOpenGiving: () => void;
   onOpenPrayer: () => void;
   onSelectSection: (sectionId: string) => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   onOpenPlanVisit,
   onOpenGiving,
   onOpenPrayer,
-  onSelectSection
+  onSelectSection,
+  onOpenAdmin
 }) => {
   return (
     <footer style={{ background: '#F3EFEA', borderTop: '1px solid var(--border-subtle)', position: 'relative' }}>
@@ -216,6 +218,23 @@ export const Footer: React.FC<FooterProps> = ({
                   Submit Prayer Request
                 </button>
               </li>
+              {onOpenAdmin && (
+                <li style={{ paddingTop: '0.4rem', borderTop: '1px dashed var(--border-subtle)' }}>
+                  <button
+                    onClick={onOpenAdmin}
+                    style={{
+                      color: 'var(--fgc-blue)',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <Lock size={13} />
+                    <span>Staff CMS Portal</span>
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -265,10 +284,31 @@ export const Footer: React.FC<FooterProps> = ({
           <div>
             &copy; {new Date().getFullYear()} Foursquare Gospel Church Mushin District Headquarters. All rights reserved.
           </div>
-          <div style={{ display: 'flex', gap: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
             <span>Privacy Policy</span>
             <span>Terms of Worship</span>
             <span>Child Protection Policy</span>
+            {onOpenAdmin && (
+              <button
+                onClick={onOpenAdmin}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  font: 'inherit',
+                  color: 'var(--fgc-blue)',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  textDecoration: 'underline'
+                }}
+              >
+                <Lock size={12} />
+                <span>Staff CMS Portal</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

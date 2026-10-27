@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Check, Clock, Coffee, Car, ShieldCheck, Plus, Minus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+import { submitGuestVisit } from '../lib/supabase';
+
 interface PlanVisitModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,12 +17,29 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
   const [adults, setAdults] = useState(1);
   const [kids, setKids] = useState(0);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName || !email) return;
+
+    setIsSubmitting(true);
+    try {
+      await submitGuestVisit({
+        fullName,
+        email,
+        phone,
+        serviceTime,
+        adultsCount: adults,
+        kidsCount: kids
+      });
+    } catch (err) {
+      console.warn('Guest RSVP Supabase submission note:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
 
     confetti({
       particleCount: 90,
@@ -270,10 +289,11 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
               {/* Submit CTA */}
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="btn-island btn-teal"
-                style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.05rem', marginTop: '0.5rem' }}
+                style={{ width: '100%', justifyContent: 'center', padding: '1rem', fontSize: '1.05rem', marginTop: '0.5rem', opacity: isSubmitting ? 0.75 : 1 }}
               >
-                <span>Reserve My VIP Welcome Experience</span>
+                <span>{isSubmitting ? 'Confirming Reservation...' : 'Reserve My VIP Welcome Experience'}</span>
                 <Check size={18} />
               </button>
             </form>

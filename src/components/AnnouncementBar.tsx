@@ -3,9 +3,18 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface AnnouncementBarProps {
   onOpenPlanVisit: () => void;
+  announcementText?: string;
+  isActive?: boolean;
 }
 
-export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenPlanVisit }) => {
+export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
+  onOpenPlanVisit,
+  announcementText,
+  isActive = true
+}) => {
+  if (!isActive) return null;
+
+  const text = announcementText || 'Welcome to FGC Mushin DHQ • Sunday Celebration Services at 7:30 AM & 9:30 AM';
   return (
     <div style={{
       background: 'linear-gradient(90deg, #1E4E85 0%, #2866AD 50%, #A32371 100%)',
@@ -23,7 +32,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenPlanVisi
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
         <Sparkles size={14} style={{ color: '#F3A645' }} />
-        <span>Welcome to FGC Mushin DHQ • Sunday Celebration Services at 7:30 AM & 9:30 AM</span>
+        <span>{text}</span>
       </div>
       <button 
         onClick={onOpenPlanVisit}

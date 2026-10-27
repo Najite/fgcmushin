@@ -7,13 +7,15 @@ interface NavbarProps {
   onOpenGiving: () => void;
   onOpenPrayer: () => void;
   onSelectSection: (sectionId: string) => void;
+  onOpenAdmin?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenPlanVisit,
   onOpenGiving,
   onOpenPrayer,
-  onSelectSection
+  onSelectSection,
+  onOpenAdmin
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -316,7 +318,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </h4>
               <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Clock size={16} color="var(--accent-teal)" />
-                <span>Sundays at 9:00 AM & 11:15 AM</span>
+                <span>Sundays at 7:30 AM & 9:30 AM</span>
               </p>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
                 <MapPin size={16} color="var(--accent-teal)" />
@@ -335,6 +337,29 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <ArrowUpRight size={15} />
                 </div>
               </button>
+
+              {onOpenAdmin && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAdmin();
+                  }}
+                  style={{
+                    width: '100%',
+                    marginTop: '0.75rem',
+                    padding: '0.5rem',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  Staff CMS Portal
+                </button>
+              )}
             </div>
           </div>
         </div>
