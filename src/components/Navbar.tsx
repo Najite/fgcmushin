@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Heart, Sparkles, MapPin, Clock } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Heart, MapPin, Clock } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface NavbarProps {
@@ -244,7 +244,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div style={{ maxWidth: '640px', margin: '0 auto', width: '100%' }}>
             <div style={{ marginBottom: '2.5rem' }}>
               <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
-                <Sparkles size={13} />
+                <span className="quad-beacon" aria-hidden="true">
+                  <span className="quad-dot red"></span>
+                  <span className="quad-dot blue"></span>
+                  <span className="quad-dot gold"></span>
+                  <span className="quad-dot purple"></span>
+                </span>
                 <span>Welcome to FGC Mushin DHQ</span>
               </div>
               <h2 className="heading-h2 font-serif" style={{ fontSize: '2.4rem', lineHeight: 1.15, color: 'var(--text-primary)' }}>

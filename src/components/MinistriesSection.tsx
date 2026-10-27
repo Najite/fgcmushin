@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowUpRight, Clock, X, Check } from 'lucide-react';
+import { ArrowUpRight, Clock, X, Check } from 'lucide-react';
 import { MINISTRIES } from '../data/churchData';
 import type { Ministry } from '../types';
 
 interface MinistriesSectionProps {
   onOpenPlanVisit: () => void;
 }
+
+const MINISTRY_COLORS = [
+  { primary: 'var(--fgc-red)', subtle: 'var(--fgc-red-subtle)', border: 'var(--fgc-red-border)', dark: 'var(--fgc-red-dark)', pill: 'red' },
+  { primary: 'var(--fgc-blue)', subtle: 'var(--fgc-blue-subtle)', border: 'var(--fgc-blue-border)', dark: 'var(--fgc-blue-dark)', pill: 'blue' },
+  { primary: 'var(--fgc-gold-dark)', subtle: 'var(--fgc-gold-subtle)', border: 'var(--fgc-gold-border)', dark: 'var(--fgc-gold-dark)', pill: 'gold' },
+  { primary: 'var(--fgc-purple)', subtle: 'var(--fgc-purple-subtle)', border: 'var(--fgc-purple-border)', dark: 'var(--fgc-purple-dark)', pill: 'purple' }
+];
 
 export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlanVisit }) => {
   const [selectedMinistry, setSelectedMinistry] = useState<Ministry | null>(null);
@@ -16,14 +23,19 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
         {/* Header Tagline & Title */}
         <div className="reveal-item" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
-            <Sparkles size={14} />
+            <span className="quad-beacon" aria-hidden="true">
+              <span className="quad-dot red"></span>
+              <span className="quad-dot blue"></span>
+              <span className="quad-dot gold"></span>
+              <span className="quad-dot purple"></span>
+            </span>
             <span>COMMUNITY FOR ALL GENERATIONS</span>
           </div>
           <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.8rem)', color: 'var(--text-primary)', marginBottom: '1rem' }}>
             There is a place here for <span className="italic-serif">Everybody.</span>
           </h2>
           <p style={{ maxWidth: '640px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
-            From your little ones to teenagers, college students, and seasoned adults, discover life-giving groups where you can truly belong.
+            From your little ones to teenagers, young professionals, and outreach leaders, discover life-giving groups where you can truly belong.
           </p>
         </div>
 
@@ -35,91 +47,96 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
             gap: '1.75rem'
           }}
         >
-          {MINISTRIES.map((ministry, idx) => (
-            <div
-              key={ministry.id}
-              className={`double-bezel reveal-scale-card reveal-stagger-${(idx % 4) + 1}`}
-              style={{ cursor: 'pointer', background: '#FAF8F5' }}
-              onClick={() => setSelectedMinistry(ministry)}
-            >
+          {MINISTRIES.map((ministry, idx) => {
+            const colorTheme = MINISTRY_COLORS[idx % MINISTRY_COLORS.length];
+            return (
               <div
-                className="double-bezel-inner"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  background: '#FFFFFF',
-                  overflow: 'hidden'
-                }}
+                key={ministry.id}
+                className={`double-bezel reveal-scale-card reveal-stagger-${(idx % 4) + 1}`}
+                style={{ cursor: 'pointer', background: '#FAF8F5', position: 'relative' }}
+                onClick={() => setSelectedMinistry(ministry)}
               >
-                {/* Image Container with Age Badge */}
-                <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
-                  <img
-                    src={ministry.image}
-                    alt={ministry.title}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      transition: 'transform 0.6s var(--ease-spring)'
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                  />
-                  <div style={{ position: 'absolute', top: '1rem', left: '1rem' }}>
-                    <span
-                      className="eyebrow-pill"
+                <div
+                  className="double-bezel-inner"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    background: '#FFFFFF',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}
+                >
+                  {/* Top Color Accent Bar */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: colorTheme.primary, zIndex: 10 }} />
+
+                  {/* Image Container with Age Badge */}
+                  <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
+                    <img
+                      src={ministry.image}
+                      alt={ministry.title}
                       style={{
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        backdropFilter: 'blur(8px)',
-                        color: 'var(--accent-teal-dark)',
-                        borderColor: 'rgba(0, 118, 129, 0.25)',
-                        fontSize: '0.725rem'
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.6s var(--ease-spring)'
                       }}
-                    >
-                      {ministry.ageGroup}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content Info */}
-                <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-                  <div>
-                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem', lineHeight: 1.25 }}>
-                      {ministry.title}
-                    </h3>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--accent-teal)', fontWeight: 600, marginBottom: '0.65rem' }}>
-                      {ministry.tagline}
-                    </p>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.25rem' }}>
-                      {ministry.description}
-                    </p>
+                      onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.06)')}
+                      onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                    />
+                    <div style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 5 }}>
+                      <span
+                        className={`eyebrow-pill ${colorTheme.pill}`}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.95)',
+                          backdropFilter: 'blur(8px)',
+                          fontSize: '0.725rem'
+                        }}
+                      >
+                        {ministry.ageGroup}
+                      </span>
+                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <Clock size={13} color="var(--accent-teal)" />
-                      <span>{ministry.schedule}</span>
+                  {/* Content Info */}
+                  <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem', lineHeight: 1.25 }}>
+                        {ministry.title}
+                      </h3>
+                      <p style={{ fontSize: '0.9rem', color: colorTheme.dark, fontWeight: 700, marginBottom: '0.65rem' }}>
+                        {ministry.tagline}
+                      </p>
+                      <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                        {ministry.description}
+                      </p>
                     </div>
 
-                    <div
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '50%',
-                        background: 'var(--accent-teal-subtle)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'var(--accent-teal)'
-                      }}
-                    >
-                      <ArrowUpRight size={15} />
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <Clock size={13} color={colorTheme.primary} />
+                        <span>{ministry.schedule}</span>
+                      </div>
+
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: colorTheme.subtle,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: colorTheme.primary
+                        }}
+                      >
+                        <ArrowUpRight size={15} />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

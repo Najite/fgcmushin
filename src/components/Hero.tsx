@@ -81,10 +81,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           textAlign: 'center'
         }}
       >
-        {/* Eyebrow Badge (Foursquare Style Light Pill with Pulsing Beacon) */}
+        {/* Eyebrow Badge (Foursquare Style Light Pill with 4-Color Quad Beacon) */}
         <div className="animate-hero-eyebrow" style={{ marginBottom: '1.75rem' }}>
-          <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 10px rgba(0, 118, 129, 0.12)' }}>
-            <span className="hero-beacon-dot"></span>
+          <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.94)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 14px rgba(40, 102, 173, 0.12)' }}>
+            <span className="quad-beacon" aria-hidden="true">
+              <span className="quad-dot red"></span>
+              <span className="quad-dot blue"></span>
+              <span className="quad-dot gold"></span>
+              <span className="quad-dot purple"></span>
+            </span>
             <span>FOURSQUARE GOSPEL CHURCH • MUSHIN DISTRICT HEADQUARTERS</span>
           </div>
         </div>
@@ -192,12 +197,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'var(--accent-teal-subtle)',
-                  border: '1px solid rgba(0, 118, 129, 0.2)',
+                  background: 'var(--fgc-blue-subtle)',
+                  border: '1px solid var(--fgc-blue-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--accent-teal)'
+                  color: 'var(--fgc-blue)'
                 }}
               >
                 <Clock size={20} />
@@ -207,7 +212,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
                   This Sunday Celebration
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  7:30 AM <span style={{ color: 'var(--accent-teal)' }}>&</span> 9:30 AM
+                  7:30 AM <span style={{ color: 'var(--fgc-blue)' }}>&</span> 9:30 AM
                 </div>
               </div>
             </div>
@@ -219,12 +224,12 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'rgba(0, 0, 0, 0.04)',
-                  border: '1px solid var(--border-subtle)',
+                  background: 'var(--fgc-red-subtle)',
+                  border: '1px solid var(--fgc-red-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--text-secondary)'
+                  color: 'var(--fgc-red)'
                 }}
               >
                 <MapPin size={20} />
@@ -256,10 +261,25 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
             {/* Quick Badge with live pulse */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="eyebrow-pill gold" style={{ fontSize: '0.725rem', padding: '0.35rem 0.85rem' }}>
-                <span className="hero-beacon-dot" style={{ background: '#B45309', width: '6px', height: '6px' }}></span>
+                <span className="hero-beacon-dot" style={{ background: 'var(--fgc-gold)', width: '6px', height: '6px' }}></span>
                 <span>Foursquare Kids Open</span>
               </span>
             </div>
+
+            {/* Bottom 4-Color Accent Line */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: '2rem',
+                right: '2rem',
+                height: '3px',
+                background: 'var(--fgc-gradient-4color)',
+                borderRadius: '3px 3px 0 0',
+                opacity: 0.85
+              }}
+              aria-hidden="true"
+            />
           </div>
         </div>
 

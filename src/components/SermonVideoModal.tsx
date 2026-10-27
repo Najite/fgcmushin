@@ -39,7 +39,10 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2rem', background: '#FFFFFF' }}>
+        <div className="double-bezel-inner" style={{ padding: '2rem', background: '#FFFFFF', position: 'relative' }}>
+          {/* Top 4-Color Church Emblem Gradient Ribbon */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
+
           {/* Header bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

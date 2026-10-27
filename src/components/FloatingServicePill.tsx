@@ -29,13 +29,18 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
         className="double-bezel"
         style={{
           pointerEvents: 'auto',
-          background: 'rgba(255, 255, 255, 0.95)',
+          background: 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderColor: 'rgba(0, 118, 129, 0.25)',
-          boxShadow: '0 12px 35px -5px rgba(0, 0, 0, 0.12)'
+          borderColor: 'var(--fgc-blue-border)',
+          boxShadow: '0 12px 35px -5px rgba(0, 0, 0, 0.12)',
+          position: 'relative',
+          overflow: 'hidden'
         }}
       >
+        {/* Top 4-Color Church Emblem Gradient Ribbon */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'var(--fgc-gradient-4color)', zIndex: 10 }} />
+
         <div className="double-bezel-inner" style={{ padding: isMinimized ? '0.65rem 1rem' : '1.25rem', background: '#FFFFFF' }}>
           {isMinimized ? (
             <div
@@ -43,19 +48,24 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
               onClick={() => setIsMinimized(false)}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-teal)' }}></span>
+                <span className="quad-beacon" aria-hidden="true">
+                  <span className="quad-dot red"></span>
+                  <span className="quad-dot blue"></span>
+                  <span className="quad-dot gold"></span>
+                  <span className="quad-dot purple"></span>
+                </span>
                 <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>Sunday: 7:30 & 9:30 AM</span>
               </div>
-              <ChevronUp size={16} color="var(--accent-teal)" />
+              <ChevronUp size={16} color="var(--fgc-blue)" />
             </div>
           ) : (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--accent-teal-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-teal)' }}>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--fgc-blue-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-blue)' }}>
                     <Clock size={12} />
                   </div>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--accent-teal)' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--fgc-blue)' }}>
                     Join Us This Sunday
                   </span>
                 </div>

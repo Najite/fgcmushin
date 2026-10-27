@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Clock, Sparkles, Coffee, Car, ShieldCheck, Plus, Minus } from 'lucide-react';
+import { X, Check, Clock, Coffee, Car, ShieldCheck, Plus, Minus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface PlanVisitModalProps {
@@ -23,10 +23,10 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
     if (!fullName || !email) return;
 
     confetti({
-      particleCount: 80,
-      spread: 70,
+      particleCount: 90,
+      spread: 75,
       origin: { y: 0.6 },
-      colors: ['#007681', '#B45309', '#1D4ED8', '#10B981']
+      colors: ['#ED3B41', '#2866AD', '#F3A645', '#CC4695']
     });
 
     setHasSubmitted(true);
@@ -65,12 +65,20 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF' }}>
+        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF', position: 'relative' }}>
+          {/* Top 4-Color Church Emblem Gradient Ribbon */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
+
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
               <div className="eyebrow-pill gold" style={{ marginBottom: '0.65rem' }}>
-                <Sparkles size={13} />
+                <span className="quad-beacon" aria-hidden="true">
+                  <span className="quad-dot red"></span>
+                  <span className="quad-dot blue"></span>
+                  <span className="quad-dot gold"></span>
+                  <span className="quad-dot purple"></span>
+                </span>
                 <span>FIRST TIME GUEST EXPERIENCE</span>
               </div>
               <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)', lineHeight: 1.15 }}>

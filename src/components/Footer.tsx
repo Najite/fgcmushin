@@ -17,6 +17,8 @@ export const Footer: React.FC<FooterProps> = ({
 }) => {
   return (
     <footer style={{ background: '#F3EFEA', borderTop: '1px solid var(--border-subtle)', position: 'relative' }}>
+      {/* 4-Color Church Emblem Gradient Ribbon */}
+      <div className="top-color-ribbon" aria-hidden="true" />
       <div className="container-max" style={{ paddingTop: '5rem', paddingBottom: '3.5rem' }}>
         {/* Top Grid */}
         <div
@@ -150,26 +152,26 @@ export const Footer: React.FC<FooterProps> = ({
 
           {/* Column 2: Gathering Times & Campus */}
           <div>
-            <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--accent-teal)', fontWeight: 700, marginBottom: '1.25rem' }}>
+            <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--fgc-blue)', fontWeight: 700, marginBottom: '1.25rem' }}>
               Sunday Gatherings
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', color: 'var(--text-secondary)', fontSize: '0.925rem' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                <Clock size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
+                <Clock size={16} color="var(--fgc-blue)" style={{ marginTop: '3px' }} />
                 <div>
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>7:30 AM & 9:30 AM</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>1st & 2nd Celebration Services (with Children Church)</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
-                <Clock size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
+                <Clock size={16} color="var(--fgc-red)" style={{ marginTop: '3px' }} />
                 <div>
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Wednesdays 6:00 PM</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Faith & Power Service & Bible Study</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginTop: '0.5rem' }}>
-                <MapPin size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
+                <MapPin size={16} color="var(--fgc-gold-dark)" style={{ marginTop: '3px' }} />
                 <div>
                   <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>District Headquarters</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{CHURCH_INFO.address}</div>

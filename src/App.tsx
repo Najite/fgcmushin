@@ -94,6 +94,9 @@ export const App: React.FC = () => {
       {/* Subtle Analog Texture Filter Overlay */}
       <div className="film-grain-overlay" />
 
+      {/* Top 4-Color Church Emblem Gradient Ribbon */}
+      <div className="top-color-ribbon" aria-hidden="true" />
+
       {/* Top Banner Notice */}
       <AnnouncementBar onOpenPlanVisit={() => setIsPlanVisitOpen(true)} />
 

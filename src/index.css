@@ -2,34 +2,59 @@
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
 
-  /* Color Palette - Luminous Warm Editorial (Brooklake Church Style) */
-  --bg-deep: #FAF8F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F3EFEA;
-  --bg-card: #FFFFFF;
-  
-  --accent-teal: #007681;
-  --accent-teal-dark: #00545C;
-  --accent-teal-light: #008793;
-  --accent-teal-subtle: rgba(0, 118, 129, 0.08);
-  
-  --accent-royal: #1D4ED8;
-  --accent-royal-glow: rgba(29, 78, 216, 0.12);
-  
-  --accent-gold: #B45309;
-  --accent-gold-subtle: rgba(180, 83, 9, 0.09);
-  
+  /* Official Foursquare Logo 4-Color System (Cross, Cup, Dove, Crown) */
+  --fgc-red: #ED3B41;
+  --fgc-red-dark: #C9242A;
+  --fgc-red-subtle: rgba(237, 59, 65, 0.08);
+  --fgc-red-border: rgba(237, 59, 65, 0.25);
+  --fgc-red-glow: rgba(237, 59, 65, 0.35);
+
+  --fgc-blue: #2866AD;
+  --fgc-blue-dark: #1E4E85;
+  --fgc-blue-light: #3D7ECB;
+  --fgc-blue-subtle: rgba(40, 102, 173, 0.08);
+  --fgc-blue-border: rgba(40, 102, 173, 0.25);
+  --fgc-blue-glow: rgba(40, 102, 173, 0.35);
+
+  --fgc-gold: #F3A645;
+  --fgc-gold-dark: #B86B0E;
+  --fgc-gold-subtle: rgba(243, 166, 69, 0.12);
+  --fgc-gold-border: rgba(243, 166, 69, 0.32);
+  --fgc-gold-glow: rgba(243, 166, 69, 0.35);
+
+  --fgc-purple: #CC4695;
+  --fgc-purple-dark: #A32371;
+  --fgc-purple-subtle: rgba(204, 70, 149, 0.08);
+  --fgc-purple-border: rgba(204, 70, 149, 0.25);
+  --fgc-purple-glow: rgba(204, 70, 149, 0.35);
+
+  /* Primary Brand Theme Anchors (Harmonized with Logo Healer Blue) */
+  --accent-teal: var(--fgc-blue);
+  --accent-teal-dark: var(--fgc-blue-dark);
+  --accent-teal-light: var(--fgc-blue-light);
+  --accent-teal-subtle: var(--fgc-blue-subtle);
+
+  --accent-royal: var(--fgc-blue);
+  --accent-royal-glow: var(--fgc-blue-glow);
+
+  --accent-gold: var(--fgc-gold-dark);
+  --accent-gold-subtle: var(--fgc-gold-subtle);
+
   --text-primary: #151A21;
   --text-secondary: #42526E;
   --text-muted: #6B7A90;
-  
+
   --border-subtle: rgba(0, 0, 0, 0.07);
   --border-medium: rgba(0, 0, 0, 0.12);
-  --border-highlight: rgba(0, 118, 129, 0.35);
+  --border-highlight: var(--fgc-blue-border);
 
   --shadow-ambient: 0 20px 45px -15px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
   --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
-  --shadow-hover: 0 20px 40px -10px rgba(0, 118, 129, 0.16);
+  --shadow-hover: 0 20px 40px -10px rgba(40, 102, 173, 0.18);
+
+  /* Signature 4-Color Gradients */
+  --fgc-gradient-4color: linear-gradient(90deg, #ED3B41 0%, #2866AD 33%, #F3A645 66%, #CC4695 100%);
+  --fgc-gradient-soft: linear-gradient(135deg, rgba(237, 59, 65, 0.07) 0%, rgba(40, 102, 173, 0.07) 35%, rgba(243, 166, 69, 0.07) 70%, rgba(204, 70, 149, 0.07) 100%);
 
   --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
@@ -130,16 +155,62 @@ img {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  background: var(--accent-teal-subtle);
-  border: 1px solid rgba(0, 118, 129, 0.22);
-  color: var(--accent-teal-dark);
+  background: var(--fgc-blue-subtle);
+  border: 1px solid var(--fgc-blue-border);
+  color: var(--fgc-blue-dark);
+}
+
+.eyebrow-pill.red {
+  color: var(--fgc-red-dark);
+  border-color: var(--fgc-red-border);
+  background: var(--fgc-red-subtle);
+}
+
+.eyebrow-pill.blue {
+  color: var(--fgc-blue-dark);
+  border-color: var(--fgc-blue-border);
+  background: var(--fgc-blue-subtle);
 }
 
 .eyebrow-pill.gold {
-  color: var(--accent-gold);
-  border-color: rgba(180, 83, 9, 0.25);
-  background: var(--accent-gold-subtle);
+  color: var(--fgc-gold-dark);
+  border-color: var(--fgc-gold-border);
+  background: var(--fgc-gold-subtle);
 }
+
+.eyebrow-pill.purple {
+  color: var(--fgc-purple-dark);
+  border-color: var(--fgc-purple-border);
+  background: var(--fgc-purple-subtle);
+}
+
+/* 4-Color Quad Beacon & Top Ribbon Utilities */
+.top-color-ribbon {
+  height: 3.5px;
+  width: 100%;
+  background: var(--fgc-gradient-4color);
+  position: relative;
+  z-index: 70;
+}
+
+.quad-beacon {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5px;
+}
+
+.quad-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.quad-dot.red { background: var(--fgc-red); }
+.quad-dot.blue { background: var(--fgc-blue); }
+.quad-dot.gold { background: var(--fgc-gold); }
+.quad-dot.purple { background: var(--fgc-purple); }
 
 /* High-End Double-Bezel (Doppelrand) Architecture in Light Theme */
 .double-bezel {

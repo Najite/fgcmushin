@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, ArrowUpRight } from 'lucide-react';
+import { Clock, MapPin, ArrowUpRight } from 'lucide-react';
 import { UPCOMING_EVENTS } from '../data/churchData';
 import type { ChurchEvent } from '../types';
 
@@ -14,6 +14,15 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
     ? UPCOMING_EVENTS
     : UPCOMING_EVENTS.filter((e) => e.category === filter);
 
+  const getCategoryClass = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'worship': return 'purple';
+      case 'community': return 'blue';
+      case 'outreach': return 'gold';
+      default: return 'red';
+    }
+  };
+
   return (
     <section id="events" className="section-padding" style={{ position: 'relative', background: '#FAF8F5' }}>
       <div className="container-max">
@@ -21,7 +30,12 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
         <div className="reveal-item" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1.5rem', marginBottom: '3rem' }}>
           <div>
             <div className="eyebrow-pill" style={{ marginBottom: '0.85rem' }}>
-              <Calendar size={14} />
+              <span className="quad-beacon" aria-hidden="true">
+                <span className="quad-dot red"></span>
+                <span className="quad-dot blue"></span>
+                <span className="quad-dot gold"></span>
+                <span className="quad-dot purple"></span>
+              </span>
               <span>GATHERINGS & CALENDAR</span>
             </div>
             <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(2.2rem, 4vw, 3.5rem)', color: 'var(--text-primary)' }}>
@@ -36,12 +50,12 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
                 key={cat}
                 onClick={() => setFilter(cat)}
                 style={{
-                  padding: '0.5rem 1.15rem',
+                  padding: '0.5rem 1.2rem',
                   borderRadius: '9999px',
                   fontSize: '0.85rem',
                   fontWeight: 700,
                   transition: 'all 0.25s var(--ease-spring)',
-                  background: filter === cat ? 'var(--accent-teal)' : 'transparent',
+                  background: filter === cat ? 'var(--fgc-blue)' : 'transparent',
                   color: filter === cat ? '#FFFFFF' : 'var(--text-secondary)'
                 }}
               >
@@ -76,7 +90,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
                 {/* Date & Category */}
                 <div>
                   <span
-                    className="eyebrow-pill"
+                    className={`eyebrow-pill ${getCategoryClass(evt.category)}`}
                     style={{
                       fontSize: '0.725rem',
                       padding: '0.25rem 0.65rem',
@@ -88,7 +102,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP }) => {
                   <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {evt.date}
                   </div>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--accent-teal)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: '0.875rem', color: 'var(--fgc-blue)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.2rem' }}>
                     <Clock size={14} />
                     <span>{evt.time}</span>
                   </div>

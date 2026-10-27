@@ -63,11 +63,19 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF' }}>
+        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF', position: 'relative' }}>
+          {/* Top 4-Color Church Emblem Gradient Ribbon */}
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
               <div className="eyebrow-pill gold" style={{ marginBottom: '0.65rem' }}>
-                <Heart size={13} />
+                <span className="quad-beacon" aria-hidden="true">
+                  <span className="quad-dot red"></span>
+                  <span className="quad-dot blue"></span>
+                  <span className="quad-dot gold"></span>
+                  <span className="quad-dot purple"></span>
+                </span>
                 <span>PRAYER & CARE MINISTRY</span>
               </div>
               <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>

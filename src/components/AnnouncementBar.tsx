@@ -8,7 +8,7 @@ interface AnnouncementBarProps {
 export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenPlanVisit }) => {
   return (
     <div style={{
-      background: 'linear-gradient(90deg, #005F68 0%, #008793 50%, #1A56DB 100%)',
+      background: 'linear-gradient(90deg, #1E4E85 0%, #2866AD 50%, #A32371 100%)',
       color: '#FFFFFF',
       padding: '0.55rem 1rem',
       fontSize: '0.825rem',
@@ -22,8 +22,8 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenPlanVisi
       letterSpacing: '0.01em'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-        <Sparkles size={14} style={{ color: '#FFE082' }} />
-        <span>Night to Shine Volunteer & Guest Registration Is Now Open!</span>
+        <Sparkles size={14} style={{ color: '#F3A645' }} />
+        <span>Welcome to FGC Mushin DHQ • Sunday Celebration Services at 7:30 AM & 9:30 AM</span>
       </div>
       <button 
         onClick={onOpenPlanVisit}
@@ -31,7 +31,7 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({ onOpenPlanVisi
           display: 'inline-flex',
           alignItems: 'center',
           gap: '0.35rem',
-          color: '#FFE082',
+          color: '#F3A645',
           fontWeight: 700,
           textDecoration: 'underline',
           cursor: 'pointer',

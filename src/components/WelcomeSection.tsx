@@ -165,95 +165,281 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
         </div>
 
-        {/* 3 Core Pillars Bento Cards (Light Theme Doppelrand) */}
+        {/* The Fourfold Gospel: The 4 Quadrants of the Church Emblem */}
+        <div style={{ marginTop: '3.5rem', marginBottom: '2.5rem' }}>
+          <div className="reveal-item" style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <div className="eyebrow-pill" style={{ marginBottom: '0.85rem' }}>
+              <span className="quad-beacon" aria-hidden="true">
+                <span className="quad-dot red"></span>
+                <span className="quad-dot blue"></span>
+                <span className="quad-dot gold"></span>
+                <span className="quad-dot purple"></span>
+              </span>
+              <span>THE FOURFOLD GOSPEL</span>
+            </div>
+            <h3 className="heading-h2 font-serif" style={{ fontSize: 'clamp(2.1rem, 4vw, 3.2rem)', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
+              The Four Pillars of <span className="italic-serif">Our Faith.</span>
+            </h3>
+            <p style={{ maxWidth: '640px', margin: '0 auto', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.6 }}>
+              The four symbols and colors on our official emblem represent the four distinct offices of Jesus Christ in our lives and ministry:
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+              gap: '1.5rem'
+            }}
+          >
+            {/* 1. Jesus the Savior (Red - Cross) */}
+            <div className="double-bezel reveal-scale-card reveal-stagger-1" style={{ position: 'relative' }}>
+              <div
+                className="double-bezel-inner"
+                style={{
+                  padding: '2.25rem 1.85rem 2rem',
+                  background: '#FFFFFF',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}
+              >
+                {/* Quadrant color line */}
+                <div style={{ position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '3.5px', background: 'var(--fgc-red)', borderRadius: '0 0 3px 3px' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      background: 'var(--fgc-red-subtle)',
+                      border: '1px solid var(--fgc-red-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--fgc-red)'
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="3" x2="12" y2="21" />
+                      <line x1="6" y1="8" x2="18" y2="8" />
+                    </svg>
+                  </div>
+                  <span className="eyebrow-pill red" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem' }}>
+                    Romans 10:9
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fgc-red-dark)', marginBottom: '0.25rem' }}>
+                  The Cross • Scarlet Red
+                </div>
+                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem', lineHeight: 1.2 }}>
+                  Jesus Our Savior
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+                  He gave His life on the cross and rose again. Through faith in Jesus Christ, everyone receives eternal salvation, forgiveness, and new life.
+                </p>
+              </div>
+            </div>
+
+            {/* 2. Jesus the Healer (Blue - Cup) */}
+            <div className="double-bezel reveal-scale-card reveal-stagger-2" style={{ position: 'relative' }}>
+              <div
+                className="double-bezel-inner"
+                style={{
+                  padding: '2.25rem 1.85rem 2rem',
+                  background: '#FFFFFF',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}
+              >
+                {/* Quadrant color line */}
+                <div style={{ position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '3.5px', background: 'var(--fgc-blue)', borderRadius: '0 0 3px 3px' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      background: 'var(--fgc-blue-subtle)',
+                      border: '1px solid var(--fgc-blue-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--fgc-blue)'
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 3h12v5a6 6 0 0 1-12 0V3z" />
+                      <path d="M12 14v6" />
+                      <path d="M8 20h8" />
+                    </svg>
+                  </div>
+                  <span className="eyebrow-pill blue" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem' }}>
+                    1 Peter 2:24
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fgc-blue-dark)', marginBottom: '0.25rem' }}>
+                  The Cup • Azure Blue
+                </div>
+                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem', lineHeight: 1.2 }}>
+                  Jesus Our Healer
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+                  Christ’s finished sacrifice provides divine physical, emotional, and spiritual wholeness for the entire person today through active prayer.
+                </p>
+              </div>
+            </div>
+
+            {/* 3. Jesus the Baptizer with the Holy Spirit (Gold - Dove) */}
+            <div className="double-bezel reveal-scale-card reveal-stagger-3" style={{ position: 'relative' }}>
+              <div
+                className="double-bezel-inner"
+                style={{
+                  padding: '2.25rem 1.85rem 2rem',
+                  background: '#FFFFFF',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}
+              >
+                {/* Quadrant color line */}
+                <div style={{ position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '3.5px', background: 'var(--fgc-gold)', borderRadius: '0 0 3px 3px' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      background: 'var(--fgc-gold-subtle)',
+                      border: '1px solid var(--fgc-gold-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--fgc-gold-dark)'
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 14c2-4 6-6 10-6 2 0 4 1 6 3-2 1-4 2-5 4-2 3-5 5-9 5a4 4 0 0 1-2-6z" />
+                      <path d="M10 8l-2-5 5 2" />
+                    </svg>
+                  </div>
+                  <span className="eyebrow-pill gold" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem' }}>
+                    Acts 1:8
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fgc-gold-dark)', marginBottom: '0.25rem' }}>
+                  The Dove • Holy Gold
+                </div>
+                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem', lineHeight: 1.2 }}>
+                  Jesus Our Baptizer
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+                  He baptizes believers with the Holy Spirit and with fire, empowering us with supernatural boldness, spiritual gifts, and daily guidance.
+                </p>
+              </div>
+            </div>
+
+            {/* 4. Jesus the Soon-Coming King (Purple - Crown) */}
+            <div className="double-bezel reveal-scale-card reveal-stagger-4" style={{ position: 'relative' }}>
+              <div
+                className="double-bezel-inner"
+                style={{
+                  padding: '2.25rem 1.85rem 2rem',
+                  background: '#FFFFFF',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  position: 'relative'
+                }}
+              >
+                {/* Quadrant color line */}
+                <div style={{ position: 'absolute', top: 0, left: '1.5rem', right: '1.5rem', height: '3.5px', background: 'var(--fgc-purple)', borderRadius: '0 0 3px 3px' }} />
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                  <div
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '14px',
+                      background: 'var(--fgc-purple-subtle)',
+                      border: '1px solid var(--fgc-purple-border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--fgc-purple)'
+                    }}
+                  >
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14v2H5v-2z" />
+                    </svg>
+                  </div>
+                  <span className="eyebrow-pill purple" style={{ fontSize: '0.68rem', padding: '0.25rem 0.65rem' }}>
+                    1 Thess 4:16
+                  </span>
+                </div>
+
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--fgc-purple-dark)', marginBottom: '0.25rem' }}>
+                  The Crown • Royal Purple
+                </div>
+                <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem', lineHeight: 1.2 }}>
+                  Jesus the Soon-Coming King
+                </h4>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+                  He will visibly return in great glory and power. We live with joyful anticipation, readying our hearts and serving with kingdom purpose.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Core Community Values Banner Strip */}
         <div
+          className="reveal-item"
           style={{
+            marginTop: '2.5rem',
+            padding: '1.5rem 2rem',
+            background: 'var(--bg-surface-elevated)',
+            borderRadius: '20px',
+            border: '1px solid var(--border-subtle)',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.75rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '1.5rem',
+            alignItems: 'center'
           }}
         >
-          {/* Pillar 1 */}
-          <div className="double-bezel reveal-scale-card reveal-stagger-1">
-            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '14px',
-                  background: 'var(--accent-teal-subtle)',
-                  border: '1px solid rgba(0, 118, 129, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--accent-teal)',
-                  marginBottom: '1.25rem'
-                }}
-              >
-                <Users size={22} />
-              </div>
-              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
-                Everyone Is Welcome
-              </h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                Whoever you are, whatever your past, there is a seat saved at the table for you. We embrace real people with radical grace.
-              </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--fgc-blue-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-blue)' }}>
+              <Users size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>Everyone is Welcome</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.825rem' }}>A seat at the table with radical grace</div>
             </div>
           </div>
 
-          {/* Pillar 2 */}
-          <div className="double-bezel reveal-scale-card reveal-stagger-2">
-            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '14px',
-                  background: 'rgba(29, 78, 216, 0.08)',
-                  border: '1px solid rgba(29, 78, 216, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--accent-royal)',
-                  marginBottom: '1.25rem'
-                }}
-              >
-                <Compass size={22} />
-              </div>
-              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
-                Everyone Has A Next Step
-              </h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                Faith isn’t a destination—it’s a journey. From baptism and small groups to leadership, we walk alongside you in growth.
-              </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--fgc-gold-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-gold-dark)' }}>
+              <Compass size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>Everyone Has A Next Step</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.825rem' }}>Discipleship, baptism, and spiritual growth</div>
             </div>
           </div>
 
-          {/* Pillar 3 */}
-          <div className="double-bezel reveal-scale-card reveal-stagger-3">
-            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
-              <div
-                style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '14px',
-                  background: 'var(--accent-gold-subtle)',
-                  border: '1px solid rgba(180, 83, 9, 0.15)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--accent-gold)',
-                  marginBottom: '1.25rem'
-                }}
-              >
-                <Heart size={22} />
-              </div>
-              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
-                Everyone Can Make A Difference
-              </h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                God has wired you with distinct gifts to serve others. When we love our city with tangible care, lives are transformed.
-              </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'var(--fgc-purple-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-purple)' }}>
+              <Heart size={18} />
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.95rem' }}>Everyone Can Make A Difference</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.825rem' }}>Using distinct God-given gifts to serve</div>
             </div>
           </div>
         </div>
