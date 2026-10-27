@@ -1,0 +1,394 @@
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+
+  /* Color Palette - Sacred Atmosphere & Architectural Warmth */
+  --bg-deep: #07090D;
+  --bg-surface: #0E131A;
+  --bg-surface-elevated: #151C26;
+  --bg-card: rgba(18, 24, 34, 0.75);
+  
+  --accent-teal: #008793;
+  --accent-teal-light: #00A8B7;
+  --accent-teal-subtle: rgba(0, 135, 147, 0.15);
+  
+  --accent-royal: #2563EB;
+  --accent-royal-glow: rgba(37, 99, 235, 0.25);
+  
+  --accent-gold: #E5B25D;
+  --accent-gold-subtle: rgba(229, 178, 93, 0.15);
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #8E9BAE;
+  
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-highlight: rgba(255, 255, 255, 0.22);
+
+  --shadow-ambient: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 35px -5px rgba(0, 135, 147, 0.35);
+
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Base Reset & Typography Setup */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: var(--bg-deep);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Typography Enhancements */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.italic-serif {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--accent-gold);
+}
+
+.heading-display {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+
+.heading-h2 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Brooklake & Motivation Styled Outline Text */
+.text-outline-white {
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.7);
+  color: transparent;
+  transition: -webkit-text-stroke 0.3s ease;
+}
+
+.text-outline-teal {
+  -webkit-text-stroke: 1.5px var(--accent-teal);
+  color: transparent;
+}
+
+/* Eyebrow Tag Pill */
+.eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-teal-light);
+  backdrop-filter: blur(8px);
+}
+
+.eyebrow-pill.gold {
+  color: var(--accent-gold);
+  border-color: rgba(229, 178, 93, 0.25);
+  background: var(--accent-gold-subtle);
+}
+
+/* High-End Double-Bezel (Doppelrand) Architecture */
+.double-bezel {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px;
+  padding: 6px;
+  transition: transform 0.4s var(--ease-spring), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.double-bezel:hover {
+  border-color: var(--border-medium);
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
+}
+
+.double-bezel-inner {
+  background: var(--bg-surface);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: calc(28px - 6px);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  height: 100%;
+}
+
+/* Island Button & Button-in-Button Trailing Icon */
+.btn-island {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: 9999px;
+  font-size: 0.925rem;
+  font-weight: 600;
+  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s ease, background-color 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.btn-island:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: #FFFFFF;
+  color: #07090D;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+  background: #F1F5F9;
+  box-shadow: 0 6px 25px rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-teal {
+  background: var(--accent-teal);
+  color: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(0, 135, 147, 0.35);
+}
+
+.btn-teal:hover {
+  background: var(--accent-teal-light);
+  box-shadow: 0 8px 30px rgba(0, 135, 147, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-medium);
+  color: #FFFFFF;
+  backdrop-filter: blur(12px);
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-highlight);
+  transform: translateY(-2px);
+}
+
+/* Nested Trailing Icon Circle */
+.btn-icon-bubble {
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.btn-ghost .btn-icon-bubble,
+.btn-teal .btn-icon-bubble {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-island:hover .btn-icon-bubble {
+  transform: translateX(3px) translateY(-1px) scale(1.05);
+}
+
+/* Circular Rotating Text (Inspiration from Motivation Church Sermon Player & Brooklake badge) */
+.rotating-badge-container {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rotating-text-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: spinSlow 18s linear infinite;
+  transform-origin: center;
+}
+
+.rotating-center-trigger {
+  width: 52px;
+  height: 52px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  color: #07090D;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s var(--ease-spring), background-color 0.2s ease;
+  z-index: 2;
+}
+
+.rotating-badge-container:hover .rotating-center-trigger {
+  transform: scale(1.1);
+  background: var(--accent-gold);
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Typographic Continuous Marquee */
+.marquee-track {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: 2rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.marquee-content {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 2.5rem;
+  min-width: 100%;
+  animation: scrollMarquee 26s linear infinite;
+}
+
+@keyframes scrollMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 2.5rem));
+  }
+}
+
+.marquee-item {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.marquee-dash {
+  width: 32px;
+  height: 3px;
+  background: var(--accent-teal);
+  border-radius: 2px;
+}
+
+/* Glassmorphism & Fixed Layers */
+.glass-panel {
+  background: rgba(14, 19, 26, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Layout Utilities */
+.container-max {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section-padding {
+  padding-top: clamp(4rem, 8vw, 7.5rem);
+  padding-bottom: clamp(4rem, 8vw, 7.5rem);
+}
+
+/* Subtle Film Grain Noise Texture */
+.film-grain-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
