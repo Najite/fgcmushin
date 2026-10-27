@@ -185,8 +185,8 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                   }}
                 >
                   <option value="Tithes & Offerings">General Ministry & Tithes</option>
-                  <option value="Haven Cares Outreach">Haven Cares & Local Food Pantry</option>
-                  <option value="Next Gen & Youth Camp">Next Gen & Youth Scholarships</option>
+                  <option value="Community Welfare Outreach">Community Welfare & Local Relief</option>
+                  <option value="Next Gen & Youth Camp">Next Gen & Youth Camp</option>
                   <option value="Global Missions">Global Church Planting & Missions</option>
                 </select>
               </div>

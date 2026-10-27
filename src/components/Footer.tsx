@@ -56,12 +56,12 @@ export const Footer: React.FC<FooterProps> = ({
                 />
               </div>
               <span style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                HAVEN CHURCH
+                FGC MUSHIN
               </span>
             </div>
 
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-              A diverse, life-giving church family learning to follow Jesus together, love people, and change the world.
+              Foursquare Gospel Church, Mushin — Jesus Christ, the Same Yesterday, Today, and Forever. A vibrant family following Jesus together.
             </p>
 
             {/* Social Icons Inline SVGs */}
@@ -152,15 +152,15 @@ export const Footer: React.FC<FooterProps> = ({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                 <Clock size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
                 <div>
-                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>9:00 AM & 11:15 AM</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Full Kids Ministry (Infants - 5th Grade)</div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>7:30 AM & 9:30 AM</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>1st & 2nd Celebration Services (with Children Church)</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
                 <Clock size={16} color="var(--accent-teal)" style={{ marginTop: '3px' }} />
                 <div>
-                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Wednesdays 7:00 PM</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Haven YTH & Community Groups</div>
+                  <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Wednesdays 6:00 PM</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Faith & Power Service & Bible Study</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -256,7 +256,7 @@ export const Footer: React.FC<FooterProps> = ({
           }}
         >
           <div>
-            &copy; {new Date().getFullYear()} Haven Church Inc. All rights reserved. 501(c)(3) Non-Profit Organization.
+            &copy; {new Date().getFullYear()} Foursquare Gospel Church, Mushin. All rights reserved.
           </div>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <span>Privacy Policy</span>

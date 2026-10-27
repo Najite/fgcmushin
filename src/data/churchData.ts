@@ -1,18 +1,19 @@
 import type { Sermon, Ministry, ChurchEvent } from '../types';
 
 export const CHURCH_INFO = {
-  name: 'Haven Church',
-  tagline: 'A Home for Everyone, Everywhere',
-  motto: 'Love God. Love People. Change The World.',
+  name: 'FGC Mushin',
+  fullName: 'Foursquare Gospel Church, Mushin',
+  tagline: 'Jesus Christ, the Same Yesterday, Today, and Forever',
+  motto: 'Jesus the Savior • Jesus the Healer • Jesus the Baptizer with the Holy Spirit • Jesus the Soon-Coming King',
   submotto: 'Everyone is welcome. Everyone has a next best step. Everyone can make a difference.',
-  address: '3904 Old Ridge Road, Richmond, VA 23234',
+  address: 'Sanctuary Cathedral, Mushin, Lagos, Nigeria',
   times: [
-    { name: 'Sunday Morning 1st Gathering', time: '9:00 AM', description: 'Full Kids ministry & live choir/band' },
-    { name: 'Sunday Morning 2nd Gathering', time: '11:15 AM', description: 'Full Kids ministry, Youth gathering & online stream' },
-    { name: 'Midweek Crew Night', time: 'Wednesday 7:00 PM', description: 'Youth, young adults, & community groups' }
+    { name: '1st Celebration Service', time: '7:30 AM', description: 'Early glory worship, children church & word' },
+    { name: '2nd Celebration Service', time: '9:30 AM', description: 'Full choir worship, teens church & online broadcast' },
+    { name: 'Midweek Faith & Power Service', time: 'Wednesday 6:00 PM', description: 'Bible study, intercessory prayer & community' }
   ],
-  phone: '(804) 555-0192',
-  email: 'hello@havenchurch.org',
+  phone: '+234 1 234 5678',
+  email: 'info@fgcmushin.org',
   socials: {
     instagram: 'https://instagram.com',
     youtube: 'https://youtube.com',
@@ -72,104 +73,104 @@ export const RECENT_SERMONS: Sermon[] = [
 export const MINISTRIES: Ministry[] = [
   {
     id: 'kids',
-    title: 'Haven Kids & Littles',
+    title: 'Children Church & Littles',
     tagline: 'Where faith begins in wonder and joy',
     ageGroup: 'Infants – 5th Grade',
-    schedule: 'Every Sunday at 9:00 AM & 11:15 AM',
+    schedule: 'Every Sunday at 7:30 AM & 9:30 AM',
     description: 'Safe, background-checked environments designed specifically for children to experience God’s great love through interactive stories, creative crafts, and caring leaders.',
     image: '/images/ministry-kids.jpg',
-    lead: 'Sarah Jenkins, Kids Director',
+    lead: 'Sarah Jenkins, Children Church Director',
     highlights: ['Secure check-in & parent paging', 'Sensory-friendly spaces', 'Age-appropriate worship & lessons']
   },
   {
     id: 'next-gen',
-    title: 'Haven YTH & Students',
+    title: 'FGC Youth & Teens',
     tagline: 'A generation alive for Jesus',
-    ageGroup: '6th – 12th Grade',
-    schedule: 'Wednesday Nights at 7:00 PM',
+    ageGroup: 'Teens & Secondary Students',
+    schedule: 'Wednesday Evenings at 6:00 PM',
     description: 'High energy, authentic friendships, and culturally relevant teaching that empowers students to discover their identity in Christ and lead bold lives.',
     image: '/images/ministry-youth.jpg',
     lead: 'Jordan & Maya Brooks, Youth Pastors',
-    highlights: ['Live youth band & worship', 'Small group breakout circles', 'Annual retreats & summer camps']
+    highlights: ['Live youth worship', 'Small group breakout circles', 'Annual retreats & camps']
   },
   {
     id: 'young-adults',
     title: 'Young Adults (YA)',
     tagline: 'Deep roots and authentic connection in the city',
-    ageGroup: 'Ages 18 – 30',
-    schedule: '1st & 3rd Thursdays at 7:30 PM',
-    description: 'College students, creatives, and young professionals gathering around tables for food, Scripture discussion, and mutual encouragement across Richmond.',
+    ageGroup: 'Ages 18 – 35',
+    schedule: '1st & 3rd Thursdays at 6:30 PM',
+    description: 'Students, young professionals, and creatives gathering around tables for food, Scripture discussion, and mutual encouragement across Lagos.',
     image: '/images/community-welcome.jpg',
     lead: 'Caleb Evans, YA Coordinator',
-    highlights: ['City hub dinners', 'Career & vocational mentorship', 'Community retreats']
+    highlights: ['Fellowship hub dinners', 'Career & vocational mentorship', 'Community retreats']
   },
   {
     id: 'city-care',
-    title: 'Haven Cares & Outreach',
+    title: 'Community Welfare & Outreach',
     tagline: 'Loving our city with tangible action',
     ageGroup: 'All Ages',
-    schedule: 'Monthly City Serve Days',
-    description: 'We believe a healthy church blesses the city outside its walls. From weekly food distribution to school partnerships, we serve with dignity and compassion.',
+    schedule: 'Monthly Community Serve Days',
+    description: 'We believe a healthy church blesses the city outside its walls. From food distribution to medical outreaches, we serve with dignity and compassion.',
     image: '/images/ministry-outreach.jpg',
     lead: 'Dr. Kimberly Adams, Missions Director',
-    highlights: ['Weekly grocery pantry partnership', 'Foster family support network', 'Global mission initiatives']
+    highlights: ['Community food pantry & relief', 'Family support network', 'Mission outreaches']
   }
 ];
 
 export const UPCOMING_EVENTS: ChurchEvent[] = [
   {
     id: 'crew-night-nov',
-    title: 'All-Church Crew Night & Worship',
+    title: 'All-Church Faith Night & Worship',
     date: 'Wednesday, Nov 4, 2026',
-    time: '7:00 PM – 8:30 PM',
-    location: 'Main Auditorium & Patio',
+    time: '6:00 PM – 8:00 PM',
+    location: 'Main Auditorium',
     category: 'Worship',
-    description: 'An extended evening of acoustic worship, prayer for our city, and fellowship with fresh tacos on the patio afterwards.'
+    description: 'An extended evening of acoustic worship, prayer for our nation and families, and fellowship together.'
   },
   {
     id: 'baptism-sunday',
     title: 'Celebration Baptism Sunday',
     date: 'Sunday, Nov 15, 2026',
-    time: 'During 9:00 AM & 11:15 AM Gatherings',
-    location: 'Sanctuary Courtyard',
+    time: 'During 7:30 AM & 9:30 AM Services',
+    location: 'Sanctuary Cathedral',
     category: 'Community',
     description: 'Celebrating public declarations of new life in Jesus! If you want to take your next step, sign up today.'
   },
   {
     id: 'thanksgiving-outreach',
-    title: 'Feeding the 5,000: City Basket Drive',
+    title: 'Community Care & Food Outreach',
     date: 'Saturday, Nov 21, 2026',
     time: '8:30 AM – 1:00 PM',
-    location: 'Haven Community Center',
+    location: 'FGC Mushin Fellowship Grounds',
     category: 'Outreach',
-    description: 'Packing and delivering 1,200 fresh Thanksgiving meals to families in local neighborhoods.'
+    description: 'Distributing food and essential supplies to families and neighbors across the Mushin community.'
   },
   {
     id: 'newcomers-lunch',
     title: 'Newcomers Welcome Luncheon',
     date: 'Sunday, Nov 22, 2026',
-    time: '12:45 PM – 2:00 PM',
-    location: 'Fireside Room',
+    time: '11:45 AM – 1:00 PM',
+    location: 'Cathedral Fellowship Hall',
     category: 'Community',
-    description: 'New to Haven? Meet Pastor Marcus and the team for good food, hear our story, and find your community.'
+    description: 'New to FGC Mushin? Meet our pastoral leadership and ministers for fellowship, hear our vision, and get connected.'
   }
 ];
 
 export const VISITOR_FAQS = [
   {
     q: 'What should I wear?',
-    a: 'Come as you are! You’ll see everything from casual t-shirts and jeans to Sunday dresses. We care about you, not what you wear.'
+    a: 'Come as you are! You’ll see everything from casual clothes to traditional attire and Sunday suits. We care about you, not what you wear.'
   },
   {
-    q: 'How long are Sunday gatherings?',
-    a: 'Each gathering lasts about 70 minutes. We begin with 20 minutes of vibrant worship music, followed by a welcome, biblical message, and prayer.'
+    q: 'How long are Sunday services?',
+    a: 'Each celebration service lasts about 90 minutes. We begin with vibrant praise and worship, followed by ministry in prayer, biblical preaching, and benediction.'
   },
   {
-    q: 'What about my kids?',
-    a: 'Our Haven Kids team has a clean, safe, and fun environment ready for infants through 5th grade. We recommend arriving 15 minutes early to register.'
+    q: 'What about my children?',
+    a: 'Our Children Church ministry has a clean, safe, and nurturing environment ready for your children. We recommend arriving 15 minutes early for easy check-in.'
   },
   {
     q: 'Where do I park and go when I arrive?',
-    a: 'Turn on your hazard lights when you enter the parking lot! Our friendly parking team will guide you to dedicated First-Time Guest parking spaces right near the main entrance.'
+    a: 'Turn on your hazard lights when you enter the church gates! Our friendly ushering and protocol team will guide you to dedicated first-time guest parking spaces.'
   }
 ];

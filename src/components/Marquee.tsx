@@ -2,12 +2,12 @@ import React from 'react';
 
 export const Marquee: React.FC = () => {
   const items = [
-    { text: 'WHO WE ARE', isOutline: true },
-    { text: 'LOVE GOD', isOutline: false },
-    { text: 'LOVE PEOPLE', isOutline: true },
-    { text: 'CHANGE THE WORLD', isOutline: false },
-    { text: 'EVERYONE IS WELCOME', isOutline: true },
-    { text: 'JESUS CHANGES LIVES', isOutline: false }
+    { text: 'JESUS OUR SAVIOR', isOutline: true },
+    { text: 'JESUS OUR HEALER', isOutline: false },
+    { text: 'JESUS OUR BAPTIZER', isOutline: true },
+    { text: 'JESUS OUR SOON-COMING KING', isOutline: false },
+    { text: 'FGC MUSHIN', isOutline: true },
+    { text: 'EVERYONE IS WELCOME', isOutline: false }
   ];
 
   return (

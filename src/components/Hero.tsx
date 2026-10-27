@@ -40,7 +40,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
       >
         <img
           src="/images/hero-sunlit.jpg"
-          alt="Haven Church sunlit morning sanctuary"
+          alt="FGC Mushin sanctuary worship service"
           className="animate-hero-bg"
           style={{
             width: '100%',
@@ -81,11 +81,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           textAlign: 'center'
         }}
       >
-        {/* Eyebrow Badge (Brooklake Style Light Pill with Pulsing Beacon) */}
+        {/* Eyebrow Badge (Foursquare Style Light Pill with Pulsing Beacon) */}
         <div className="animate-hero-eyebrow" style={{ marginBottom: '1.75rem' }}>
           <div className="eyebrow-pill" style={{ background: 'rgba(255, 255, 255, 0.88)', backdropFilter: 'blur(12px)', boxShadow: '0 2px 10px rgba(0, 118, 129, 0.12)' }}>
             <span className="hero-beacon-dot"></span>
-            <span>IN OUR CITY AS IT IS IN HEAVEN</span>
+            <span>FOURSQUARE GOSPEL CHURCH • MUSHIN</span>
           </div>
         </div>
 
@@ -204,10 +204,10 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontWeight: 700 }}>
-                  This Sunday Morning
+                  This Sunday Celebration
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                  9:00 AM <span style={{ color: 'var(--accent-teal)' }}>&</span> 11:15 AM
+                  7:30 AM <span style={{ color: 'var(--accent-teal)' }}>&</span> 9:30 AM
                 </div>
               </div>
             </div>
@@ -231,7 +231,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
               </div>
               <div>
                 <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', fontWeight: 700 }}>
-                  Sanctuary Campus
+                  Sanctuary Cathedral
                 </div>
                 <button
                   onClick={handleCopyAddress}
@@ -246,7 +246,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
                     cursor: 'pointer'
                   }}
                 >
-                  <span>3904 Old Ridge Rd</span>
+                  <span>Mushin, Lagos, Nigeria</span>
                   {copied ? <Check size={14} color="#059669" /> : <Copy size={13} color="var(--accent-teal)" />}
                 </button>
               </div>
@@ -256,7 +256,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="eyebrow-pill gold" style={{ fontSize: '0.725rem', padding: '0.35rem 0.85rem' }}>
                 <span className="hero-beacon-dot" style={{ background: '#B45309', width: '6px', height: '6px' }}></span>
-                <span>Haven Kids Open</span>
+                <span>Foursquare Kids Open</span>
               </span>
             </div>
           </div>

@@ -8,7 +8,7 @@ interface PlanVisitModalProps {
 }
 
 export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose }) => {
-  const [serviceTime, setServiceTime] = useState<'9:00 AM' | '11:15 AM'>('11:15 AM');
+  const [serviceTime, setServiceTime] = useState<'7:30 AM' | '9:30 AM'>('9:30 AM');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -106,7 +106,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                   1. Select Gathering Time
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                  {(['9:00 AM', '11:15 AM'] as const).map((t) => (
+                  {(['7:30 AM', '9:30 AM'] as const).map((t) => (
                     <button
                       type="button"
                       key={t}
@@ -319,7 +319,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
                   <ShieldCheck size={18} color="var(--accent-teal)" />
-                  <span>Haven Kids is pre-notified for instant check-in.</span>
+                  <span>Children Church is pre-notified for instant check-in.</span>
                 </div>
               </div>
 

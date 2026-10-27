@@ -44,7 +44,7 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-teal)' }}></span>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>Sunday: 9 & 11:15 AM</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>Sunday: 7:30 & 9:30 AM</span>
               </div>
               <ChevronUp size={16} color="var(--accent-teal)" />
             </div>
@@ -80,7 +80,7 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
               </div>
 
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-                9:00 AM & 11:15 AM
+                7:30 AM & 9:30 AM
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-secondary)', fontSize: '0.825rem', marginBottom: '1rem' }}>
