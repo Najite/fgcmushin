@@ -23,7 +23,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
       particleCount: 70,
       spread: 75,
       origin: { y: 0.6 },
-      colors: ['#008793', '#FFE082', '#FFFFFF']
+      colors: ['#007681', '#B45309', '#10B981']
     });
     setCompleted(true);
   };
@@ -39,7 +39,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
         position: 'fixed',
         inset: 0,
         zIndex: 110,
-        background: 'rgba(0, 0, 0, 0.85)',
+        background: 'rgba(21, 26, 33, 0.65)',
         backdropFilter: 'blur(20px)',
         display: 'flex',
         alignItems: 'center',
@@ -54,18 +54,19 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
           maxWidth: '560px',
           width: '100%',
           maxHeight: '90vh',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          background: '#FFFFFF'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#0F141C' }}>
+        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
               <div className="eyebrow-pill gold" style={{ marginBottom: '0.65rem' }}>
                 <Heart size={13} />
                 <span>GENEROSITY & STEWARDSHIP</span>
               </div>
-              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: '#FFFFFF' }}>
+              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>
                 {completed ? 'Thank You For Sowing!' : 'Give Generously'}
               </h3>
             </div>
@@ -75,11 +76,11 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FFFFFF'
+                color: 'var(--text-primary)'
               }}
             >
               <X size={18} />
@@ -88,24 +89,24 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
 
           {!completed ? (
             <form onSubmit={handleGive} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', lineHeight: 1.6 }}>
                 Every gift empowers ministry across Richmond, supports families through our local food pantry, and carries the gospel around the world.
               </p>
 
               {/* Frequency Selector */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'rgba(255, 255, 255, 0.04)', padding: '4px', borderRadius: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: '#F3EFEA', padding: '4px', borderRadius: '12px' }}>
                 {(['One-Time', 'Recurring'] as const).map((freq) => (
                   <button
                     type="button"
                     key={freq}
                     onClick={() => setFrequency(freq)}
                     style={{
-                      padding: '0.65rem',
+                      padding: '0.7rem',
                       borderRadius: '10px',
                       fontSize: '0.9rem',
                       fontWeight: 700,
                       background: frequency === freq ? 'var(--accent-teal)' : 'transparent',
-                      color: frequency === freq ? '#FFFFFF' : 'var(--text-muted)'
+                      color: frequency === freq ? '#FFFFFF' : 'var(--text-secondary)'
                     }}
                   >
                     {freq} Gift
@@ -115,7 +116,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
 
               {/* Amount Presets */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.65rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.65rem' }}>
                   Select Gift Amount
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '0.85rem' }}>
@@ -127,9 +128,9 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                       style={{
                         padding: '0.75rem 0.25rem',
                         borderRadius: '12px',
-                        border: Number(amount) === val ? '2px solid var(--accent-gold)' : '1px solid var(--border-subtle)',
-                        background: Number(amount) === val ? 'var(--accent-gold-subtle)' : 'rgba(255, 255, 255, 0.03)',
-                        color: Number(amount) === val ? 'var(--accent-gold)' : '#FFFFFF',
+                        border: Number(amount) === val ? '2px solid var(--accent-teal)' : '1px solid var(--border-medium)',
+                        background: Number(amount) === val ? 'var(--accent-teal-subtle)' : '#FAF8F5',
+                        color: Number(amount) === val ? 'var(--accent-teal-dark)' : 'var(--text-primary)',
                         fontWeight: 700,
                         fontSize: '1rem'
                       }}
@@ -152,9 +153,9 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                       width: '100%',
                       padding: '0.85rem 1rem 0.85rem 2.25rem',
                       borderRadius: '12px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid var(--border-subtle)',
-                      color: '#FFFFFF',
+                      background: '#F8FAFC',
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      color: 'var(--text-primary)',
                       fontSize: '1.1rem',
                       fontWeight: 700,
                       outline: 'none'
@@ -165,7 +166,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
 
               {/* Fund Selector */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
                   Designate Fund
                 </label>
                 <select
@@ -175,9 +176,9 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                     width: '100%',
                     padding: '0.85rem 1rem',
                     borderRadius: '12px',
-                    background: '#151C26',
-                    border: '1px solid var(--border-subtle)',
-                    color: '#FFFFFF',
+                    background: '#F8FAFC',
+                    border: '1px solid rgba(0, 0, 0, 0.12)',
+                    color: 'var(--text-primary)',
                     fontSize: '0.95rem',
                     outline: 'none'
                   }}
@@ -199,7 +200,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
               </button>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                <ShieldCheck size={14} color="var(--accent-teal-light)" />
+                <ShieldCheck size={14} color="var(--accent-teal)" />
                 <span>256-Bit SSL Encrypted • 501(c)(3) Tax-Deductible</span>
               </div>
             </form>
@@ -210,23 +211,23 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                   width: '64px',
                   height: '64px',
                   borderRadius: '50%',
-                  background: 'rgba(0, 135, 147, 0.2)',
-                  border: '2px solid var(--accent-teal-light)',
+                  background: 'var(--accent-teal-subtle)',
+                  border: '2px solid var(--accent-teal)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: '0 auto',
-                  color: 'var(--accent-teal-light)'
+                  color: 'var(--accent-teal)'
                 }}
               >
                 <Check size={32} />
               </div>
 
-              <h4 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF' }}>
+              <h4 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)' }}>
                 Your Generosity Changes Lives
               </h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '440px', margin: '0 auto' }}>
-                We received your gift of <strong style={{ color: '#FFFFFF' }}>${amount}</strong> designated to <strong style={{ color: 'var(--accent-gold)' }}>{fund}</strong>. A tax-deductible receipt has been dispatched.
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', maxWidth: '440px', margin: '0 auto' }}>
+                We received your gift of <strong style={{ color: 'var(--text-primary)' }}>${amount}</strong> designated to <strong style={{ color: 'var(--accent-teal)' }}>{fund}</strong>. A tax-deductible receipt has been dispatched to your email.
               </p>
 
               <button

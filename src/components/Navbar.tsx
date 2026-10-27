@@ -20,7 +20,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      setIsScrolled(window.scrollY > 30);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -36,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <header
         style={{
           position: 'sticky',
-          top: '1rem',
+          top: '0.85rem',
           zIndex: 40,
           width: '100%',
           display: 'flex',
@@ -54,12 +54,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             borderRadius: '9999px',
             padding: '4px',
             background: isScrolled
-              ? 'rgba(10, 14, 20, 0.88)'
-              : 'rgba(14, 19, 26, 0.65)',
+              ? 'rgba(255, 255, 255, 0.94)'
+              : 'rgba(255, 255, 255, 0.82)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            borderColor: isScrolled ? 'rgba(255, 255, 255, 0.16)' : 'rgba(255, 255, 255, 0.08)',
-            boxShadow: isScrolled ? '0 16px 36px -10px rgba(0, 0, 0, 0.8)' : '0 8px 24px -10px rgba(0, 0, 0, 0.4)'
+            borderColor: isScrolled ? 'rgba(0, 0, 0, 0.12)' : 'rgba(0, 0, 0, 0.08)',
+            boxShadow: isScrolled
+              ? '0 12px 35px -8px rgba(0, 0, 0, 0.12)'
+              : '0 4px 20px -4px rgba(0, 0, 0, 0.06)'
           }}
         >
           <div
@@ -90,24 +92,23 @@ export const Navbar: React.FC<NavbarProps> = ({
                   width: '36px',
                   height: '36px',
                   borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #008793 0%, #1A56DB 100%)',
+                  background: 'linear-gradient(135deg, #007681 0%, #1D4ED8 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0, 135, 147, 0.4)'
+                  boxShadow: '0 4px 12px rgba(0, 118, 129, 0.3)'
                 }}
               >
-                {/* Custom stylized Cross & Haven arch symbol */}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M12 3V21M7 8H17" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
                   <path d="M4 19C4 14.5817 7.58172 11 12 11C16.4183 11 20 14.5817 20 19" stroke="#FFE082" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="1 3" />
                 </svg>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
                   HAVEN
                 </span>
-                <span style={{ fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.18em', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.18em', color: 'var(--accent-teal)' }}>
                   CHURCH
                 </span>
               </div>
@@ -120,14 +121,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 alignItems: 'center',
                 gap: '1.8rem',
                 fontSize: '0.9rem',
-                fontWeight: 500
+                fontWeight: 600
               }}
               className="desktop-links"
             >
               <button
                 onClick={() => handleNavClick('welcome')}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Who We Are
@@ -135,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => handleNavClick('ministries')}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Ministries
@@ -143,7 +144,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => handleNavClick('sermons')}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Messages
@@ -151,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={() => handleNavClick('events')}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Events
@@ -159,7 +160,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenGiving}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Give
@@ -204,9 +205,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(0, 0, 0, 0.05)',
                   border: '1px solid var(--border-subtle)',
-                  color: '#FFFFFF'
+                  color: 'var(--text-primary)'
                 }}
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -216,14 +217,14 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
       </header>
 
-      {/* Fullscreen Mega-Menu Overlay (Mobile & Extended Navigation) */}
+      {/* Fullscreen Mega-Menu Overlay in Light Theme */}
       {mobileMenuOpen && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
             zIndex: 35,
-            background: 'rgba(5, 7, 10, 0.94)',
+            background: 'rgba(250, 248, 245, 0.98)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             display: 'flex',
@@ -238,7 +239,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Sparkles size={13} />
                 <span>Welcome to Haven Church</span>
               </div>
-              <h2 className="heading-h2 font-serif" style={{ fontSize: '2.4rem', lineHeight: 1.15 }}>
+              <h2 className="heading-h2 font-serif" style={{ fontSize: '2.4rem', lineHeight: 1.15, color: 'var(--text-primary)' }}>
                 Making Jesus known to <span className="italic-serif">Everyone,</span> Everywhere.
               </h2>
             </div>
@@ -246,25 +247,25 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '3rem' }}>
               <button
                 onClick={() => handleNavClick('welcome')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}
+                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 01. Who We Are
               </button>
               <button
                 onClick={() => handleNavClick('ministries')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}
+                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 02. Ministries (Kids, YTH, YA)
               </button>
               <button
                 onClick={() => handleNavClick('sermons')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}
+                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 03. Watch Messages
               </button>
               <button
                 onClick={() => handleNavClick('events')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}
+                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 04. Upcoming Events
               </button>
@@ -273,7 +274,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setMobileMenuOpen(false);
                   onOpenGiving();
                 }}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: '#FFFFFF' }}
+                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 05. Generosity & Giving
               </button>
@@ -292,7 +293,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="double-bezel"
               style={{
                 padding: '1.5rem',
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: '#FFFFFF',
                 borderRadius: '20px',
                 marginBottom: '2rem'
               }}
@@ -300,11 +301,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
                 Join Us In Person
               </h4>
-              <p style={{ fontWeight: 600, marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Clock size={16} color="var(--accent-teal)" />
                 <span>Sundays at 9:00 AM & 11:15 AM</span>
               </p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
                 <MapPin size={16} color="var(--accent-teal)" />
                 <span>{CHURCH_INFO.address}</span>
               </p>
@@ -326,7 +327,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
 
-      {/* Inline styles for responsive breakpoints */}
       <style>{`
         @media (min-width: 860px) {
           .desktop-links {

@@ -8,7 +8,7 @@ interface WelcomeSectionProps {
 
 export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit, onOpenPrayer }) => {
   return (
-    <section id="welcome" className="section-padding" style={{ position: 'relative' }}>
+    <section id="welcome" className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max">
         {/* Top Header Tag */}
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
@@ -22,26 +22,26 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
               fontSize: 'clamp(2.2rem, 4.5vw, 3.8rem)',
               maxWidth: '850px',
               margin: '0 auto',
-              color: '#FFFFFF'
+              color: 'var(--text-primary)'
             }}
           >
             Looking for a life-changing <span className="italic-serif">performance?</span> Neither are we.
           </h2>
         </div>
 
-        {/* Editorial Split Layout (Double-Bezel Image + Rich Story Block) */}
+        {/* Editorial Split Layout */}
         <div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '3rem',
+            gap: '3.5rem',
             alignItems: 'center',
             marginBottom: '4.5rem'
           }}
         >
           {/* Left: Double-Bezel Nested Photo Frame with Rotating Circular Badge */}
           <div style={{ position: 'relative' }}>
-            <div className="double-bezel">
+            <div className="double-bezel" style={{ background: '#FAF8F5' }}>
               <div
                 className="double-bezel-inner"
                 style={{
@@ -66,7 +66,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(180deg, transparent 60%, rgba(7, 9, 13, 0.8) 100%)'
+                    background: 'linear-gradient(180deg, transparent 65%, rgba(15, 20, 28, 0.75) 100%)'
                   }}
                 />
                 <div
@@ -81,7 +81,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: 'var(--accent-gold)', fontWeight: 700 }}>
+                    <div style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#FFE082', fontWeight: 700 }}>
                       Sunday Morning Fellowship
                     </div>
                     <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>
@@ -92,7 +92,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
               </div>
             </div>
 
-            {/* Signature Rotating Circular Badge (Brooklake & Motivation Pattern) */}
+            {/* Signature Rotating Circular Badge (Light Mode) */}
             <div
               style={{
                 position: 'absolute',
@@ -104,18 +104,18 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
             >
               <svg className="rotating-text-svg" viewBox="0 0 120 120">
                 <path
-                  id="circlePath"
+                  id="circlePathLight"
                   d="M 60, 60 m -45, 0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
                   fill="none"
                 />
-                <text fill="#FFE082" fontSize="9.2" fontWeight="700" letterSpacing="0.16em">
-                  <textPath href="#circlePath" startOffset="0%">
+                <text fill="#007681" fontSize="9.2" fontWeight="800" letterSpacing="0.16em">
+                  <textPath href="#circlePathLight" startOffset="0%">
                     JOIN US SUNDAYS • 9:00 & 11:15 AM •
                   </textPath>
                 </text>
               </svg>
               <div className="rotating-center-trigger">
-                <Sparkles size={20} color="#07090D" />
+                <Sparkles size={20} color="#FFFFFF" />
               </div>
             </div>
           </div>
@@ -126,11 +126,11 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
               style={{
                 fontSize: 'clamp(1.75rem, 2.5vw, 2.4rem)',
                 fontWeight: 700,
-                color: '#FFFFFF',
+                color: 'var(--text-primary)',
                 lineHeight: 1.25
               }}
             >
-              Instead of hosting a show, we simply desire to <span style={{ color: 'var(--accent-teal-light)' }}>meet with Jesus.</span>
+              Instead of hosting a show, we simply desire to <span style={{ color: 'var(--accent-teal)' }}>meet with Jesus.</span>
             </h3>
 
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', lineHeight: 1.7 }}>
@@ -158,14 +158,14 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
               >
                 <span>Need Prayer Today?</span>
                 <div className="btn-icon-bubble">
-                  <Heart size={14} />
+                  <Heart size={14} color="var(--accent-teal)" />
                 </div>
               </button>
             </div>
           </div>
         </div>
 
-        {/* 3 Core Pillars Bento Cards (Nested Double-Bezel) */}
+        {/* 3 Core Pillars Bento Cards (Light Theme Doppelrand) */}
         <div
           style={{
             display: 'grid',
@@ -175,26 +175,27 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
         >
           {/* Pillar 1 */}
           <div className="double-bezel">
-            <div className="double-bezel-inner" style={{ padding: '2rem 1.75rem' }}>
+            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '14px',
                   background: 'var(--accent-teal-subtle)',
+                  border: '1px solid rgba(0, 118, 129, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--accent-teal-light)',
+                  color: 'var(--accent-teal)',
                   marginBottom: '1.25rem'
                 }}
               >
                 <Users size={22} />
               </div>
-              <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.65rem' }}>
+              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
                 Everyone Is Welcome
               </h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 Whoever you are, whatever your past, there is a seat saved at the table for you. We embrace real people with radical grace.
               </p>
             </div>
@@ -202,26 +203,27 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
 
           {/* Pillar 2 */}
           <div className="double-bezel">
-            <div className="double-bezel-inner" style={{ padding: '2rem 1.75rem' }}>
+            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
-                  background: 'rgba(26, 86, 219, 0.15)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '14px',
+                  background: 'rgba(29, 78, 216, 0.08)',
+                  border: '1px solid rgba(29, 78, 216, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#60A5FA',
+                  color: 'var(--accent-royal)',
                   marginBottom: '1.25rem'
                 }}
               >
                 <Compass size={22} />
               </div>
-              <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.65rem' }}>
+              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
                 Everyone Has A Next Step
               </h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 Faith isn’t a destination—it’s a journey. From baptism and small groups to leadership, we walk alongside you in growth.
               </p>
             </div>
@@ -229,13 +231,14 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
 
           {/* Pillar 3 */}
           <div className="double-bezel">
-            <div className="double-bezel-inner" style={{ padding: '2rem 1.75rem' }}>
+            <div className="double-bezel-inner" style={{ padding: '2.25rem 2rem', background: '#FFFFFF' }}>
               <div
                 style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '12px',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '14px',
                   background: 'var(--accent-gold-subtle)',
+                  border: '1px solid rgba(180, 83, 9, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -245,10 +248,10 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
               >
                 <Heart size={22} />
               </div>
-              <h4 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.65rem' }}>
+              <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.65rem' }}>
                 Everyone Can Make A Difference
               </h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                 God has wired you with distinct gifts to serve others. When we love our city with tangible care, lives are transformed.
               </p>
             </div>

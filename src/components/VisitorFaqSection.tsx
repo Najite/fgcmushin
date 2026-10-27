@@ -14,17 +14,17 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
   };
 
   return (
-    <section className="section-padding" style={{ position: 'relative', background: '#05070B' }}>
+    <section className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max" style={{ maxWidth: '920px' }}>
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
             <HelpCircle size={14} />
             <span>WHAT TO EXPECT</span>
           </div>
-          <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', color: '#FFFFFF', marginBottom: '1rem' }}>
+          <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(2.2rem, 4.5vw, 3.5rem)', color: 'var(--text-primary)', marginBottom: '1rem' }}>
             First Time Visiting? <span className="italic-serif">Here’s what to expect.</span>
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem' }}>
             Visiting a new church can feel intimidating. Here are honest answers to make your first Sunday effortless.
           </p>
         </div>
@@ -33,12 +33,12 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
           {VISITOR_FAQS.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
-              <div key={index} className="double-bezel">
+              <div key={index} className="double-bezel" style={{ background: '#FAF8F5' }}>
                 <div
                   className="double-bezel-inner"
                   style={{
-                    background: isOpen ? 'rgba(0, 135, 147, 0.08)' : 'var(--bg-surface)',
-                    transition: 'background-color 0.3s ease'
+                    background: isOpen ? '#FFFFFF' : '#FFFFFF',
+                    transition: 'all 0.3s ease'
                   }}
                 >
                   <button
@@ -51,7 +51,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                       justifyContent: 'space-between',
                       textAlign: 'left',
                       gap: '1rem',
-                      color: '#FFFFFF',
+                      color: isOpen ? 'var(--accent-teal)' : 'var(--text-primary)',
                       fontWeight: 700,
                       fontSize: '1.15rem'
                     }}
@@ -62,11 +62,11 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                         width: '32px',
                         height: '32px',
                         borderRadius: '50%',
-                        background: 'rgba(255, 255, 255, 0.08)',
+                        background: isOpen ? 'var(--accent-teal-subtle)' : 'rgba(0, 0, 0, 0.04)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: isOpen ? 'var(--accent-teal-light)' : 'var(--text-muted)',
+                        color: isOpen ? 'var(--accent-teal)' : 'var(--text-muted)',
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                         transition: 'transform 0.3s var(--ease-spring)'
                       }}
@@ -90,8 +90,8 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
         <div
           className="double-bezel"
           style={{
-            background: 'linear-gradient(135deg, rgba(0, 135, 147, 0.25) 0%, rgba(26, 86, 219, 0.25) 100%)',
-            borderColor: 'rgba(0, 135, 147, 0.3)'
+            background: 'var(--accent-teal-subtle)',
+            borderColor: 'rgba(0, 118, 129, 0.25)'
           }}
         >
           <div
@@ -103,15 +103,15 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: '1.5rem',
-              background: 'rgba(10, 14, 20, 0.85)'
+              background: '#FFFFFF'
             }}
           >
             <div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF', marginBottom: '0.4rem' }}>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
                 Still have a question?
               </h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                Our welcome team would love to connect with you directly.
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                Our welcome team would love to connect with you directly before you visit.
               </p>
             </div>
             <button

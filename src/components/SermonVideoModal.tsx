@@ -17,7 +17,7 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
         position: 'fixed',
         inset: 0,
         zIndex: 110,
-        background: 'rgba(0, 0, 0, 0.9)',
+        background: 'rgba(21, 26, 33, 0.75)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         display: 'flex',
@@ -33,11 +33,12 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
           maxWidth: '900px',
           width: '100%',
           maxHeight: '92vh',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          background: '#FFFFFF'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2rem', background: '#0C1017' }}>
+        <div className="double-bezel-inner" style={{ padding: '2rem', background: '#FFFFFF' }}>
           {/* Header bar */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -54,11 +55,11 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FFFFFF'
+                color: 'var(--text-primary)'
               }}
             >
               <X size={18} />
@@ -75,10 +76,9 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
               overflow: 'hidden',
               background: '#000000',
               marginBottom: '1.75rem',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.8)'
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)'
             }}
           >
-            {/* Embedded Responsive Player with Fallback Video Graphic */}
             <iframe
               src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=0"
               title={sermon.title}
@@ -94,13 +94,13 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
 
           {/* Message Meta Info & Scripture */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-            <h2 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: '#FFFFFF' }}>
+            <h2 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>
               {sermon.title}
             </h2>
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              <span style={{ color: 'var(--accent-teal-light)', fontWeight: 600 }}>{sermon.speaker}</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+              <span style={{ color: 'var(--accent-teal)', fontWeight: 700 }}>{sermon.speaker}</span>
               <span>•</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-gold)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-gold)', fontWeight: 600 }}>
                 <BookOpen size={16} />
                 <span>Scripture: {sermon.passage}</span>
               </span>
@@ -108,7 +108,7 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
               <span>{sermon.duration}</span>
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '1.025rem', lineHeight: 1.7 }}>
               {sermon.summary}
             </p>
           </div>
@@ -125,18 +125,16 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
               borderTop: '1px solid var(--border-subtle)'
             }}
           >
-            <div style={{ display: 'flex', gap: '0.85rem' }}>
-              <button
-                onClick={() => {
-                  alert('Sermon study guide & scripture outline downloaded!');
-                }}
-                className="btn-island btn-ghost"
-                style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem' }}
-              >
-                <Download size={14} />
-                <span>Study Guide (PDF)</span>
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                alert('Sermon study guide & scripture outline downloaded!');
+              }}
+              className="btn-island btn-ghost"
+              style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
+            >
+              <Download size={14} color="var(--accent-teal)" />
+              <span>Study Guide (PDF)</span>
+            </button>
 
             <button
               onClick={() => {
@@ -144,7 +142,7 @@ export const SermonVideoModal: React.FC<SermonVideoModalProps> = ({ sermon, onCl
                 onOpenPrayer();
               }}
               className="btn-island btn-teal"
-              style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem' }}
+              style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
             >
               <Heart size={14} />
               <span>Request Prayer for this Message</span>

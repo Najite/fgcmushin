@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Clock, Sparkles, Coffee, Car, ShieldCheck } from 'lucide-react';
+import { X, Check, Clock, Sparkles, Coffee, Car, ShieldCheck, Plus, Minus } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface PlanVisitModalProps {
@@ -26,7 +26,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
       particleCount: 80,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#008793', '#FFE082', '#1A56DB', '#FFFFFF']
+      colors: ['#007681', '#B45309', '#1D4ED8', '#10B981']
     });
 
     setHasSubmitted(true);
@@ -43,7 +43,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
         position: 'fixed',
         inset: 0,
         zIndex: 100,
-        background: 'rgba(0, 0, 0, 0.85)',
+        background: 'rgba(21, 26, 33, 0.65)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         display: 'flex',
@@ -59,11 +59,12 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
           maxWidth: '620px',
           width: '100%',
           maxHeight: '92vh',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          background: '#FFFFFF'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#0F141C' }}>
+        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF' }}>
           {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
@@ -71,7 +72,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                 <Sparkles size={13} />
                 <span>FIRST TIME GUEST EXPERIENCE</span>
               </div>
-              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: '#FFFFFF', lineHeight: 1.15 }}>
+              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)', lineHeight: 1.15 }}>
                 {hasSubmitted ? "We're Ready for You!" : "Plan Your Sunday Visit"}
               </h3>
             </div>
@@ -81,11 +82,11 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.08)',
+                background: 'rgba(0, 0, 0, 0.05)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FFFFFF'
+                color: 'var(--text-primary)'
               }}
             >
               <X size={18} />
@@ -94,13 +95,13 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
 
           {!hasSubmitted ? (
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', lineHeight: 1.6 }}>
                 Let us know you’re coming! We’ll have a VIP parking spot reserved, a dedicated host to show you around, and a welcome gift + fresh coffee waiting at the Welcome Center.
               </p>
 
               {/* Step 1: Choose Gathering Time */}
               <div>
-                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   1. Select Gathering Time
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
@@ -112,9 +113,9 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                       style={{
                         padding: '1rem',
                         borderRadius: '14px',
-                        border: serviceTime === t ? '2px solid var(--accent-teal)' : '1px solid var(--border-subtle)',
-                        background: serviceTime === t ? 'rgba(0, 135, 147, 0.15)' : 'rgba(255, 255, 255, 0.03)',
-                        color: '#FFFFFF',
+                        border: serviceTime === t ? '2px solid var(--accent-teal)' : '1px solid var(--border-medium)',
+                        background: serviceTime === t ? 'var(--accent-teal-subtle)' : '#FAF8F5',
+                        color: serviceTime === t ? 'var(--accent-teal-dark)' : 'var(--text-primary)',
                         fontWeight: 700,
                         fontSize: '1.05rem',
                         display: 'flex',
@@ -124,7 +125,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                         cursor: 'pointer'
                       }}
                     >
-                      <Clock size={16} color={serviceTime === t ? 'var(--accent-teal-light)' : 'var(--text-muted)'} />
+                      <Clock size={16} color={serviceTime === t ? 'var(--accent-teal)' : 'var(--text-muted)'} />
                       <span>{t}</span>
                     </button>
                   ))}
@@ -134,7 +135,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
               {/* Step 2: Contact Info */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
                     Full Name *
                   </label>
                   <input
@@ -147,9 +148,9 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                       width: '100%',
                       padding: '0.85rem 1rem',
                       borderRadius: '12px',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid var(--border-subtle)',
-                      color: '#FFFFFF',
+                      background: '#F8FAFC',
+                      border: '1px solid rgba(0, 0, 0, 0.12)',
+                      color: 'var(--text-primary)',
                       fontSize: '0.95rem',
                       outline: 'none'
                     }}
@@ -158,7 +159,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
                       Email Address *
                     </label>
                     <input
@@ -171,9 +172,9 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                         width: '100%',
                         padding: '0.85rem 1rem',
                         borderRadius: '12px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid var(--border-subtle)',
-                        color: '#FFFFFF',
+                        background: '#F8FAFC',
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        color: 'var(--text-primary)',
                         fontSize: '0.95rem',
                         outline: 'none'
                       }}
@@ -181,7 +182,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                   </div>
 
                   <div>
-                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>
                       Phone (for VIP parking text)
                     </label>
                     <input
@@ -193,9 +194,9 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                         width: '100%',
                         padding: '0.85rem 1rem',
                         borderRadius: '12px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid var(--border-subtle)',
-                        color: '#FFFFFF',
+                        background: '#F8FAFC',
+                        border: '1px solid rgba(0, 0, 0, 0.12)',
+                        color: 'var(--text-primary)',
                         fontSize: '0.95rem',
                         outline: 'none'
                       }}
@@ -206,48 +207,52 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
 
               {/* Step 3: Party Size & Kids */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                <div style={{ background: '#FAF8F5', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontWeight: 600 }}>
                     Number of Adults
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                     <button
                       type="button"
+                      aria-label="Decrease adults"
                       onClick={() => setAdults(Math.max(1, adults - 1))}
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF' }}
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      -
+                      <Minus size={14} />
                     </button>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>{adults}</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{adults}</span>
                     <button
                       type="button"
+                      aria-label="Increase adults"
                       onClick={() => setAdults(adults + 1)}
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF' }}
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      +
+                      <Plus size={14} />
                     </button>
                   </div>
                 </div>
 
-                <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
-                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                <div style={{ background: '#FAF8F5', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontWeight: 600 }}>
                     Kids (Infant - 5th Grade)
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                     <button
                       type="button"
+                      aria-label="Decrease kids"
                       onClick={() => setKids(Math.max(0, kids - 1))}
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF' }}
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      -
+                      <Minus size={14} />
                     </button>
-                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF' }}>{kids}</span>
+                    <span style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{kids}</span>
                     <button
                       type="button"
+                      aria-label="Increase kids"
                       onClick={() => setKids(kids + 1)}
-                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', color: '#FFFFFF' }}
+                      style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid var(--border-subtle)', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
-                      +
+                      <Plus size={14} />
                     </button>
                   </div>
                 </div>
@@ -270,48 +275,49 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                   width: '64px',
                   height: '64px',
                   borderRadius: '50%',
-                  background: 'rgba(0, 135, 147, 0.2)',
-                  border: '2px solid var(--accent-teal-light)',
+                  background: 'var(--accent-teal-subtle)',
+                  border: '2px solid var(--accent-teal)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: '0 auto',
-                  color: 'var(--accent-teal-light)'
+                  color: 'var(--accent-teal)'
                 }}
               >
                 <Check size={32} />
               </div>
 
               <div>
-                <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#FFFFFF', marginBottom: '0.5rem' }}>
+                <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
                   You’re On The Guest List, {fullName}!
                 </h4>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', maxWidth: '480px', margin: '0 auto' }}>
-                  We’ve reserved seats for your party of {adults + kids} on Sunday at {serviceTime}. Check your inbox at <strong style={{ color: '#FFFFFF' }}>{email}</strong> for parking directions and your VIP host contact.
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.975rem', maxWidth: '480px', margin: '0 auto' }}>
+                  We’ve reserved seats for your party of {adults + kids} on Sunday at {serviceTime}. Check your inbox at <strong style={{ color: 'var(--accent-teal-dark)' }}>{email}</strong> for parking directions and your VIP host contact.
                 </p>
               </div>
 
               <div
                 style={{
-                  background: 'rgba(255, 255, 255, 0.04)',
+                  background: '#FAF8F5',
                   padding: '1.5rem',
                   borderRadius: '16px',
                   textAlign: 'left',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '1rem'
+                  gap: '1rem',
+                  border: '1px solid var(--border-subtle)'
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#FFFFFF', fontSize: '0.9rem' }}>
-                  <Car size={18} color="var(--accent-teal-light)" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
+                  <Car size={18} color="var(--accent-teal)" />
                   <span>Turn your hazard lights on at the entrance for VIP parking.</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#FFFFFF', fontSize: '0.9rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
                   <Coffee size={18} color="var(--accent-gold)" />
                   <span>Fresh espresso & iced drinks waiting at the Welcome Kiosk.</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#FFFFFF', fontSize: '0.9rem' }}>
-                  <ShieldCheck size={18} color="var(--accent-teal-light)" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-primary)', fontSize: '0.925rem' }}>
+                  <ShieldCheck size={18} color="var(--accent-teal)" />
                   <span>Haven Kids is pre-notified for instant check-in.</span>
                 </div>
               </div>

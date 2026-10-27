@@ -15,7 +15,10 @@ export const Marquee: React.FC = () => {
       <div className="marquee-content">
         {items.map((item, index) => (
           <div key={`m1-${index}`} className="marquee-item">
-            <span className={item.isOutline ? 'text-outline-white font-serif italic-serif' : ''} style={{ letterSpacing: '0.04em' }}>
+            <span
+              className={item.isOutline ? 'text-outline-dark font-serif italic-serif' : ''}
+              style={{ letterSpacing: '0.04em', color: item.isOutline ? 'transparent' : 'var(--text-primary)' }}
+            >
               {item.text}
             </span>
             <div className="marquee-dash" />
@@ -25,7 +28,10 @@ export const Marquee: React.FC = () => {
       <div className="marquee-content" aria-hidden="true">
         {items.map((item, index) => (
           <div key={`m2-${index}`} className="marquee-item">
-            <span className={item.isOutline ? 'text-outline-white font-serif italic-serif' : ''} style={{ letterSpacing: '0.04em' }}>
+            <span
+              className={item.isOutline ? 'text-outline-dark font-serif italic-serif' : ''}
+              style={{ letterSpacing: '0.04em', color: item.isOutline ? 'transparent' : 'var(--text-primary)' }}
+            >
               {item.text}
             </span>
             <div className="marquee-dash" />
