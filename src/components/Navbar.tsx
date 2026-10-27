@@ -89,20 +89,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <div
                 style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '38px',
+                  height: '38px',
                   borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #007681 0%, #1D4ED8 100%)',
+                  overflow: 'hidden',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0, 118, 129, 0.3)'
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
+                  background: '#FFFFFF',
+                  border: '1px solid var(--border-subtle)',
+                  flexShrink: 0
                 }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 3V21M7 8H17" stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round" />
-                  <path d="M4 19C4 14.5817 7.58172 11 12 11C16.4183 11 20 14.5817 20 19" stroke="#FFE082" strokeWidth="1.8" strokeLinecap="round" strokeDasharray="1 3" />
-                </svg>
+                <img
+                  src="/logo.png"
+                  alt="Church Logo"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
