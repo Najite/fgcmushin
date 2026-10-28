@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow } from '../types/database';
+import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow, ServiceAttendanceRow, StaffUserRow } from '../types/database';
 import type { Sermon, ChurchEvent, Ministry } from '../types';
 
 const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://tmjuucclnumavnbyukmf.supabase.co';
@@ -397,3 +397,100 @@ export async function updateGuestVisitStatus(id: string, status: string): Promis
     return { success: false, error: message };
   }
 }
+
+// ================= IAM Staff Accounts & Service Headcount =================
+
+/**
+ * Fetch all registered church staff accounts
+ */
+export async function getStaffUsers(): Promise<StaffUserRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from('staff_users')
+      .select('*')
+      .order('role', { ascending: true });
+
+    if (error) {
+      console.warn('Error fetching staff_users:', error.message);
+      return [];
+    }
+    return (data as unknown as StaffUserRow[]) || [];
+  } catch (err) {
+    console.warn('Network error fetching staff_users:', err);
+    return [];
+  }
+}
+
+/**
+ * Update staff profile or passkey (Admin IAM)
+ */
+export async function updateStaffUser(id: string, updates: Partial<StaffUserRow>): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase
+      .from('staff_users')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Fetch service attendance logs
+ */
+export async function getServiceAttendance(): Promise<ServiceAttendanceRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from('service_attendance')
+      .select('*')
+      .order('service_date', { ascending: false });
+
+    if (error) {
+      console.warn('Error fetching service_attendance:', error.message);
+      return [];
+    }
+    return (data as unknown as ServiceAttendanceRow[]) || [];
+  } catch (err) {
+    console.warn('Network error fetching service_attendance:', err);
+    return [];
+  }
+}
+
+/**
+ * Log new service attendance (Head Usher & Protocol)
+ */
+export async function logServiceAttendance(entry: {
+  service_date: string;
+  service_name: string;
+  men_count: number;
+  women_count: number;
+  children_count: number;
+  head_usher_name?: string;
+  notes?: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.from('service_attendance').insert({
+      service_date: entry.service_date,
+      service_name: entry.service_name,
+      men_count: entry.men_count,
+      women_count: entry.women_count,
+      children_count: entry.children_count,
+      head_usher_name: entry.head_usher_name || 'Bro. Emmanuel Kalu',
+      notes: entry.notes || null
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+

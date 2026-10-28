@@ -284,6 +284,88 @@ export type Database = {
         }
         Relationships: []
       }
+      service_attendance: {
+        Row: {
+          id: string
+          service_date: string
+          service_name: string
+          men_count: number
+          women_count: number
+          children_count: number
+          total_count: number
+          head_usher_name: string | null
+          notes: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          service_date: string
+          service_name: string
+          men_count?: number
+          women_count?: number
+          children_count?: number
+          head_usher_name?: string | null
+          notes?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          service_date?: string
+          service_name?: string
+          men_count?: number
+          women_count?: number
+          children_count?: number
+          head_usher_name?: string | null
+          notes?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      staff_users: {
+        Row: {
+          id: string
+          name: string
+          role: string
+          title: string
+          email: string
+          phone: string | null
+          passkey: string
+          avatar_initials: string
+          is_active: boolean
+          last_login_at: string | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          role: string
+          title: string
+          email: string
+          phone?: string | null
+          passkey: string
+          avatar_initials: string
+          is_active?: boolean
+          last_login_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          role?: string
+          title?: string
+          email?: string
+          phone?: string | null
+          passkey?: string
+          avatar_initials?: string
+          is_active?: boolean
+          last_login_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -307,3 +389,32 @@ export type MinistryRow = Database['public']['Tables']['ministries']['Row']
 export type PrayerRequestRow = Database['public']['Tables']['prayer_requests']['Row']
 export type GuestVisitRow = Database['public']['Tables']['guest_visits']['Row']
 export type GivingRecordRow = Database['public']['Tables']['giving_records']['Row']
+
+export interface ServiceAttendanceRow {
+  id: string;
+  service_date: string;
+  service_name: string;
+  men_count: number;
+  women_count: number;
+  children_count: number;
+  total_count: number;
+  head_usher_name?: string | null;
+  notes?: string | null;
+  created_at?: string;
+}
+
+export interface StaffUserRow {
+  id: string;
+  name: string;
+  role: 'admin' | 'district_overseer' | 'resident_pastor' | 'secretariat' | 'head_usher';
+  title: string;
+  email: string;
+  phone?: string | null;
+  passkey: string;
+  avatar_initials: string;
+  is_active: boolean;
+  last_login_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
