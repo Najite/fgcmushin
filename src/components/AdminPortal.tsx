@@ -14,7 +14,19 @@ import {
   Check,
   RefreshCw,
   Shield,
-  AlertCircle
+  Phone,
+  Mail,
+  MessageCircle,
+  Clock,
+  MapPin,
+  ArrowLeft,
+  Menu,
+  Sparkles,
+  BarChart3,
+  CheckCircle2,
+  AlertCircle,
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type { ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow } from '../types/database';
@@ -40,6 +52,8 @@ interface AdminPortalProps {
   onDataRefresh: () => void;
 }
 
+type TabType = 'overview' | 'sermons' | 'events' | 'guests' | 'prayers' | 'giving' | 'settings';
+
 export const AdminPortal: React.FC<AdminPortalProps> = ({
   isOpen,
   onClose,
@@ -48,20 +62,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   churchSettings,
   onDataRefresh
 }) => {
-  // Passkey authentication
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Authentication with sessionStorage persistence
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('fgc_staff_auth') === 'true';
+    }
+    return false;
+  });
   const [passkeyInput, setPasskeyInput] = useState('');
   const [authError, setAuthError] = useState('');
 
-  // Active Tab
-  type TabType = 'sermons' | 'events' | 'guests' | 'prayers' | 'giving' | 'settings';
-  const [activeTab, setActiveTab] = useState<TabType>('sermons');
+  // Active Tab & Mobile Sidebar State
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Loading & notification states
+  // Loading & Notification Notice
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-  // Submissions Data
+  // Live Submissions Data
   const [guestVisits, setGuestVisits] = useState<GuestVisitRow[]>([]);
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequestRow[]>([]);
   const [givingRecords, setGivingRecords] = useState<GivingRecordRow[]>([]);
@@ -82,11 +101,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     isFeatured: boolean;
   }>({
     title: '',
-    series: '',
-    speaker: '',
+    series: 'UNSHAKABLE',
+    speaker: 'Lead Pastor Marcus Vance',
     date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     duration: '35 min',
-    passage: '',
+    passage: 'Hebrews 13:8',
     thumbnail: '/images/sermon-series.jpg',
     summary: '',
     videoUrl: '',
@@ -101,18 +120,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     date: string;
     time: string;
     location: string;
-    category: ChurchEvent['category'];
+    category: 'Worship' | 'Community' | 'Outreach';
     description: string;
   }>({
     title: '',
-    date: '',
-    time: '6:00 PM',
+    date: 'Sunday, Nov 29, 2026',
+    time: '9:30 AM',
     location: 'District Headquarters, Idi-Oro',
     category: 'Community',
     description: ''
   });
 
-  // Announcement & Church Settings Form
+  // Settings State
   const [settingsForm, setSettingsForm] = useState({
     announcementText: churchSettings?.announcement_text || 'Welcome to FGC Mushin DHQ • Sunday Celebration Services at 7:30 AM & 9:30 AM',
     announcementActive: churchSettings?.announcement_active ?? true,
@@ -121,7 +140,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     address: churchSettings?.address || '4, Obarinmola Adedoyin Street, Mushin, Idi Oro, Lagos, Nigeria'
   });
 
-  // Sync settings when prop updates
   useEffect(() => {
     if (churchSettings) {
       setSettingsForm({
@@ -134,7 +152,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
   }, [churchSettings]);
 
-  // Load submissions when tab opens
+  // Load Submissions
   const loadSubmissions = async () => {
     setLoading(true);
     const [guests, prayers, giving] = await Promise.all([
@@ -152,7 +170,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     if (isAuthenticated && isOpen) {
       loadSubmissions();
     }
-  }, [isAuthenticated, isOpen, activeTab]);
+  }, [isAuthenticated, isOpen]);
 
   if (!isOpen) return null;
 
@@ -163,23 +181,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Default passkey for church administration
     if (passkeyInput === 'fgcmushin2026' || passkeyInput === 'admin') {
       setIsAuthenticated(true);
+      sessionStorage.setItem('fgc_staff_auth', 'true');
       setAuthError('');
     } else {
-      setAuthError('Incorrect church admin passkey. Please check with the Secretariat.');
+      setAuthError('Incorrect church administration passkey. Please check with the Secretariat.');
     }
+  };
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('fgc_staff_auth');
   };
 
   // --- Sermon Handlers ---
   const handleOpenAddSermon = () => {
     setSermonForm({
       title: '',
-      series: 'SUNDAY CELEBRATION',
-      speaker: 'Lead Pastor',
+      series: 'UNSHAKABLE',
+      speaker: 'Lead Pastor Marcus Vance',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      duration: '40 min',
+      duration: '35 min',
       passage: 'Hebrews 13:8',
       thumbnail: '/images/sermon-series.jpg',
       summary: '',
@@ -227,7 +250,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
     setLoading(false);
     if (res.success) {
-      showNotice('Sermon successfully saved and published!');
+      showNotice('Sermon successfully published to congregation!');
       setIsEditingSermon(false);
       onDataRefresh();
     } else {
@@ -236,7 +259,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   };
 
   const handleDeleteSermon = async (id: string, title: string) => {
-    if (!window.confirm(`Are you sure you want to delete "${title}"?`)) return;
+    if (!window.confirm(`Delete sermon "${title}" from public archive?`)) return;
     setLoading(true);
     const res = await deleteSermon(id);
     setLoading(false);
@@ -268,7 +291,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       date: evt.date,
       time: evt.time,
       location: evt.location,
-      category: evt.category,
+      category: evt.category as 'Worship' | 'Community' | 'Outreach',
       description: evt.description
     });
     setIsEditingEvent(true);
@@ -300,19 +323,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   };
 
   const handleDeleteEvent = async (id: string, title: string) => {
-    if (!window.confirm(`Are you sure you want to remove event "${title}"?`)) return;
+    if (!window.confirm(`Remove event "${title}" from calendar?`)) return;
     setLoading(true);
     const res = await deleteEvent(id);
     setLoading(false);
     if (res.success) {
-      showNotice('Event removed from calendar.');
+      showNotice('Event removed.');
       onDataRefresh();
     } else {
       showNotice(`Failed to delete event: ${res.error}`, 'error');
     }
   };
 
-  // --- Settings Handlers ---
+  // --- Settings Handler ---
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -325,1108 +348,1585 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     });
     setLoading(false);
     if (res.success) {
-      showNotice('Church settings updated successfully!');
+      showNotice('Live announcements & contact info updated.');
       onDataRefresh();
     } else {
-      showNotice(`Error updating settings: ${res.error}`, 'error');
+      showNotice(`Failed to update settings: ${res.error}`, 'error');
     }
   };
 
-  // --- Status Update Handlers ---
-  const handleUpdatePrayer = async (id: string, status: string) => {
-    const res = await updatePrayerStatus(id, status);
-    if (res.success) {
-      showNotice(`Prayer marked as "${status}"`);
-      loadSubmissions();
-    }
-  };
-
+  // --- Guest / Prayer Status Handlers ---
   const handleUpdateGuest = async (id: string, status: string) => {
     const res = await updateGuestVisitStatus(id, status);
     if (res.success) {
-      showNotice(`Guest marked as "${status}"`);
-      loadSubmissions();
+      setGuestVisits(prev => prev.map(g => g.id === id ? { ...g, status } : g));
+      showNotice(`Guest marked as ${status}`);
+    } else {
+      showNotice(`Could not update guest: ${res.error}`, 'error');
     }
+  };
+
+  const handleUpdatePrayer = async (id: string, status: string) => {
+    const res = await updatePrayerStatus(id, status);
+    if (res.success) {
+      setPrayerRequests(prev => prev.map(p => p.id === id ? { ...p, status } : p));
+      showNotice(`Prayer marked as ${status}`);
+    } else {
+      showNotice(`Could not update prayer: ${res.error}`, 'error');
+    }
+  };
+
+  // Quick Action Utilities
+  const getWhatsAppLink = (phone: string | null, name: string) => {
+    if (!phone) return null;
+    const cleanPhone = phone.replace(/[^0-9]/g, '');
+    const text = encodeURIComponent(`Peace be with you ${name}! This is the pastoral care team from Foursquare Gospel Church Mushin District Headquarters. We are so honored you connected with us!`);
+    return `https://wa.me/${cleanPhone}?text=${text}`;
   };
 
   return (
     <div
-      className="modal-backdrop-animate"
+      className="admin-dashboard-root"
       style={{
         position: 'fixed',
         inset: 0,
-        zIndex: 150,
-        background: 'rgba(21, 26, 33, 0.7)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        zIndex: 9999,
+        background: '#F8FAFC',
+        color: '#0F172A',
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1.25rem'
+        flexDirection: 'column',
+        overflow: 'hidden',
+        fontFamily: 'var(--font-sans)'
       }}
-      onClick={onClose}
     >
-      <div
-        className="double-bezel modal-dialog-animate"
-        style={{
-          maxWidth: '1050px',
-          width: '100%',
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: '#FFFFFF',
-          borderRadius: '24px'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="double-bezel-inner" style={{ padding: 'clamp(1.25rem, 3.5vw, 2.5rem)', background: '#FFFFFF', position: 'relative' }}>
-          {/* Top 4-Color Church Emblem Gradient Ribbon */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--fgc-gradient-4color)' }} />
+      {/* Top 4-Color Church Emblem Accent Strip */}
+      <div style={{ height: '3.5px', background: 'var(--fgc-gradient-4color)', width: '100%', flexShrink: 0, zIndex: 60 }} />
 
-          {/* Top Modal Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-              <div
+      {/* Notice Toast */}
+      {notice && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '1.25rem',
+            right: '1.5rem',
+            zIndex: 10000,
+            padding: '0.85rem 1.4rem',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            background: notice.type === 'success' ? '#065F46' : '#991B1B',
+            color: '#FFFFFF',
+            boxShadow: '0 12px 28px rgba(0,0,0,0.22)',
+            animation: 'fadeIn 0.2s ease-out'
+          }}
+        >
+          {notice.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          <span>{notice.message}</span>
+        </div>
+      )}
+
+      {/* LOGIN VIEW (Clean centered card if not authenticated) */}
+      {!isAuthenticated ? (
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1.5rem',
+            background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)'
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: '440px',
+              background: '#FFFFFF',
+              borderRadius: '24px',
+              padding: '2.5rem 2rem',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.4)',
+              textAlign: 'center'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-1rem' }}>
+              <button
+                onClick={onClose}
                 style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: '12px',
-                  background: 'var(--fgc-blue-subtle)',
-                  border: '1px solid var(--fgc-blue-border)',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.05)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--fgc-blue)'
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer'
                 }}
+                title="Return to website"
               >
-                <Settings size={22} />
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                    FGC Mushin CMS & Content Backend
-                  </h3>
-                  <span className="eyebrow-pill blue" style={{ fontSize: '0.7rem', padding: '0.2rem 0.6rem' }}>
-                    Supabase Live
-                  </span>
-                </div>
-                <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Manage sermons, events, live announcements, and view visitor & prayer requests
-                </p>
-              </div>
+                <X size={16} />
+              </button>
             </div>
 
-            <button
-              onClick={onClose}
+            <div
               style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                background: '#F3EFEA',
-                border: '1px solid var(--border-subtle)',
+                width: '64px',
+                height: '64px',
+                borderRadius: '16px',
+                background: 'var(--fgc-blue-subtle)',
+                border: '1px solid var(--fgc-blue-border)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--text-primary)',
-                cursor: 'pointer'
+                margin: '0 auto 1.25rem',
+                color: 'var(--fgc-blue)'
               }}
             >
-              <X size={18} />
-            </button>
-          </div>
-
-          {/* Notice Toast */}
-          {notice && (
-            <div
-              style={{
-                marginBottom: '1.25rem',
-                padding: '0.85rem 1.25rem',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.65rem',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                background: notice.type === 'success' ? '#ECFDF5' : '#FEF2F2',
-                color: notice.type === 'success' ? '#065F46' : '#991B1B',
-                border: `1px solid ${notice.type === 'success' ? '#A7F3D0' : '#FECACA'}`
-              }}
-            >
-              {notice.type === 'success' ? <Check size={18} /> : <AlertCircle size={18} />}
-              <span>{notice.message}</span>
+              <Shield size={32} />
             </div>
-          )}
 
-          {/* Authentication View */}
-          {!isAuthenticated ? (
-            <div style={{ maxWidth: '440px', margin: '3rem auto', textAlign: 'center' }}>
-              <div
-                style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '50%',
-                  background: 'var(--fgc-blue-subtle)',
-                  border: '2px solid var(--fgc-blue)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 1.5rem',
-                  color: 'var(--fgc-blue)'
-                }}
-              >
-                <Lock size={26} />
-              </div>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--fgc-blue)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+              FGC Mushin District Headquarters
+            </div>
+            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+              Staff Operations Portal
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.5, marginBottom: '1.75rem' }}>
+              Authorized pastoral and secretariat team access. Enter your administrative passkey to manage content and church records.
+            </p>
 
-              <h4 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
-                Church Staff Access
-              </h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                Enter the church administration passkey to access live content management.
-              </p>
-
-              <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <form onSubmit={handleAuthSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ position: 'relative' }}>
                 <input
                   type="password"
-                  placeholder="Enter staff passkey (e.g. fgcmushin2026)"
+                  placeholder="Enter staff passkey"
                   value={passkeyInput}
                   onChange={(e) => setPasskeyInput(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '0.85rem 1rem',
+                    padding: '0.9rem 1rem',
                     borderRadius: '12px',
-                    border: '1px solid var(--border-medium)',
+                    border: authError ? '1px solid #DC2626' : '1px solid var(--border-medium)',
                     background: '#FAF8F5',
                     fontSize: '1rem',
                     outline: 'none',
                     textAlign: 'center',
-                    letterSpacing: '0.05em'
+                    fontWeight: 600,
+                    letterSpacing: '0.08em'
                   }}
                   autoFocus
                 />
+              </div>
 
-                {authError && (
-                  <p style={{ color: '#DC2626', fontSize: '0.825rem', margin: 0, fontWeight: 600 }}>
-                    {authError}
-                  </p>
-                )}
+              {authError && (
+                <div style={{ color: '#DC2626', fontSize: '0.825rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+                  <AlertCircle size={14} />
+                  <span>{authError}</span>
+                </div>
+              )}
 
-                <button
-                  type="submit"
-                  className="btn-island btn-teal"
-                  style={{ justifyContent: 'center', padding: '0.85rem 1.5rem', fontSize: '0.95rem' }}
-                >
-                  <span>Authorize & Open CMS</span>
-                  <Shield size={16} />
-                </button>
+              <button
+                type="submit"
+                className="btn-island btn-teal"
+                style={{ width: '100%', justifyContent: 'center', padding: '0.9rem', fontSize: '1rem', marginTop: '0.25rem' }}
+              >
+                <span>Authorize & Open Workspace</span>
+                <ChevronRight size={16} />
+              </button>
 
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                  Default passkey: <code style={{ background: '#F3EFEA', padding: '2px 6px', borderRadius: '4px' }}>fgcmushin2026</code>
-                </p>
-              </form>
-            </div>
-          ) : (
-            /* Authenticated Admin Dashboard */
-            <div>
-              {/* Navigation Tabs */}
-              <div
+              <button
+                type="button"
+                onClick={onClose}
                 style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '0.5rem',
-                  background: '#FAF8F5',
-                  padding: '6px',
-                  borderRadius: '14px',
-                  border: '1px solid var(--border-subtle)',
-                  marginBottom: '1.75rem'
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  marginTop: '0.5rem'
                 }}
               >
-                <button
-                  onClick={() => { setActiveTab('sermons'); setIsEditingSermon(false); }}
+                ← Return to Public Church Website
+              </button>
+            </form>
+          </div>
+        </div>
+      ) : (
+        /* AUTHENTICATED FULL DASHBOARD WORKSPACE */
+        <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
+          
+          {/* 1. LEFT SIDEBAR (Desktop Fixed, Mobile Slide-Over) */}
+          <aside
+            className={`admin-sidebar ${mobileSidebarOpen ? 'is-mobile-open' : ''}`}
+            style={{
+              width: '280px',
+              background: '#0F172A',
+              color: '#F8FAFC',
+              display: 'flex',
+              flexDirection: 'column',
+              flexShrink: 0,
+              zIndex: 50,
+              transition: 'transform 0.3s var(--ease-spring)'
+            }}
+          >
+            {/* Church Identity Header in Sidebar */}
+            <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div
                   style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '10px',
+                    background: '#FFFFFF',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'sermons' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'sermons' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    flexShrink: 0
                   }}
                 >
-                  <BookOpen size={15} />
-                  <span>Sermons ({sermons.length})</span>
-                </button>
-
-                <button
-                  onClick={() => { setActiveTab('events'); setIsEditingEvent(false); }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'events' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'events' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Calendar size={15} />
-                  <span>Events ({events.length})</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('guests')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'guests' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'guests' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Users size={15} />
-                  <span>First-Time Guests ({guestVisits.length})</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('prayers')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'prayers' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'prayers' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Heart size={15} />
-                  <span>Prayer Requests ({prayerRequests.length})</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('giving')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'giving' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'giving' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <DollarSign size={15} />
-                  <span>Giving Records ({givingRecords.length})</span>
-                </button>
-
-                <button
-                  onClick={() => setActiveTab('settings')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    padding: '0.6rem 1rem',
-                    borderRadius: '10px',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    background: activeTab === 'settings' ? 'var(--fgc-blue)' : 'transparent',
-                    color: activeTab === 'settings' ? '#FFFFFF' : 'var(--text-secondary)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <Settings size={15} />
-                  <span>Church Settings</span>
-                </button>
-
-                <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-                  <button
-                    onClick={() => { onDataRefresh(); loadSubmissions(); }}
-                    title="Refresh data from Supabase"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      padding: '0.5rem 0.85rem',
-                      fontSize: '0.8rem',
-                      color: 'var(--text-muted)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                    <span>Sync</span>
-                  </button>
+                  <img src="/logo.png" alt="Church Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                    FGC MUSHIN DHQ
+                  </div>
+                  <div style={{ fontSize: '0.62rem', fontWeight: 700, color: '#38BDF8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                    Staff Operations Suite
+                  </div>
                 </div>
               </div>
 
-              {/* TAB 1: SERMONS */}
-              {activeTab === 'sermons' && (
+              {/* Close button for mobile drawer */}
+              <button
+                className="admin-mobile-close-btn"
+                onClick={() => setMobileSidebarOpen(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  padding: '4px',
+                  display: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Cloud Sync Status Beacon */}
+            <div style={{ padding: '0.75rem 1.5rem', background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#94A3B8' }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', display: 'inline-block', boxShadow: '0 0 8px #10B981' }} />
+                <span>Supabase Live Cloud</span>
+              </div>
+              <button
+                onClick={() => { onDataRefresh(); loadSubmissions(); }}
+                title="Sync database now"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#38BDF8',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem',
+                  cursor: 'pointer'
+                }}
+              >
+                <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                <span>Sync</span>
+              </button>
+            </div>
+
+            {/* Sidebar Navigation Items */}
+            <nav style={{ padding: '1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', flex: 1, overflowY: 'auto' }}>
+              <div style={{ fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#64748B', padding: '0.5rem 0.75rem' }}>
+                Core Workspace
+              </div>
+
+              {[
+                { id: 'overview', label: 'Dashboard Pulse', icon: BarChart3, count: null },
+                { id: 'sermons', label: 'Sermons & Teaching', icon: BookOpen, count: sermons.length },
+                { id: 'events', label: 'Calendar & Gatherings', icon: Calendar, count: events.length },
+                { id: 'guests', label: 'First-Time Guests', icon: Users, count: guestVisits.length, highlight: guestVisits.filter(g => g.status !== 'welcomed').length > 0 },
+                { id: 'prayers', label: 'Prayer & Pastoral Care', icon: Heart, count: prayerRequests.length, highlight: prayerRequests.filter(p => p.status !== 'prayed').length > 0 },
+                { id: 'giving', label: 'Giving Ledger', icon: DollarSign, count: givingRecords.length },
+                { id: 'settings', label: 'Announcements & Info', icon: Settings, count: null }
+              ].map(item => {
+                const isActive = activeTab === item.id;
+                const IconComponent = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id as TabType);
+                      setIsEditingSermon(false);
+                      setIsEditingEvent(false);
+                      setMobileSidebarOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.7rem 0.85rem',
+                      borderRadius: '10px',
+                      background: isActive ? '#1E293B' : 'transparent',
+                      color: isActive ? '#FFFFFF' : '#94A3B8',
+                      fontSize: '0.875rem',
+                      fontWeight: isActive ? 700 : 500,
+                      cursor: 'pointer',
+                      borderLeft: isActive ? '3px solid var(--accent-teal)' : '3px solid transparent',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <IconComponent size={18} color={isActive ? 'var(--accent-teal)' : '#64748B'} />
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.count !== null && (
+                      <span
+                        style={{
+                          fontSize: '0.725rem',
+                          fontWeight: 700,
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '9999px',
+                          background: item.highlight ? '#DC2626' : (isActive ? '#334155' : 'rgba(255,255,255,0.06)'),
+                          color: '#FFFFFF'
+                        }}
+                      >
+                        {item.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {/* Sidebar Bottom Footer (Sign Out & Public View) */}
+            <div style={{ padding: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button
+                onClick={onClose}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: '10px',
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: '#E2E8F0',
+                  fontSize: '0.825rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  border: 'none'
+                }}
+              >
+                <ArrowLeft size={16} />
+                <span>Return to Website</span>
+              </button>
+
+              <button
+                onClick={handleSignOut}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.5rem 0.85rem',
+                  borderRadius: '10px',
+                  background: 'transparent',
+                  color: '#94A3B8',
+                  fontSize: '0.8rem',
+                  cursor: 'pointer',
+                  border: 'none'
+                }}
+              >
+                <LogOut size={14} />
+                <span>Sign Out of Portal</span>
+              </button>
+            </div>
+          </aside>
+
+          {/* Mobile backdrop for sidebar drawer */}
+          {mobileSidebarOpen && (
+            <div
+              className="admin-mobile-backdrop"
+              onClick={() => setMobileSidebarOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 45
+              }}
+            />
+          )}
+
+          {/* 2. MAIN CONTENT AREA */}
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+            
+            {/* Top Workspace Bar */}
+            <header
+              style={{
+                height: '64px',
+                background: '#FFFFFF',
+                borderBottom: '1px solid #E2E8F0',
+                padding: '0 1.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexShrink: 0
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button
+                  className="admin-mobile-menu-trigger"
+                  onClick={() => setMobileSidebarOpen(true)}
+                  aria-label="Open portal navigation"
+                  style={{
+                    display: 'none',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '8px',
+                    background: '#F1F5F9',
+                    border: '1px solid #E2E8F0',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Menu size={18} />
+                </button>
+
                 <div>
-                  {!isEditingSermon ? (
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                        <div>
-                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                            Published Sermons & Teaching
-                          </h4>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                            Add sermon titles, scripture references, video embeds, and summaries
-                          </p>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0F172A', margin: 0, textTransform: 'capitalize' }}>
+                    {activeTab === 'overview' && 'Operations Dashboard Pulse'}
+                    {activeTab === 'sermons' && 'Sermons & Congregation Teaching'}
+                    {activeTab === 'events' && 'Church Calendar & Special Gatherings'}
+                    {activeTab === 'guests' && 'First-Time Guest Connections'}
+                    {activeTab === 'prayers' && 'Pastoral Prayer & Care Ministry'}
+                    {activeTab === 'giving' && 'Generosity & Stewardship Ledger'}
+                    {activeTab === 'settings' && 'Church Announcements & Public Contact'}
+                  </h2>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <button
+                  onClick={onClose}
+                  className="btn-island btn-ghost"
+                  style={{ padding: '0.45rem 0.95rem', fontSize: '0.825rem' }}
+                >
+                  <span>Close Workspace</span>
+                  <X size={15} />
+                </button>
+              </div>
+            </header>
+
+            {/* Scrollable Tab Content Container */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: 'clamp(1rem, 3vw, 2rem)' }}>
+              <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+
+                {/* TAB 0: DASHBOARD PULSE / OVERVIEW */}
+                {activeTab === 'overview' && (
+                  <div>
+                    {/* At-a-Glance KPI Metrics Grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+                      
+                      {/* Card 1: Guests */}
+                      <div
+                        onClick={() => setActiveTab('guests')}
+                        style={{
+                          background: '#FFFFFF',
+                          padding: '1.5rem',
+                          borderRadius: '16px',
+                          border: '1px solid #E2E8F0',
+                          borderTop: '3px solid var(--fgc-blue)',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>First-Time Guests</span>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--fgc-blue-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-blue)' }}>
+                            <Users size={18} />
+                          </div>
                         </div>
-                        <button
-                          onClick={handleOpenAddSermon}
-                          className="btn-island btn-teal"
-                          style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
-                        >
-                          <Plus size={16} />
-                          <span>Add New Sermon</span>
-                        </button>
+                        <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A' }}>
+                          {guestVisits.length}
+                        </div>
+                        <div style={{ fontSize: '0.825rem', color: '#059669', fontWeight: 600, marginTop: '0.35rem' }}>
+                          {guestVisits.filter(g => g.status === 'welcomed').length} Welcomed • {guestVisits.filter(g => g.status !== 'welcomed').length} Pending
+                        </div>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                        {sermons.map((s) => (
-                          <div
-                            key={s.id}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '1rem 1.25rem',
-                              borderRadius: '12px',
-                              background: '#FAF8F5',
-                              border: '1px solid var(--border-subtle)'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
-                              <img
-                                src={s.thumbnail}
-                                alt={s.title}
-                                style={{ width: '65px', height: '45px', objectFit: 'cover', borderRadius: '8px' }}
-                              />
-                              <div style={{ minWidth: 0 }}>
-                                <div style={{ fontSize: '0.725rem', color: 'var(--accent-teal)', fontWeight: 700, textTransform: 'uppercase' }}>
-                                  {s.series} • {s.passage}
-                                </div>
-                                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {s.title}
-                                </div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {s.speaker} • {s.date}
-                                </div>
-                              </div>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                              <button
-                                onClick={() => handleEditSermon(s)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.3rem',
-                                  padding: '0.5rem 0.85rem',
-                                  borderRadius: '8px',
-                                  border: '1px solid var(--border-subtle)',
-                                  background: '#FFFFFF',
-                                  fontSize: '0.8rem',
-                                  fontWeight: 600,
-                                  color: 'var(--text-primary)',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                <Edit3 size={14} />
-                                <span>Edit</span>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteSermon(s.id, s.title)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  padding: '0.5rem',
-                                  borderRadius: '8px',
-                                  border: '1px solid #FECACA',
-                                  background: '#FEF2F2',
-                                  color: '#DC2626',
-                                  cursor: 'pointer'
-                                }}
-                                title="Delete sermon"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
+                      {/* Card 2: Prayers */}
+                      <div
+                        onClick={() => setActiveTab('prayers')}
+                        style={{
+                          background: '#FFFFFF',
+                          padding: '1.5rem',
+                          borderRadius: '16px',
+                          border: '1px solid #E2E8F0',
+                          borderTop: '3px solid var(--fgc-red)',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Prayer Requests</span>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--fgc-red-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-red)' }}>
+                            <Heart size={18} />
                           </div>
-                        ))}
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A' }}>
+                          {prayerRequests.length}
+                        </div>
+                        <div style={{ fontSize: '0.825rem', color: '#D97706', fontWeight: 600, marginTop: '0.35rem' }}>
+                          {prayerRequests.filter(p => p.status !== 'prayed').length} Intercessions Active
+                        </div>
+                      </div>
+
+                      {/* Card 3: Events */}
+                      <div
+                        onClick={() => setActiveTab('events')}
+                        style={{
+                          background: '#FFFFFF',
+                          padding: '1.5rem',
+                          borderRadius: '16px',
+                          border: '1px solid #E2E8F0',
+                          borderTop: '3px solid var(--fgc-purple)',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Upcoming Events</span>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--fgc-purple-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-purple)' }}>
+                            <Calendar size={18} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A' }}>
+                          {events.length}
+                        </div>
+                        <div style={{ fontSize: '0.825rem', color: '#64748B', fontWeight: 600, marginTop: '0.35rem' }}>
+                          Next: {events[0]?.title || 'Sunday Gathering'}
+                        </div>
+                      </div>
+
+                      {/* Card 4: Sermons */}
+                      <div
+                        onClick={() => setActiveTab('sermons')}
+                        style={{
+                          background: '#FFFFFF',
+                          padding: '1.5rem',
+                          borderRadius: '16px',
+                          border: '1px solid #E2E8F0',
+                          borderTop: '3px solid var(--fgc-gold)',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Published Sermons</span>
+                          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--fgc-gold-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fgc-gold-dark)' }}>
+                            <BookOpen size={18} />
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '2rem', fontWeight: 800, color: '#0F172A' }}>
+                          {sermons.length}
+                        </div>
+                        <div style={{ fontSize: '0.825rem', color: '#64748B', fontWeight: 600, marginTop: '0.35rem' }}>
+                          Latest: {sermons[0]?.title || 'Sunday Message'}
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    /* Add / Edit Sermon Form */
-                    <form onSubmit={handleSaveSermon} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem' }}>
-                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                          {sermonForm.id ? 'Edit Sermon Message' : 'Create New Sermon'}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingSermon(false)}
-                          style={{ fontSize: '0.85rem', color: 'var(--text-muted)', cursor: 'pointer' }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Sermon Title *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={sermonForm.title}
-                            onChange={(e) => setSermonForm({ ...sermonForm, title: e.target.value })}
-                            placeholder="e.g. Walking In Divine Favor"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Series Name
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.series}
-                            onChange={(e) => setSermonForm({ ...sermonForm, series: e.target.value })}
-                            placeholder="e.g. UNSHAKABLE"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Preacher / Speaker *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={sermonForm.speaker}
-                            onChange={(e) => setSermonForm({ ...sermonForm, speaker: e.target.value })}
-                            placeholder="e.g. District Overseer / Pastor"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Date Preached
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.date}
-                            onChange={(e) => setSermonForm({ ...sermonForm, date: e.target.value })}
-                            placeholder="e.g. Oct 25, 2026"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Scripture Passage
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.passage}
-                            onChange={(e) => setSermonForm({ ...sermonForm, passage: e.target.value })}
-                            placeholder="e.g. Hebrews 13:8"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Video URL (YouTube or Vimeo embed)
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.videoUrl}
-                            onChange={(e) => setSermonForm({ ...sermonForm, videoUrl: e.target.value })}
-                            placeholder="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                          Sermon Summary & Key Takeaways
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={sermonForm.summary}
-                          onChange={(e) => setSermonForm({ ...sermonForm, summary: e.target.value })}
-                          placeholder="Brief message summary for congregation and online visitors..."
-                          style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                        />
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingSermon(false)}
-                          className="btn-island btn-ghost"
-                          style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="btn-island btn-teal"
-                          style={{ padding: '0.65rem 1.5rem', fontSize: '0.85rem' }}
-                        >
-                          <Check size={16} />
-                          <span>Save & Publish Sermon</span>
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 2: EVENTS */}
-              {activeTab === 'events' && (
-                <div>
-                  {!isEditingEvent ? (
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                        <div>
-                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                            Church Calendar & Gatherings
-                          </h4>
-                          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                            Manage upcoming prayer vigils, outreaches, youth programs, and celebrations
-                          </p>
-                        </div>
-                        <button
-                          onClick={handleOpenAddEvent}
-                          className="btn-island btn-teal"
-                          style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
-                        >
-                          <Plus size={16} />
-                          <span>Add New Event</span>
-                        </button>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                        {events.map((evt) => (
-                          <div
-                            key={evt.id}
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              padding: '1rem 1.25rem',
-                              borderRadius: '12px',
-                              background: '#FAF8F5',
-                              border: '1px solid var(--border-subtle)'
-                            }}
-                          >
-                            <div style={{ minWidth: 0, flex: 1 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                <span className={`eyebrow-pill ${evt.category.toLowerCase()}`} style={{ fontSize: '0.7rem', padding: '0.15rem 0.5rem' }}>
-                                  {evt.category}
-                                </span>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--fgc-blue)', fontWeight: 600 }}>
-                                  {evt.date} • {evt.time}
-                                </span>
-                              </div>
-                              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                                {evt.title}
-                              </div>
-                              <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-                                {evt.location}
-                              </div>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                              <button
-                                onClick={() => handleEditEvent(evt)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: '0.3rem',
-                                  padding: '0.5rem 0.85rem',
-                                  borderRadius: '8px',
-                                  border: '1px solid var(--border-subtle)',
-                                  background: '#FFFFFF',
-                                  fontSize: '0.8rem',
-                                  fontWeight: 600,
-                                  color: 'var(--text-primary)',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                <Edit3 size={14} />
-                                <span>Edit</span>
-                              </button>
-                              <button
-                                onClick={() => handleDeleteEvent(evt.id, evt.title)}
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  padding: '0.5rem',
-                                  borderRadius: '8px',
-                                  border: '1px solid #FECACA',
-                                  background: '#FEF2F2',
-                                  color: '#DC2626',
-                                  cursor: 'pointer'
-                                }}
-                                title="Delete event"
-                              >
-                                <Trash2 size={15} />
-                              </button>
-                            </div>
+                    {/* Dual Action & Summary Columns */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
+                      
+                      {/* Recent Guests Widget */}
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Users size={18} color="var(--fgc-blue)" />
+                            <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>Recent Guest Registrations</h4>
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    /* Add / Edit Event Form */
-                    <form onSubmit={handleSaveEvent} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem' }}>
-                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                          {eventForm.id ? 'Edit Event Details' : 'Create New Event'}
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingEvent(false)}
-                          style={{ fontSize: '0.85rem', color: 'var(--text-muted)', cursor: 'pointer' }}
-                        >
-                          Cancel
-                        </button>
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Event Title *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={eventForm.title}
-                            onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
-                            placeholder="e.g. Night of Prophetic Praise"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Category *
-                          </label>
-                          <select
-                            value={eventForm.category}
-                            onChange={(e) => setEventForm({ ...eventForm, category: e.target.value as ChurchEvent['category'] })}
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
+                          <button
+                            onClick={() => setActiveTab('guests')}
+                            style={{ background: 'none', border: 'none', color: 'var(--fgc-blue)', fontSize: '0.825rem', fontWeight: 700, cursor: 'pointer' }}
                           >
-                            <option value="Worship">Worship Service</option>
-                            <option value="Community">Community Gathering</option>
-                            <option value="Outreach">Outreach & Welfare</option>
-                            <option value="NextGen">NextGen & Youth</option>
-                          </select>
+                            View All →
+                          </button>
                         </div>
 
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Date *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={eventForm.date}
-                            onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
-                            placeholder="e.g. Friday, Nov 27, 2026"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Time *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={eventForm.time}
-                            onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })}
-                            placeholder="e.g. 6:00 PM – 8:30 PM"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
-
-                        <div style={{ gridColumn: 'span 2' }}>
-                          <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                            Location
-                          </label>
-                          <input
-                            type="text"
-                            value={eventForm.location}
-                            onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
-                            placeholder="e.g. 4, Obarinmola Adedoyin Street, Mushin, Idi-Oro"
-                            style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                          />
-                        </div>
+                        {guestVisits.length === 0 ? (
+                          <p style={{ color: '#94A3B8', fontSize: '0.9rem', textAlign: 'center', padding: '2rem 0' }}>No guest registrations yet.</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {guestVisits.slice(0, 3).map(g => (
+                              <div key={g.id} style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                  <div style={{ fontWeight: 700, fontSize: '0.925rem', color: '#0F172A' }}>{g.full_name}</div>
+                                  <div style={{ fontSize: '0.775rem', color: '#64748B' }}>Service: {g.service_time} • {g.phone || g.email}</div>
+                                </div>
+                                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.55rem', borderRadius: '6px', background: g.status === 'welcomed' ? '#DCFCE7' : '#FEF3C7', color: g.status === 'welcomed' ? '#166534' : '#92400E' }}>
+                                  {g.status === 'welcomed' ? 'Welcomed' : 'Pending'}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                          Description
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={eventForm.description}
-                          onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
-                          placeholder="Event description and details for attendees..."
-                          style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                        />
-                      </div>
+                      {/* Recent Prayer Requests Widget */}
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Heart size={18} color="var(--fgc-red)" />
+                            <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>Recent Prayer Needs</h4>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab('prayers')}
+                            style={{ background: 'none', border: 'none', color: 'var(--fgc-red)', fontSize: '0.825rem', fontWeight: 700, cursor: 'pointer' }}
+                          >
+                            View All →
+                          </button>
+                        </div>
 
-                      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingEvent(false)}
-                          className="btn-island btn-ghost"
-                          style={{ padding: '0.65rem 1.25rem', fontSize: '0.85rem' }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="submit"
-                          className="btn-island btn-teal"
-                          style={{ padding: '0.65rem 1.5rem', fontSize: '0.85rem' }}
-                        >
-                          <Check size={16} />
-                          <span>Save & Publish Event</span>
-                        </button>
+                        {prayerRequests.length === 0 ? (
+                          <p style={{ color: '#94A3B8', fontSize: '0.9rem', textAlign: 'center', padding: '2rem 0' }}>No prayer requests yet.</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                            {prayerRequests.slice(0, 3).map(p => (
+                              <div key={p.id} style={{ padding: '0.85rem 1rem', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#0F172A' }}>{p.full_name}</div>
+                                  <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.45rem', borderRadius: '4px', background: p.is_confidential ? '#FEE2E2' : '#E0E7FF', color: p.is_confidential ? '#991B1B' : '#3730A3' }}>
+                                    {p.is_confidential ? 'CONFIDENTIAL' : 'PUBLIC'}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: '0.825rem', color: '#475569', fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                  "{p.request}"
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </form>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 3: FIRST-TIME GUESTS */}
-              {activeTab === 'guests' && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                        First-Time Guest RSVPs ({guestVisits.length})
-                      </h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        Visitors who filled out "Plan Your Sunday Visit"
-                      </p>
                     </div>
                   </div>
+                )}
 
-                  {guestVisits.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem 1rem', background: '#FAF8F5', borderRadius: '16px', color: 'var(--text-muted)' }}>
-                      <Users size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
-                      <p style={{ margin: 0, fontWeight: 600 }}>No guest reservations submitted yet.</p>
-                      <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem' }}>When visitors RSVP via the website, their details appear here in real time.</p>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                      {guestVisits.map((g) => (
-                        <div
-                          key={g.id}
-                          style={{
-                            padding: '1.25rem',
-                            borderRadius: '12px',
-                            background: '#FAF8F5',
-                            border: '1px solid var(--border-subtle)',
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: '1rem'
-                          }}
-                        >
+                {/* TAB 1: SERMONS */}
+                {activeTab === 'sermons' && (
+                  <div>
+                    {!isEditingSermon ? (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                           <div>
-                            <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                              {g.full_name}
-                            </div>
-                            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', gap: '1rem', marginTop: '0.2rem' }}>
-                              <span>Email: <strong>{g.email}</strong></span>
-                              {g.phone && <span>Phone: <strong>{g.phone}</strong></span>}
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem', display: 'flex', gap: '1rem' }}>
-                              <span>Service: <strong>{g.service_time}</strong></span>
-                              <span>Party: <strong>{g.adults_count ?? 1} Adults, {g.kids_count ?? 0} Kids</strong></span>
-                              <span>Date: {g.created_at ? new Date(g.created_at).toLocaleDateString() : 'Recent'}</span>
-                            </div>
+                            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                              Published Sermons & Media ({sermons.length})
+                            </h3>
+                            <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                              Add sermon titles, series, scripture passages, and YouTube embed links
+                            </p>
                           </div>
+                          <button
+                            onClick={handleOpenAddSermon}
+                            className="btn-island btn-teal"
+                            style={{ padding: '0.75rem 1.4rem', fontSize: '0.9rem' }}
+                          >
+                            <Plus size={16} />
+                            <span>Add New Sermon</span>
+                          </button>
+                        </div>
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: g.status === 'welcomed' ? '#059669' : '#D97706' }}>
-                              Status: {g.status || 'Pending'}
-                            </span>
-                            <button
-                              onClick={() => handleUpdateGuest(g.id, g.status === 'welcomed' ? 'pending' : 'welcomed')}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          {sermons.map((sermon) => (
+                            <div
+                              key={sermon.id}
                               style={{
-                                padding: '0.45rem 0.85rem',
-                                borderRadius: '8px',
-                                border: '1px solid var(--border-medium)',
                                 background: '#FFFFFF',
-                                fontSize: '0.785rem',
-                                fontWeight: 600,
-                                cursor: 'pointer'
+                                border: '1px solid #E2E8F0',
+                                borderRadius: '14px',
+                                padding: '1.25rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '1rem',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
                               }}
                             >
-                              {g.status === 'welcomed' ? 'Mark Pending' : 'Mark Welcomed'}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', minWidth: 0 }}>
+                                <img
+                                  src={sermon.thumbnail}
+                                  alt={sermon.title}
+                                  style={{
+                                    width: '100px',
+                                    height: '65px',
+                                    borderRadius: '10px',
+                                    objectFit: 'cover',
+                                    flexShrink: 0
+                                  }}
+                                />
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                    <span className="eyebrow-pill gold" style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem' }}>
+                                      {sermon.series}
+                                    </span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--accent-teal)', fontWeight: 600 }}>
+                                      {sermon.passage}
+                                    </span>
+                                  </div>
+                                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A', lineHeight: 1.2 }}>
+                                    {sermon.title}
+                                  </div>
+                                  <div style={{ fontSize: '0.825rem', color: '#64748B', marginTop: '0.2rem' }}>
+                                    {sermon.speaker} • {sermon.date} • {sermon.duration}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <button
+                                  onClick={() => handleEditSermon(sermon)}
+                                  className="btn-island btn-ghost"
+                                  style={{ padding: '0.55rem 0.95rem', fontSize: '0.825rem' }}
+                                >
+                                  <Edit3 size={14} />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteSermon(sermon.id, sermon.title)}
+                                  style={{
+                                    width: '38px',
+                                    height: '38px',
+                                    borderRadius: '10px',
+                                    background: '#FEF2F2',
+                                    border: '1px solid #FECACA',
+                                    color: '#DC2626',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer'
+                                  }}
+                                  title="Delete sermon"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      /* SERMON FORM WITH PINNED SAVE BAR */
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #E2E8F0' }}>
+                          <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>
+                            {sermonForm.id ? 'Edit Sermon Details' : 'Publish New Sermon to Website'}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingSermon(false)}
+                            className="btn-island btn-ghost"
+                            style={{ padding: '0.45rem 0.95rem', fontSize: '0.825rem' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+
+                        <form onSubmit={handleSaveSermon} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Sermon Title *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={sermonForm.title}
+                                onChange={(e) => setSermonForm({ ...sermonForm, title: e.target.value })}
+                                placeholder="e.g. Hope In The Storm"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Preacher / Speaker *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={sermonForm.speaker}
+                                onChange={(e) => setSermonForm({ ...sermonForm, speaker: e.target.value })}
+                                placeholder="e.g. Lead Pastor Marcus Vance"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Sermon Series
+                              </label>
+                              <input
+                                type="text"
+                                value={sermonForm.series}
+                                onChange={(e) => setSermonForm({ ...sermonForm, series: e.target.value })}
+                                placeholder="e.g. UNSHAKABLE or KINGDOM HEARTS"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Scripture Reference
+                              </label>
+                              <input
+                                type="text"
+                                value={sermonForm.passage}
+                                onChange={(e) => setSermonForm({ ...sermonForm, passage: e.target.value })}
+                                placeholder="e.g. Hebrews 6:19–20"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Date Preached
+                              </label>
+                              <input
+                                type="text"
+                                value={sermonForm.date}
+                                onChange={(e) => setSermonForm({ ...sermonForm, date: e.target.value })}
+                                placeholder="e.g. Oct 25, 2026"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                YouTube Video URL or Embed ID
+                              </label>
+                              <input
+                                type="text"
+                                value={sermonForm.videoUrl}
+                                onChange={(e) => setSermonForm({ ...sermonForm, videoUrl: e.target.value })}
+                                placeholder="e.g. https://youtube.com/watch?v=..."
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                              Sermon Summary / Key Takeaways
+                            </label>
+                            <textarea
+                              rows={4}
+                              value={sermonForm.summary}
+                              onChange={(e) => setSermonForm({ ...sermonForm, summary: e.target.value })}
+                              placeholder="Summary of this message for seekers and online listeners..."
+                              style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                            />
+                          </div>
+
+                          {/* Pinned Action Buttons */}
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '1.25rem', borderTop: '1px solid #E2E8F0' }}>
+                            <button
+                              type="button"
+                              onClick={() => setIsEditingSermon(false)}
+                              className="btn-island btn-ghost"
+                              style={{ padding: '0.75rem 1.5rem', fontSize: '0.9rem' }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="btn-island btn-teal"
+                              style={{ padding: '0.75rem 1.85rem', fontSize: '0.9rem' }}
+                            >
+                              <Check size={16} />
+                              <span>{loading ? 'Saving to Database...' : 'Save & Publish Sermon'}</span>
                             </button>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 4: PRAYER REQUESTS */}
-              {activeTab === 'prayers' && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                        Pastoral Prayer Requests ({prayerRequests.length})
-                      </h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        Requests received from members and seekers for intercessory prayer
-                      </p>
-                    </div>
+                        </form>
+                      </div>
+                    )}
                   </div>
+                )}
 
-                  {prayerRequests.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem 1rem', background: '#FAF8F5', borderRadius: '16px', color: 'var(--text-muted)' }}>
-                      <Heart size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
-                      <p style={{ margin: 0, fontWeight: 600 }}>No prayer requests submitted yet.</p>
-                      <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem' }}>Requests submitted through the prayer modal will be securely listed here.</p>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                      {prayerRequests.map((p) => (
-                        <div
-                          key={p.id}
-                          style={{
-                            padding: '1.25rem',
-                            borderRadius: '12px',
-                            background: '#FAF8F5',
-                            border: '1px solid var(--border-subtle)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '0.65rem'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                            <div>
-                              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                                {p.full_name}
+                {/* TAB 2: EVENTS */}
+                {activeTab === 'events' && (
+                  <div>
+                    {!isEditingEvent ? (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                          <div>
+                            <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                              Church Calendar & Gatherings ({events.length})
+                            </h3>
+                            <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                              Manage vigils, special services, youth rallies, and community outreaches
+                            </p>
+                          </div>
+                          <button
+                            onClick={handleOpenAddEvent}
+                            className="btn-island btn-teal"
+                            style={{ padding: '0.75rem 1.4rem', fontSize: '0.9rem' }}
+                          >
+                            <Plus size={16} />
+                            <span>Add New Event</span>
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                          {events.map((evt) => (
+                            <div
+                              key={evt.id}
+                              style={{
+                                background: '#FFFFFF',
+                                border: '1px solid #E2E8F0',
+                                borderRadius: '14px',
+                                padding: '1.25rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '1rem',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                              }}
+                            >
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                                  <span className={`eyebrow-pill ${evt.category.toLowerCase()}`} style={{ fontSize: '0.7rem', padding: '0.2rem 0.55rem' }}>
+                                    {evt.category}
+                                  </span>
+                                  <span style={{ fontSize: '0.825rem', color: 'var(--fgc-blue)', fontWeight: 700 }}>
+                                    {evt.date} • {evt.time}
+                                  </span>
+                                </div>
+                                <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A' }}>
+                                  {evt.title}
+                                </div>
+                                <div style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem' }}>
+                                  <MapPin size={13} color="var(--accent-teal)" />
+                                  <span>{evt.location}</span>
+                                </div>
                               </div>
-                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {p.email || 'No email provided'} • {p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Recent'}
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <button
+                                  onClick={() => handleEditEvent(evt)}
+                                  className="btn-island btn-ghost"
+                                  style={{ padding: '0.55rem 0.95rem', fontSize: '0.825rem' }}
+                                >
+                                  <Edit3 size={14} />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteEvent(evt.id, evt.title)}
+                                  style={{
+                                    width: '38px',
+                                    height: '38px',
+                                    borderRadius: '10px',
+                                    background: '#FEF2F2',
+                                    border: '1px solid #FECACA',
+                                    color: '#DC2626',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer'
+                                  }}
+                                  title="Delete event"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
                               </div>
                             </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      /* EVENT FORM WITH PINNED SAVE BAR */
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid #E2E8F0' }}>
+                          <h3 style={{ fontSize: '1.35rem', fontWeight: 800, margin: 0, color: '#0F172A' }}>
+                            {eventForm.id ? 'Edit Event Schedule' : 'Schedule New Church Event'}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingEvent(false)}
+                            className="btn-island btn-ghost"
+                            style={{ padding: '0.45rem 0.95rem', fontSize: '0.825rem' }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              {p.is_confidential && (
-                                <span className="eyebrow-pill red" style={{ fontSize: '0.685rem', padding: '0.15rem 0.5rem' }}>
-                                  <Shield size={12} /> Confidential
-                                </span>
-                              )}
-                              <button
-                                onClick={() => handleUpdatePrayer(p.id, p.status === 'prayed' ? 'received' : 'prayed')}
+                        <form onSubmit={handleSaveEvent} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                            <div style={{ gridColumn: 'span 2' }}>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Event Title *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={eventForm.title}
+                                onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                                placeholder="e.g. All-Church Faith Night & Worship"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Category
+                              </label>
+                              <select
+                                value={eventForm.category}
+                                onChange={(e) => setEventForm({ ...eventForm, category: e.target.value as 'Worship' | 'Community' | 'Outreach' })}
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              >
+                                <option value="Worship">Worship</option>
+                                <option value="Community">Community</option>
+                                <option value="Outreach">Outreach</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Date String *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={eventForm.date}
+                                onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                                placeholder="e.g. Wednesday, Nov 4, 2026"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Time Range *
+                              </label>
+                              <input
+                                type="text"
+                                required
+                                value={eventForm.time}
+                                onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })}
+                                placeholder="e.g. 6:00 PM – 8:00 PM"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+
+                            <div>
+                              <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                                Venue / Location
+                              </label>
+                              <input
+                                type="text"
+                                value={eventForm.location}
+                                onChange={(e) => setEventForm({ ...eventForm, location: e.target.value })}
+                                placeholder="e.g. District Headquarters, Idi-Oro"
+                                style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: '#475569', marginBottom: '0.35rem' }}>
+                              Event Details & Description
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={eventForm.description}
+                              onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                              placeholder="Details for congregation and visitors..."
+                              style={{ width: '100%', padding: '0.8rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                            />
+                          </div>
+
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '1.25rem', borderTop: '1px solid #E2E8F0' }}>
+                            <button
+                              type="button"
+                              onClick={() => setIsEditingEvent(false)}
+                              className="btn-island btn-ghost"
+                              style={{ padding: '0.75rem 1.5rem', fontSize: '0.9rem' }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="submit"
+                              disabled={loading}
+                              className="btn-island btn-teal"
+                              style={{ padding: '0.75rem 1.85rem', fontSize: '0.9rem' }}
+                            >
+                              <Check size={16} />
+                              <span>{loading ? 'Saving...' : 'Save & Publish Event'}</span>
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 3: FIRST-TIME GUESTS WITH DIRECT PASTORAL ACTIONS */}
+                {activeTab === 'guests' && (
+                  <div>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                        First-Time Guest RSVPs ({guestVisits.length})
+                      </h3>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                        Congregation seekers who registered via "Plan Your Sunday Visit". Connect with them immediately using 1-click pastoral actions.
+                      </p>
+                    </div>
+
+                    {guestVisits.length === 0 ? (
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '4rem 1.5rem', textAlign: 'center' }}>
+                        <Users size={36} color="#94A3B8" style={{ margin: '0 auto 1rem' }} />
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>No Guest Registrations Yet</h4>
+                        <p style={{ color: '#64748B', fontSize: '0.875rem', maxWidth: '380px', margin: '0.5rem auto 0' }}>
+                          When visitors fill out the "Plan Your Sunday Visit" form on the website, their details appear here in real time.
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {guestVisits.map((guest) => {
+                          const isWelcomed = guest.status === 'welcomed';
+                          const waLink = getWhatsAppLink(guest.phone, guest.full_name);
+                          return (
+                            <div
+                              key={guest.id}
+                              style={{
+                                background: '#FFFFFF',
+                                border: '1px solid #E2E8F0',
+                                borderLeft: isWelcomed ? '4px solid #10B981' : '4px solid #F59E0B',
+                                borderRadius: '14px',
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                gap: '1.25rem',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                              }}
+                            >
+                              <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginBottom: '0.35rem' }}>
+                                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                                    {guest.full_name}
+                                  </h4>
+                                  <span
+                                    style={{
+                                      fontSize: '0.725rem',
+                                      fontWeight: 800,
+                                      padding: '0.2rem 0.6rem',
+                                      borderRadius: '9999px',
+                                      background: isWelcomed ? '#DCFCE7' : '#FEF3C7',
+                                      color: isWelcomed ? '#166534' : '#92400E',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.25rem'
+                                    }}
+                                  >
+                                    {isWelcomed ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                                    <span>{isWelcomed ? 'Welcomed & Followed Up' : 'Pending Follow-up'}</span>
+                                  </span>
+                                </div>
+
+                                <div style={{ fontSize: '0.85rem', color: '#64748B', display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginTop: '0.4rem' }}>
+                                  <span>Service Time: <strong style={{ color: '#0F172A' }}>{guest.service_time}</strong></span>
+                                  <span>Family Party: <strong style={{ color: '#0F172A' }}>{guest.adults_count ?? 1} Adults, {guest.kids_count ?? 0} Kids</strong></span>
+                                  <span>Date: {guest.created_at ? new Date(guest.created_at).toLocaleDateString() : 'Recent'}</span>
+                                </div>
+
+                                <div style={{ fontSize: '0.85rem', color: '#475569', display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginTop: '0.5rem' }}>
+                                  {guest.phone && <span>Phone: <strong>{guest.phone}</strong></span>}
+                                  {guest.email && <span>Email: <strong>{guest.email}</strong></span>}
+                                </div>
+                              </div>
+
+                              {/* Direct Pastoral Action Buttons */}
+                              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.65rem' }}>
+                                {waLink && (
+                                  <a
+                                    href={waLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.4rem',
+                                      padding: '0.55rem 1rem',
+                                      borderRadius: '10px',
+                                      background: '#25D366',
+                                      color: '#FFFFFF',
+                                      fontSize: '0.825rem',
+                                      fontWeight: 700,
+                                      textDecoration: 'none'
+                                    }}
+                                    title="Open WhatsApp chat with prefilled pastoral greeting"
+                                  >
+                                    <MessageCircle size={15} />
+                                    <span>WhatsApp</span>
+                                  </a>
+                                )}
+
+                                {guest.phone && (
+                                  <a
+                                    href={`tel:${guest.phone}`}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.4rem',
+                                      padding: '0.55rem 0.9rem',
+                                      borderRadius: '10px',
+                                      background: '#F1F5F9',
+                                      border: '1px solid #CBD5E1',
+                                      color: '#334155',
+                                      fontSize: '0.825rem',
+                                      fontWeight: 700,
+                                      textDecoration: 'none'
+                                    }}
+                                    title="Direct call"
+                                  >
+                                    <Phone size={14} />
+                                    <span>Call</span>
+                                  </a>
+                                )}
+
+                                {guest.email && (
+                                  <a
+                                    href={`mailto:${guest.email}?subject=${encodeURIComponent('Welcome to FGC Mushin District Headquarters!')}`}
+                                    style={{
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.4rem',
+                                      padding: '0.55rem 0.9rem',
+                                      borderRadius: '10px',
+                                      background: '#F1F5F9',
+                                      border: '1px solid #CBD5E1',
+                                      color: '#334155',
+                                      fontSize: '0.825rem',
+                                      fontWeight: 700,
+                                      textDecoration: 'none'
+                                    }}
+                                    title="Send welcome email"
+                                  >
+                                    <Mail size={14} />
+                                    <span>Email</span>
+                                  </a>
+                                )}
+
+                                <button
+                                  onClick={() => handleUpdateGuest(guest.id, isWelcomed ? 'pending' : 'welcomed')}
+                                  style={{
+                                    padding: '0.55rem 1rem',
+                                    borderRadius: '10px',
+                                    border: isWelcomed ? '1px solid #CBD5E1' : '1px solid #059669',
+                                    background: isWelcomed ? '#FFFFFF' : '#059669',
+                                    color: isWelcomed ? '#475569' : '#FFFFFF',
+                                    fontSize: '0.825rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  {isWelcomed ? 'Mark as Pending' : '✓ Mark Welcomed'}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* TAB 4: PRAYER REQUESTS */}
+                {activeTab === 'prayers' && (
+                  <div>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                        Pastoral Prayer & Intercession Ministry ({prayerRequests.length})
+                      </h3>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                        Requests submitted by members, families, and seekers for weekly pastoral intercession.
+                      </p>
+                    </div>
+
+                    {prayerRequests.length === 0 ? (
+                      <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '4rem 1.5rem', textAlign: 'center' }}>
+                        <Heart size={36} color="#94A3B8" style={{ margin: '0 auto 1rem' }} />
+                        <h4 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: '#0F172A' }}>No Prayer Requests Submitted Yet</h4>
+                        <p style={{ color: '#64748B', fontSize: '0.875rem', maxWidth: '380px', margin: '0.5rem auto 0' }}>
+                          Prayer petitions submitted through the Prayer & Care modal appear here securely.
+                        </p>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {prayerRequests.map((prayer) => {
+                          const isPrayed = prayer.status === 'prayed';
+                          return (
+                            <div
+                              key={prayer.id}
+                              style={{
+                                background: '#FFFFFF',
+                                border: '1px solid #E2E8F0',
+                                borderLeft: prayer.is_confidential ? '4px solid var(--fgc-red)' : '4px solid var(--fgc-blue)',
+                                borderRadius: '14px',
+                                padding: '1.5rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.85rem',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                              }}
+                            >
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                <div>
+                                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0F172A' }}>
+                                    {prayer.full_name}
+                                  </div>
+                                  <div style={{ fontSize: '0.825rem', color: '#64748B' }}>
+                                    {prayer.email || 'No email provided'} • {prayer.created_at ? new Date(prayer.created_at).toLocaleDateString() : 'Recent'}
+                                  </div>
+                                </div>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                                  {prayer.is_confidential && (
+                                    <span style={{ fontSize: '0.725rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: '9999px', background: '#FEE2E2', color: '#991B1B', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                      <Lock size={12} />
+                                      <span>CONFIDENTIAL (PASTORAL ONLY)</span>
+                                    </span>
+                                  )}
+
+                                  <button
+                                    onClick={() => handleUpdatePrayer(prayer.id, isPrayed ? 'pending' : 'prayed')}
+                                    style={{
+                                      padding: '0.5rem 1rem',
+                                      borderRadius: '8px',
+                                      border: isPrayed ? '1px solid #CBD5E1' : '1px solid var(--accent-gold)',
+                                      background: isPrayed ? '#FFFFFF' : 'var(--accent-gold)',
+                                      color: isPrayed ? '#475569' : '#FFFFFF',
+                                      fontSize: '0.825rem',
+                                      fontWeight: 700,
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    {isPrayed ? 'Re-open Prayer' : '✓ Mark Prayed Over'}
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Prayer Request Body */}
+                              <div
                                 style={{
-                                  padding: '0.45rem 0.85rem',
-                                  borderRadius: '8px',
-                                  border: '1px solid var(--border-medium)',
-                                  background: p.status === 'prayed' ? '#ECFDF5' : '#FFFFFF',
-                                  color: p.status === 'prayed' ? '#065F46' : 'var(--text-primary)',
-                                  fontSize: '0.785rem',
-                                  fontWeight: 600,
-                                  cursor: 'pointer'
+                                  background: '#F8FAFC',
+                                  padding: '1.15rem 1.25rem',
+                                  borderRadius: '10px',
+                                  borderLeft: '3px solid #CBD5E1',
+                                  fontSize: '0.95rem',
+                                  color: '#334155',
+                                  lineHeight: 1.6
                                 }}
                               >
-                                {p.status === 'prayed' ? '✓ Prayed Over' : 'Mark Prayed Over'}
-                              </button>
+                                "{prayer.request}"
+                              </div>
                             </div>
-                          </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
 
-                          <div style={{ background: '#FFFFFF', padding: '0.85rem 1rem', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontSize: '0.925rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>
-                            "{p.request}"
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 5: GIVING RECORDS */}
-              {activeTab === 'giving' && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                    <div>
-                      <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                {/* TAB 5: GIVING & TITHE LEDGER */}
+                {activeTab === 'giving' && (
+                  <div>
+                    <div style={{ marginBottom: '1.5rem' }}>
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
                         Stewardship & Giving Records ({givingRecords.length})
-                      </h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                        Online transactions and designated offerings
+                      </h3>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                        Direct digital offerings, tithes, building pledges, and welfare seed gifts.
                       </p>
                     </div>
-                  </div>
 
-                  {givingRecords.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem 1rem', background: '#FAF8F5', borderRadius: '16px', color: 'var(--text-muted)' }}>
-                      <DollarSign size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
-                      <p style={{ margin: 0, fontWeight: 600 }}>No online giving records yet.</p>
+                    <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '3.5rem 1.5rem', textAlign: 'center' }}>
+                      <div
+                        style={{
+                          width: '60px',
+                          height: '60px',
+                          borderRadius: '50%',
+                          background: 'var(--fgc-gold-subtle)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: '0 auto 1.25rem',
+                          color: 'var(--fgc-gold-dark)'
+                        }}
+                      >
+                        <DollarSign size={28} />
+                      </div>
+                      <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                        Church Bank Accounts & Tithes Active
+                      </h4>
+                      <p style={{ color: '#64748B', fontSize: '0.9rem', maxWidth: '440px', margin: '0.5rem auto 1.5rem', lineHeight: 1.6 }}>
+                        Congregation members currently sow via official bank transfers displayed on the Giving drawer. Integrated automated Paystack records will populate here in real time.
+                      </p>
+                      <div style={{ display: 'inline-flex', padding: '0.75rem 1.25rem', borderRadius: '10px', background: '#F8FAFC', border: '1px solid #E2E8F0', fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>
+                        Official Account: Access Bank • 0123456789 • FGC Mushin DHQ
+                      </div>
                     </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                      {givingRecords.map((r) => (
-                        <div
-                          key={r.id}
-                          style={{
-                            padding: '1rem 1.25rem',
-                            borderRadius: '12px',
-                            background: '#FAF8F5',
-                            border: '1px solid var(--border-subtle)',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <div>
-                            <div style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--fgc-blue)' }}>
-                              ${r.amount} <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>({r.frequency})</span>
-                            </div>
-                            <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-                              Fund: <strong>{r.fund}</strong> • {r.created_at ? new Date(r.created_at).toLocaleDateString() : 'Recent'}
-                            </div>
-                          </div>
-                          <span className="eyebrow-pill gold" style={{ fontSize: '0.725rem' }}>
-                            Confirmed
-                          </span>
+                  </div>
+                )}
+
+                {/* TAB 6: SETTINGS WITH PINNED SAVE BAR */}
+                {activeTab === 'settings' && (
+                  <div style={{ background: '#FFFFFF', borderRadius: '16px', border: '1px solid #E2E8F0', padding: '2rem', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                    <div style={{ marginBottom: '1.75rem', paddingBottom: '1rem', borderBottom: '1px solid #E2E8F0' }}>
+                      <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0F172A', margin: 0 }}>
+                        Live Announcement Banner & Contact Details
+                      </h3>
+                      <p style={{ margin: '0.2rem 0 0', fontSize: '0.875rem', color: '#64748B' }}>
+                        Modify the announcement ribbon text and church contact details displayed across the website.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                          <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155' }}>
+                            Top Announcement Message
+                          </label>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.825rem', color: '#64748B', fontWeight: 600 }}>
+                            <input
+                              type="checkbox"
+                              checked={settingsForm.announcementActive}
+                              onChange={(e) => setSettingsForm({ ...settingsForm, announcementActive: e.target.checked })}
+                              style={{ accentColor: 'var(--accent-teal)' }}
+                            />
+                            <span>Banner Active & Visible on Website</span>
+                          </label>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 6: SETTINGS */}
-              {activeTab === 'settings' && (
-                <form onSubmit={handleSaveSettings} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                      Live Announcement Banner & Contact Details
-                    </h4>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                      Modify the top announcement ribbon and church contact information displayed to the congregation.
-                    </p>
-                  </div>
-
-                  {/* Announcement Banner Text */}
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                      <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                        Top Banner Message
-                      </label>
-                      <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.825rem', cursor: 'pointer' }}>
                         <input
-                          type="checkbox"
-                          checked={settingsForm.announcementActive}
-                          onChange={(e) => setSettingsForm({ ...settingsForm, announcementActive: e.target.checked })}
-                          style={{ accentColor: 'var(--fgc-blue)' }}
+                          type="text"
+                          value={settingsForm.announcementText}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, announcementText: e.target.value })}
+                          placeholder="e.g. Welcome to FGC Mushin DHQ • Sunday Services at 7:30 AM & 9:30 AM"
+                          style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
                         />
-                        <span>Banner Active / Visible</span>
-                      </label>
-                    </div>
-                    <input
-                      type="text"
-                      value={settingsForm.announcementText}
-                      onChange={(e) => setSettingsForm({ ...settingsForm, announcementText: e.target.value })}
-                      placeholder="Welcome to FGC Mushin DHQ • Sunday Celebration Services at 7:30 AM & 9:30 AM"
-                      style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '12px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                    />
+
+                        {/* Live Banner Preview */}
+                        <div style={{ marginTop: '0.75rem' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>Preview on Public Website:</span>
+                          <div style={{ marginTop: '0.35rem', padding: '0.65rem 1rem', borderRadius: '8px', background: 'linear-gradient(90deg, #1E4E85 0%, #2866AD 50%, #A32371 100%)', color: '#FFFFFF', fontSize: '0.825rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Sparkles size={14} style={{ color: '#F3A645' }} />
+                            <span>{settingsForm.announcementText || 'Banner text here...'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                            Secretariat Phone Number
+                          </label>
+                          <input
+                            type="text"
+                            value={settingsForm.phone}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
+                            placeholder="+234 1 234 5678"
+                            style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                          />
+                        </div>
+
+                        <div>
+                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                            Official Email Address
+                          </label>
+                          <input
+                            type="email"
+                            value={settingsForm.email}
+                            onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
+                            placeholder="info@fgcmushin.org"
+                            style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+                          District Headquarters Physical Address
+                        </label>
+                        <input
+                          type="text"
+                          value={settingsForm.address}
+                          onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
+                          placeholder="4, Obarinmola Adedoyin Street, Mushin, Idi Oro, Lagos, Nigeria"
+                          style={{ width: '100%', padding: '0.85rem 1rem', borderRadius: '10px', border: '1px solid #CBD5E1', background: '#F8FAFC', fontSize: '0.95rem' }}
+                        />
+                      </div>
+
+                      {/* Sticky Save Bar — Never sliced off */}
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '1.25rem', borderTop: '1px solid #E2E8F0', marginTop: '1rem' }}>
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="btn-island btn-teal"
+                          style={{ padding: '0.85rem 2rem', fontSize: '0.95rem' }}
+                        >
+                          <Check size={16} />
+                          <span>{loading ? 'Saving Settings...' : 'Save & Publish Live Settings'}</span>
+                        </button>
+                      </div>
+                    </form>
                   </div>
-
-                  {/* Contact Info */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                        Secretariat Phone Number
-                      </label>
-                      <input
-                        type="text"
-                        value={settingsForm.phone}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })}
-                        style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                      />
-                    </div>
-
-                    <div>
-                      <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                        Official Email Address
-                      </label>
-                      <input
-                        type="email"
-                        value={settingsForm.email}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })}
-                        style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                      />
-                    </div>
-
-                    <div style={{ gridColumn: 'span 2' }}>
-                      <label style={{ display: 'block', fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
-                        District Headquarters Physical Address
-                      </label>
-                      <input
-                        type="text"
-                        value={settingsForm.address}
-                        onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
-                        style={{ width: '100%', padding: '0.75rem', borderRadius: '10px', border: '1px solid var(--border-medium)', background: '#FAF8F5' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '0.5rem' }}>
-                    <button
-                      type="submit"
-                      className="btn-island btn-teal"
-                      style={{ padding: '0.75rem 1.75rem', fontSize: '0.95rem' }}
-                    >
-                      <Check size={16} />
-                      <span>Update Church Settings</span>
-                    </button>
-                  </div>
-                </form>
-              )}
+                )}
+              </div>
             </div>
-          )}
+          </main>
         </div>
-      </div>
+      )}
+
+      {/* Responsive Styles for the Dashboard */}
+      <style>{`
+        @media (max-width: 860px) {
+          .admin-sidebar {
+            position: fixed !important;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 280px !important;
+            transform: translateX(-100%);
+            z-index: 60 !important;
+          }
+          .admin-sidebar.is-mobile-open {
+            transform: translateX(0) !important;
+          }
+          .admin-mobile-close-btn {
+            display: block !important;
+          }
+          .admin-mobile-menu-trigger {
+            display: inline-flex !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
