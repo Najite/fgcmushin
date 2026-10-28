@@ -102,6 +102,43 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Lock background scroll when any modal or full-screen portal is active
+  useEffect(() => {
+    const isAnyModalOpen = isPlanVisitOpen || isGivingOpen || isPrayerOpen || isAdminOpen || !!activeVideoSermon;
+    if (isAnyModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isPlanVisitOpen, isGivingOpen, isPrayerOpen, isAdminOpen, activeVideoSermon]);
+
+  // Support direct URL #admin hash navigation and Alt+A / Ctrl+Shift+A hotkeys
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#admin') {
+        setIsAdminOpen(true);
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.altKey && e.key.toLowerCase() === 'a') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a')) {
+        e.preventDefault();
+        setIsAdminOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHash);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleSelectSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (el) {
@@ -220,7 +257,12 @@ export const App: React.FC = () => {
       {/* Staff & Pastoral Content Management Portal (CMS) */}
       <AdminPortal
         isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
+        onClose={() => {
+          setIsAdminOpen(false);
+          if (window.location.hash === '#admin') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
         sermons={sermons}
         events={events}
         churchSettings={churchSettings}

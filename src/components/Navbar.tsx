@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Heart, MapPin, Clock } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Heart, MapPin, Clock, Lock } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface NavbarProps {
@@ -188,6 +188,27 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <Heart size={14} />
                 <span>Prayer</span>
               </button>
+              {onOpenAdmin && (
+                <button
+                  onClick={onOpenAdmin}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    color: 'var(--text-muted)',
+                    fontSize: '0.85rem',
+                    transition: 'color 0.2s',
+                    padding: '0.2rem 0.4rem',
+                    borderRadius: '6px'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--fgc-blue)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+                  title="Staff Operations Suite (Alt+A)"
+                >
+                  <Lock size={12} />
+                  <span>Staff</span>
+                </button>
+              )}
             </div>
 
             {/* Right Action Island */}

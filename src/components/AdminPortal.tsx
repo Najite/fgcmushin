@@ -644,6 +644,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   );
                 })}
               </div>
+
+              {/* Selected Role Scope Card */}
+              {selectedLoginProfileId && (
+                <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 mt-3 flex items-start gap-3">
+                  <div 
+                    className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" 
+                    style={{ backgroundColor: ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].badgeColor }}
+                  />
+                  <div className="text-xs">
+                    <div className="font-bold text-white">
+                      {ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].primaryDesk}
+                    </div>
+                    <div className="text-[11px] text-slate-400 mt-0.5">
+                      {ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].description}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Passkey Input Form */}
@@ -784,7 +802,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </header>
 
           {/* Body: Left Sidebar + Main Content Area */}
-          <div className="flex-1 flex overflow-hidden relative">
+          <div className="flex-1 flex overflow-hidden relative min-h-0">
             {/* Backdrop for mobile drawer */}
             {mobileSidebarOpen && (
               <div 
@@ -1070,7 +1088,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </aside>
 
             {/* Main Content Workspace */}
-            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#070d18]">
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#070d18] min-h-0 overscroll-contain">
 
               {/* ---------------------------------------------------- */}
               {/* TAB: OVERVIEW PULSE (ADMINISTRATOR)                 */}
@@ -1336,21 +1354,32 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               {/* ---------------------------------------------------- */}
               {activeTab === 'headcount_logger' && (
                 <div className="space-y-6 max-w-4xl mx-auto">
-                  <div className="p-6 rounded-3xl bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-950 border border-rose-500/30">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2.5 rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30">
-                        <Activity className="w-6 h-6" />
+                  <div className="p-6 rounded-3xl bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-950 border border-rose-500/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2.5 rounded-2xl bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                          <Activity className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-bold uppercase tracking-widest text-rose-400">
+                            Ushering & Protocol Desk • Service Headcount
+                          </span>
+                          <h1 className="text-2xl font-black text-white">Log Sunday Service Attendance</h1>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-rose-400">
-                          Ushering & Protocol Desk • Service Headcount
-                        </span>
-                        <h1 className="text-2xl font-black text-white">Log Sunday Service Attendance</h1>
-                      </div>
+                      <p className="text-xs text-slate-300 max-w-xl">
+                        Record exact attendance counts for men, women, and children during Sunday services and midweek gatherings.
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-300 max-w-xl">
-                      Record exact attendance counts for men, women, and children during Sunday services and midweek gatherings.
-                    </p>
+                    <button
+                      type="button"
+                      onClick={handleLogAttendance}
+                      disabled={loading}
+                      className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition-all active:scale-[0.96] flex items-center justify-center gap-2 self-start sm:self-auto shrink-0"
+                    >
+                      <Check className="w-4 h-4" />
+                      {loading ? 'Submitting...' : 'Save Attendance'}
+                    </button>
                   </div>
 
                   {/* Headcount Form */}
@@ -1386,56 +1415,175 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </div>
                     </div>
 
-                    {/* Numeric Counters */}
+                    {/* Numeric Counters with +/- step buttons */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
-                          Men Headcount
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={attendanceForm.men_count}
-                          onChange={(e) => setAttendanceForm({ ...attendanceForm, men_count: Math.max(0, parseInt(e.target.value) || 0) })}
-                          className="w-full py-2 bg-transparent text-center text-3xl font-black text-white focus:outline-none"
-                        />
+                      {/* Men */}
+                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center flex flex-col justify-between">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
+                            Men Headcount
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={attendanceForm.men_count}
+                            onChange={(e) => setAttendanceForm({ ...attendanceForm, men_count: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-full py-1 bg-transparent text-center text-3xl font-black text-white focus:outline-none tabular-nums"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5 mt-3 pt-2 border-t border-slate-800/80">
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, men_count: Math.max(0, prev.men_count - 10) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -10
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, men_count: Math.max(0, prev.men_count - 1) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, men_count: prev.men_count + 1 }))}
+                            className="px-2 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, men_count: prev.men_count + 10 }))}
+                            className="px-2 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +10
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">
-                          Women Headcount
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={attendanceForm.women_count}
-                          onChange={(e) => setAttendanceForm({ ...attendanceForm, women_count: Math.max(0, parseInt(e.target.value) || 0) })}
-                          className="w-full py-2 bg-transparent text-center text-3xl font-black text-white focus:outline-none"
-                        />
+                      {/* Women */}
+                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center flex flex-col justify-between">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">
+                            Women Headcount
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={attendanceForm.women_count}
+                            onChange={(e) => setAttendanceForm({ ...attendanceForm, women_count: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-full py-1 bg-transparent text-center text-3xl font-black text-white focus:outline-none tabular-nums"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5 mt-3 pt-2 border-t border-slate-800/80">
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, women_count: Math.max(0, prev.women_count - 10) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -10
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, women_count: Math.max(0, prev.women_count - 1) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, women_count: prev.women_count + 1 }))}
+                            className="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, women_count: prev.women_count + 10 }))}
+                            className="px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +10
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center">
-                        <label className="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
-                          Children Headcount
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={attendanceForm.children_count}
-                          onChange={(e) => setAttendanceForm({ ...attendanceForm, children_count: Math.max(0, parseInt(e.target.value) || 0) })}
-                          className="w-full py-2 bg-transparent text-center text-3xl font-black text-white focus:outline-none"
-                        />
+                      {/* Children */}
+                      <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800 text-center flex flex-col justify-between">
+                        <div>
+                          <label className="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                            Children Headcount
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={attendanceForm.children_count}
+                            onChange={(e) => setAttendanceForm({ ...attendanceForm, children_count: Math.max(0, parseInt(e.target.value) || 0) })}
+                            className="w-full py-1 bg-transparent text-center text-3xl font-black text-white focus:outline-none tabular-nums"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center gap-1.5 mt-3 pt-2 border-t border-slate-800/80">
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, children_count: Math.max(0, prev.children_count - 10) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -10
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, children_count: Math.max(0, prev.children_count - 1) }))}
+                            className="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            -1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, children_count: prev.children_count + 1 }))}
+                            className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +1
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setAttendanceForm(prev => ({ ...prev, children_count: prev.children_count + 10 }))}
+                            className="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-[11px] font-bold active:scale-95 transition-transform"
+                          >
+                            +10
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Total Calculated Banner */}
-                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between">
-                      <div>
-                        <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Calculated Total Headcount</div>
-                        <div className="text-[11px] text-slate-400">Sum of Men, Women, and Children</div>
+                    {/* Total Calculated Banner with Sanctuary Capacity Meter */}
+                    <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Calculated Total Headcount</div>
+                          <div className="text-[11px] text-slate-400">Sum of Men, Women, and Children</div>
+                        </div>
+                        <div className="text-3xl font-black text-emerald-400 tabular-nums">
+                          {attendanceForm.men_count + attendanceForm.women_count + attendanceForm.children_count}
+                        </div>
                       </div>
-                      <div className="text-3xl font-black text-emerald-400">
-                        {attendanceForm.men_count + attendanceForm.women_count + attendanceForm.children_count}
+
+                      {/* Sanctuary Seating Capacity Progress Bar */}
+                      <div>
+                        <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                          <span>Sanctuary Seating Utilization (1,000 Capacity)</span>
+                          <span className="font-bold text-emerald-400">
+                            {Math.round(((attendanceForm.men_count + attendanceForm.women_count + attendanceForm.children_count) / 1000) * 100)}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-slate-950/80 overflow-hidden border border-slate-800">
+                          <div 
+                            className="h-full bg-gradient-to-r from-emerald-500 to-amber-400 transition-all duration-300"
+                            style={{ 
+                              width: `${Math.min(100, Math.round(((attendanceForm.men_count + attendanceForm.women_count + attendanceForm.children_count) / 1000) * 100))}%` 
+                            }}
+                          />
+                        </div>
                       </div>
                     </div>
 
