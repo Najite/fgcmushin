@@ -118,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
                   FGC MUSHIN
                 </span>
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
+                <span className="navbar-brand-subtitle" style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
                   DISTRICT HEADQUARTERS
                 </span>
               </div>
@@ -234,110 +234,159 @@ export const Navbar: React.FC<NavbarProps> = ({
           style={{
             position: 'fixed',
             inset: 0,
-            zIndex: 35,
+            zIndex: 999,
             background: 'rgba(250, 248, 245, 0.98)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             display: 'flex',
             flexDirection: 'column',
-            padding: '6rem 2rem 3rem',
+            padding: '1.5rem 1.5rem 2.5rem',
             overflowY: 'auto'
           }}
         >
-          <div style={{ maxWidth: '640px', margin: '0 auto', width: '100%' }}>
-            <div style={{ marginBottom: '2.5rem' }}>
-              <div className="eyebrow-pill" style={{ marginBottom: '1rem' }}>
-                <span className="quad-beacon" aria-hidden="true">
-                  <span className="quad-dot red"></span>
-                  <span className="quad-dot blue"></span>
-                  <span className="quad-dot gold"></span>
-                  <span className="quad-dot purple"></span>
-                </span>
-                <span>Welcome to FGC Mushin DHQ</span>
+          <div style={{ maxWidth: '480px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
+            {/* Top Bar inside Menu */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: '1px solid var(--border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                <div
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '8px',
+                    overflow: 'hidden',
+                    background: '#FFFFFF',
+                    border: '1px solid var(--border-subtle)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <img src="/logo.png" alt="Church Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.1 }}>FGC MUSHIN</span>
+                  <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--accent-teal)' }}>DISTRICT HEADQUARTERS</span>
+                </div>
               </div>
-              <h2 className="heading-h2 font-serif" style={{ fontSize: '2.4rem', lineHeight: 1.15, color: 'var(--text-primary)' }}>
-                Making Jesus known to <span className="italic-serif">Everyone,</span> Everywhere.
-              </h2>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close navigation menu"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  background: 'rgba(0, 0, 0, 0.05)',
+                  border: '1px solid var(--border-subtle)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer'
+                }}
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '3rem' }}>
+            {/* Nav Links */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
               <button
                 onClick={() => handleNavClick('welcome')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', padding: '0.35rem 0' }}
               >
-                01. Who We Are
+                <span style={{ color: 'var(--accent-teal)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>01.</span>
+                Who We Are
               </button>
               <button
                 onClick={() => handleNavClick('ministries')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', padding: '0.35rem 0' }}
               >
-                02. Ministries (Kids, YTH, YA)
+                <span style={{ color: 'var(--accent-teal)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>02.</span>
+                Ministries (Kids, YTH, YA)
               </button>
               <button
                 onClick={() => handleNavClick('sermons')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', padding: '0.35rem 0' }}
               >
-                03. Watch Messages
+                <span style={{ color: 'var(--accent-teal)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>03.</span>
+                Watch Messages
               </button>
               <button
                 onClick={() => handleNavClick('events')}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', padding: '0.35rem 0' }}
               >
-                04. Upcoming Events
+                <span style={{ color: 'var(--accent-teal)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>04.</span>
+                Upcoming Gatherings
               </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenGiving();
                 }}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-primary)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', padding: '0.35rem 0' }}
               >
-                05. Generosity & Giving
+                <span style={{ color: 'var(--accent-teal)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>05.</span>
+                Generosity & Giving
               </button>
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   onOpenPrayer();
                 }}
-                style={{ textAlign: 'left', fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent-gold)' }}
+                style={{ textAlign: 'left', fontSize: '1.35rem', fontWeight: 700, color: 'var(--accent-gold)', padding: '0.35rem 0' }}
               >
-                06. Request Prayer & Care
+                <span style={{ color: 'var(--accent-gold)', fontSize: '0.9rem', marginRight: '0.5rem', fontWeight: 800 }}>06.</span>
+                Request Prayer & Care
               </button>
             </div>
 
+            {/* Mobile Actions Card */}
             <div
               className="double-bezel"
               style={{
-                padding: '1.5rem',
+                padding: '1.25rem',
                 background: '#FFFFFF',
-                borderRadius: '20px',
-                marginBottom: '2rem'
+                borderRadius: '16px',
+                marginTop: 'auto',
+                marginBottom: '1rem'
               }}
             >
-              <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                Join Us In Person
-              </h4>
-              <p style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Clock size={16} color="var(--accent-teal)" />
-                <span>Sundays at 7:30 AM & 9:30 AM</span>
-              </p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
-                <MapPin size={16} color="var(--accent-teal)" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.35rem' }}>
+                <Clock size={15} color="var(--accent-teal)" />
+                <span>Sundays: 7:30 AM & 9:30 AM</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                <MapPin size={15} color="var(--accent-teal)" />
                 <span>{CHURCH_INFO.address}</span>
-              </p>
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenPlanVisit();
-                }}
-                className="btn-island btn-teal"
-                style={{ width: '100%', justifyContent: 'center' }}
-              >
-                <span>Plan Your Sunday Visit</span>
-                <div className="btn-icon-bubble">
-                  <ArrowUpRight size={15} />
-                </div>
-              </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenPlanVisit();
+                  }}
+                  className="btn-island btn-teal"
+                  style={{ width: '100%', justifyContent: 'center', padding: '0.75rem' }}
+                >
+                  <span>Plan Your Sunday Visit</span>
+                  <div className="btn-icon-bubble">
+                    <ArrowUpRight size={14} />
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenGiving();
+                  }}
+                  className="btn-island btn-ghost"
+                  style={{ width: '100%', justifyContent: 'center', padding: '0.75rem' }}
+                >
+                  <Heart size={14} color="var(--accent-gold)" />
+                  <span>Give Online</span>
+                </button>
+              </div>
 
               {onOpenAdmin && (
                 <button
@@ -348,11 +397,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   style={{
                     width: '100%',
                     marginTop: '0.75rem',
-                    padding: '0.5rem',
+                    padding: '0.35rem',
                     background: 'none',
                     border: 'none',
                     color: 'var(--text-muted)',
-                    fontSize: '0.8rem',
+                    fontSize: '0.75rem',
                     cursor: 'pointer',
                     textAlign: 'center',
                     textDecoration: 'underline'
@@ -372,6 +421,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             display: flex !important;
           }
           .mobile-trigger {
+            display: none !important;
+          }
+        }
+        @media (max-width: 859px) {
+          .navbar-cta-btn {
+            display: none !important;
+          }
+          .navbar-brand-subtitle {
             display: none !important;
           }
         }

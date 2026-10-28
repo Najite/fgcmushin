@@ -47,7 +47,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
           </div>
 
           {/* Filter Tabs in Light Theme */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#FFFFFF', padding: '4px', borderRadius: '9999px', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
+          <div className="event-filters-bar" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', background: '#FFFFFF', padding: '4px', borderRadius: '9999px', border: '1px solid var(--border-subtle)', boxShadow: '0 2px 6px rgba(0,0,0,0.03)' }}>
             {(['All', 'Worship', 'Community', 'Outreach'] as const).map((cat) => (
               <button
                 key={cat}
@@ -116,7 +116,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
                   <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem', lineHeight: 1.25 }}>
                     {evt.title}
                   </h3>
-                  <p style={{ fontSize: '0.925rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                  <p className="event-card-desc" style={{ fontSize: '0.925rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                     {evt.description}
                   </p>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -143,6 +143,25 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
           ))}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .event-filters-bar {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 4px 6px !important;
+          }
+          .event-filters-bar::-webkit-scrollbar {
+            display: none;
+          }
+          .event-card-desc {
+            display: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

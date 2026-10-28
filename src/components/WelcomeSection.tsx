@@ -100,7 +100,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
                 right: '-20px',
                 zIndex: 10
               }}
-              className="rotating-badge-container"
+              className="rotating-badge-container welcome-rotating-badge"
             >
               <svg className="rotating-text-svg" viewBox="0 0 120 120">
                 <path
@@ -400,7 +400,7 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
 
         {/* 3 Core Community Values Banner Strip */}
         <div
-          className="reveal-item"
+          className="reveal-item welcome-values-strip"
           style={{
             marginTop: '2.5rem',
             padding: '1.5rem 2rem',
@@ -444,6 +444,17 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .welcome-rotating-badge {
+            display: none !important;
+          }
+          .welcome-values-strip {
+            display: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

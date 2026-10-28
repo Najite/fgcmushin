@@ -90,7 +90,8 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
               <span className="quad-dot gold"></span>
               <span className="quad-dot purple"></span>
             </span>
-            <span>FOURSQUARE GOSPEL CHURCH • MUSHIN DISTRICT HEADQUARTERS</span>
+            <span className="hero-eyebrow-desktop">FOURSQUARE GOSPEL CHURCH • MUSHIN DISTRICT HEADQUARTERS</span>
+            <span className="hero-eyebrow-mobile">FGC MUSHIN DISTRICT HEADQUARTERS</span>
           </div>
         </div>
 
@@ -259,7 +260,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
             </div>
 
             {/* Quick Badge with live pulse */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="hero-kids-badge" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span className="eyebrow-pill gold" style={{ fontSize: '0.725rem', padding: '0.35rem 0.85rem' }}>
                 <span className="hero-beacon-dot" style={{ background: 'var(--fgc-gold)', width: '6px', height: '6px' }}></span>
                 <span>Foursquare Kids Open</span>
@@ -284,7 +285,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
         </div>
 
         {/* Subtle Floating Scroll-Down Cue */}
-        <div className="animate-hero-scroll" style={{ marginTop: '2.5rem' }}>
+        <div className="animate-hero-scroll hero-scroll-cue" style={{ marginTop: '2.5rem' }}>
           <a
             href="#welcome"
             className="hero-scroll-float"
@@ -310,6 +311,27 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           </a>
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 641px) {
+          .hero-eyebrow-mobile {
+            display: none !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .hero-eyebrow-desktop {
+            display: none !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .hero-kids-badge {
+            display: none !important;
+          }
+          .hero-scroll-cue {
+            display: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

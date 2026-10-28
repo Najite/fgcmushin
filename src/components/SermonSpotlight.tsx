@@ -108,7 +108,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
                   transform: 'translate(-50%, -50%)',
                   zIndex: 10
                 }}
-                className="rotating-badge-container"
+                className="rotating-badge-container sermon-rotating-play"
               >
                 <svg className="rotating-text-svg" viewBox="0 0 120 120">
                   <path
@@ -211,12 +211,12 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
               gap: '1.25rem'
             }}
           >
-            {sermonList.map((sermon) => {
+            {sermonList.map((sermon, idx) => {
               const isCurrent = activeSermon.id === sermon.id;
               return (
                 <div
                   key={sermon.id}
-                  className="double-bezel"
+                  className={`double-bezel sermon-switcher-card ${idx >= 2 ? 'sermon-card-extra' : ''}`}
                   onClick={() => setActiveSermon(sermon)}
                   style={{
                     cursor: 'pointer',
@@ -263,6 +263,25 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .sermon-rotating-play svg {
+            display: none !important;
+          }
+          .sermon-rotating-play {
+            width: 52px !important;
+            height: 52px !important;
+          }
+          .sermon-rotating-play .rotating-center-trigger {
+            width: 52px !important;
+            height: 52px !important;
+          }
+          .sermon-card-extra {
+            display: none !important;
+          }
+        }
+      `}</style>
     </section>
   );
 };

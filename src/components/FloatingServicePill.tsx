@@ -130,6 +130,14 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
           )}
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          .floating-pill-wrap {
+            display: none !important;
+          }
+        }
+      `}</style>
     </aside>
   );
 };

@@ -69,7 +69,7 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
             </div>
 
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            <p className="footer-brand-desc" style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
               Foursquare Gospel Church Mushin District Headquarters — Jesus Christ, the Same Yesterday, Today, and Forever. A vibrant family following Jesus together.
             </p>
 
@@ -312,6 +312,14 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .footer-brand-desc {
+            display: none !important;
+          }
+        }
+      `}</style>
     </footer>
   );
 };
