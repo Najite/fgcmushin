@@ -114,11 +114,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                 />
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="navbar-brand-text" style={{ display: 'flex', flexDirection: 'column' }}>
                 <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
                   FGC MUSHIN
                 </span>
-                <span className="navbar-brand-subtitle" style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
                   DISTRICT HEADQUARTERS
                 </span>
               </div>
@@ -428,7 +428,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           .navbar-cta-btn {
             display: none !important;
           }
-          .navbar-brand-subtitle {
+          .navbar-brand-text {
             display: none !important;
           }
         }
