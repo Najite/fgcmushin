@@ -561,31 +561,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   return (
     <div 
-      className="admin-portal-root fixed inset-0 z-[1000] flex bg-[#060a12] text-slate-100 font-sans antialiased overflow-hidden"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 10000,
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: '#060a12',
-        color: '#f1f5f9',
-        overflow: 'hidden'
-      }}
+      className="admin-portal-root modal-backdrop-animate"
       role="dialog"
       aria-modal="true"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
       {/* Toast Notice */}
       {notice && (
         <div 
-          className={`fixed top-5 right-6 z-[999] px-4 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-fade-in ${
-            notice.type === 'success' 
-              ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' 
-              : 'bg-rose-950/90 border-rose-500/40 text-rose-200'
-          }`}
+          className="fixed top-5 right-6 z-[999] px-4 py-3 rounded-xl border shadow-xl flex items-center gap-3 animate-fade-in"
+          style={{
+            background: notice.type === 'success' ? '#ECFDF5' : '#FFF1F2',
+            borderColor: notice.type === 'success' ? '#10B981' : '#ED3B41',
+            color: notice.type === 'success' ? '#065F46' : '#9F1239'
+          }}
         >
-          {notice.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <AlertCircle className="w-5 h-5 text-rose-400" />}
-          <span className="text-sm font-medium">{notice.message}</span>
+          {notice.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <AlertCircle className="w-5 h-5 text-rose-500" />}
+          <span className="text-sm font-semibold">{notice.message}</span>
         </div>
       )}
 
@@ -593,32 +587,65 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       {/* AUTHENTICATION VIEW: ROLE-AWARE IAM ACCESS               */}
       {/* ======================================================== */}
       {!isAuthenticated ? (
-        <div className="w-full h-full flex items-center justify-center p-4 bg-gradient-to-br from-[#050b14] via-[#091322] to-[#040810] overflow-y-auto">
-          <div className="w-full max-w-xl bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative my-auto">
+        <div 
+          className="double-bezel modal-dialog-animate"
+          style={{
+            maxWidth: '640px',
+            width: '100%',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            background: '#FFFFFF',
+            margin: 'auto'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="double-bezel-inner" style={{ padding: 'clamp(1.5rem, 4vw, 2.5rem)', background: '#FFFFFF', position: 'relative' }}>
+            {/* Top 4-Color Church Emblem Gradient Ribbon */}
+            <div className="top-color-ribbon" style={{ position: 'absolute', top: 0, left: 0, right: 0 }} />
+
             {/* Close Button */}
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+              style={{
+                position: 'absolute',
+                top: '1.25rem',
+                right: '1.25rem',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-primary)',
+                cursor: 'pointer'
+              }}
               aria-label="Close Staff Portal"
             >
-              <X className="w-5 h-5" />
+              <X size={18} />
             </button>
 
-            <div className="text-center mb-6">
-              <div className="inline-flex p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 mb-3 shadow-inner">
-                <Shield className="w-8 h-8" />
+            <div style={{ marginBottom: '1.75rem', marginTop: '0.35rem' }}>
+              <div className="eyebrow-pill blue" style={{ marginBottom: '0.65rem' }}>
+                <span className="quad-beacon" aria-hidden="true">
+                  <span className="quad-dot red"></span>
+                  <span className="quad-dot blue"></span>
+                  <span className="quad-dot gold"></span>
+                  <span className="quad-dot purple"></span>
+                </span>
+                <span>STAFF OPERATIONS &amp; PASTORAL SUITE</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Staff Operations & Pastoral Suite
+              <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(1.5rem, 3.8vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.15 }}>
+                Enter Ministry Desk &amp; Pastoral Suite
               </h2>
-              <p className="text-sm text-slate-400 mt-1 max-w-md mx-auto">
-                Foursquare Gospel Church Mushin District Headquarters. Select your role profile or enter your passkey to access your ministry desk.
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineHeight: 1.55 }}>
+                Foursquare Gospel Church Mushin District Headquarters. Select your assigned ministry desk or enter your security passkey to access operational records.
               </p>
             </div>
 
             {/* Quick Profile Selector Cards */}
             <div className="mb-6">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
                 Select Your Role Desk:
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -634,23 +661,46 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         setPasskeyInput(user.passkey);
                         setAuthError('');
                       }}
-                      className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all ${
-                        isSelected 
-                          ? 'border-amber-400/60 bg-amber-500/10 shadow-lg' 
-                          : 'border-slate-800 hover:border-slate-700 bg-slate-950/40 hover:bg-slate-800/40'
-                      }`}
+                      style={{
+                        padding: '0.75rem',
+                        borderRadius: '14px',
+                        border: isSelected ? `2px solid ${roleDef.badgeColor}` : '1px solid var(--border-subtle)',
+                        background: isSelected ? roleDef.badgeBg : '#F8FAFC',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.75rem',
+                        textAlign: 'left',
+                        boxShadow: isSelected ? 'var(--shadow-card)' : 'none',
+                        transition: 'all 0.2s ease'
+                      }}
                     >
                       <div 
-                        className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shrink-0 border"
-                        style={{ backgroundColor: roleDef.badgeBg, color: roleDef.badgeColor, borderColor: roleDef.badgeColor + '40' }}
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '10px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 700,
+                          fontSize: '0.875rem',
+                          flexShrink: 0,
+                          backgroundColor: roleDef.badgeBg,
+                          color: roleDef.badgeColor,
+                          border: `1px solid ${roleDef.badgeColor}40`
+                        }}
                       >
                         {user.avatar_initials}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-xs font-semibold text-white truncate">{user.name}</div>
-                        <div className="text-[11px] font-medium text-slate-400 truncate">{roleDef.badge}</div>
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {user.name}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: roleDef.badgeColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {roleDef.badge}
+                        </div>
                       </div>
-                      {isSelected && <Check className="w-4 h-4 text-amber-400 shrink-0" />}
+                      {isSelected && <Check size={16} color={roleDef.badgeColor} style={{ flexShrink: 0 }} />}
                     </button>
                   );
                 })}
@@ -660,16 +710,31 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               {selectedLoginProfileId && (() => {
                 const selectedRoleDef = ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'] || ROLE_DEFINITIONS.admin;
                 return (
-                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 mt-3 flex items-start gap-3">
+                  <div style={{
+                    padding: '0.85rem 1rem',
+                    borderRadius: '14px',
+                    background: selectedRoleDef.badgeBg,
+                    border: `1px solid ${selectedRoleDef.badgeColor}30`,
+                    marginTop: '0.75rem',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.75rem'
+                  }}>
                     <div 
-                      className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" 
-                      style={{ backgroundColor: selectedRoleDef.badgeColor }}
+                      style={{
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        marginTop: '0.35rem',
+                        flexShrink: 0,
+                        backgroundColor: selectedRoleDef.badgeColor
+                      }} 
                     />
-                    <div className="text-xs">
-                      <div className="font-bold text-white">
+                    <div style={{ fontSize: '0.75rem' }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
                         {selectedRoleDef.primaryDesk}
                       </div>
-                      <div className="text-[11px] text-slate-400 mt-0.5">
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem', lineHeight: 1.5 }}>
                         {selectedRoleDef.description}
                       </div>
                     </div>
@@ -679,13 +744,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </div>
 
             {/* Passkey Input Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
                   Administrative Passkey
                 </label>
-                <div className="relative">
-                  <Lock className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <div style={{ position: 'relative' }}>
+                  <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
                     type="password"
                     value={passkeyInput}
@@ -694,13 +759,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       setAuthError('');
                     }}
                     placeholder="Enter role passkey (e.g. fgcmushin2026, do2026)"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-950/70 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition-colors text-sm"
+                    style={{
+                      width: '100%',
+                      paddingLeft: '2.75rem',
+                      paddingRight: '1rem',
+                      paddingTop: '0.85rem',
+                      paddingBottom: '0.85rem',
+                      fontSize: '0.9rem',
+                      borderRadius: '12px',
+                      border: '1.5px solid var(--border-medium)',
+                      color: 'var(--text-primary)',
+                      background: '#FFFFFF'
+                    }}
                     autoFocus
                   />
                 </div>
                 {authError && (
-                  <p className="text-rose-400 text-xs mt-1.5 flex items-center gap-1.5">
-                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  <p style={{ color: 'var(--fgc-red-dark)', fontSize: '0.75rem', marginTop: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
+                    <AlertCircle size={14} />
                     {authError}
                   </p>
                 )}
@@ -708,24 +784,44 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
               <button
                 type="submit"
-                className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 text-sm"
+                className="btn-island btn-primary"
+                style={{
+                  width: '100%',
+                  justifyContent: 'center',
+                  padding: '0.9rem 1.5rem',
+                  fontSize: '0.925rem',
+                  borderRadius: '9999px',
+                  boxShadow: 'var(--shadow-hover)'
+                }}
               >
-                <Key className="w-4 h-4" />
-                Unlock Role Operations Suite
+                <Key size={18} />
+                <span>Unlock Role Operations Desk</span>
+                <span style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.25)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: '0.25rem'
+                }}>
+                  →
+                </span>
               </button>
             </form>
 
             {/* Role Credential Quick Guide */}
-            <div className="mt-6 pt-5 border-t border-slate-800/80">
-              <div className="text-[11px] text-slate-400 font-semibold mb-2 uppercase tracking-wider">
+            <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
                 Assigned Role Passkeys:
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px] text-slate-400">
-                <div><span className="text-slate-300 font-medium">Administrator:</span> <code className="text-amber-400">fgcmushin2026</code></div>
-                <div><span className="text-slate-300 font-medium">Senior Pastor:</span> <code className="text-amber-400">do2026</code></div>
-                <div><span className="text-slate-300 font-medium">Resident Pastor:</span> <code className="text-amber-400">pastor2026</code></div>
-                <div><span className="text-slate-300 font-medium">Secretariat:</span> <code className="text-amber-400">sec2026</code></div>
-                <div><span className="text-slate-300 font-medium">Head Usher:</span> <code className="text-amber-400">usher2026</code></div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" style={{ fontSize: '0.75rem' }}>
+                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Administrator:</span> <code style={{ color: 'var(--fgc-blue)', fontWeight: 700 }}>fgcmushin2026</code></div>
+                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Senior Pastor:</span> <code style={{ color: 'var(--fgc-gold-dark)', fontWeight: 700 }}>do2026</code></div>
+                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Resident Pastor:</span> <code style={{ color: 'var(--fgc-blue-dark)', fontWeight: 700 }}>pastor2026</code></div>
+                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Secretariat:</span> <code style={{ color: 'var(--fgc-purple-dark)', fontWeight: 700 }}>sec2026</code></div>
+                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Head Usher:</span> <code style={{ color: 'var(--fgc-red-dark)', fontWeight: 700 }}>usher2026</code></div>
               </div>
             </div>
           </div>
@@ -734,16 +830,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         /* ======================================================== */
         /* AUTHENTICATED FULL-VIEWPORT OPERATIONS DASHBOARD          */
         /* ======================================================== */
-        <div className="w-full h-full flex flex-col overflow-hidden">
-          {/* Top Bar Header */}
-          <header className="h-16 px-4 sm:px-6 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between shrink-0 z-20 backdrop-blur-md">
-            <div className="flex items-center gap-3">
-              {/* Mobile hamburger toggle */}
-              <button
-                onClick={() => setMobileSidebarOpen(prev => !prev)}
-                className="lg:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300"
-                aria-label="Toggle navigation"
-              >
+        <div className="admin-portal-window modal-dialog-animate" onClick={(e) => e.stopPropagation()}>
+          {/* Top 4-Color Church Emblem Gradient Ribbon */}
+          <div className="top-color-ribbon" />
+
+          <div className="admin-portal-window-inner">
+            {/* Top Bar Header */}
+            <header className="h-16 px-4 sm:px-6 bg-white border-b border-slate-800/80 flex items-center justify-between shrink-0 z-20">
+              <div className="flex items-center gap-3">
+                {/* Mobile hamburger toggle */}
+                <button
+                  onClick={() => setMobileSidebarOpen(prev => !prev)}
+                  className="lg:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300"
+                  aria-label="Toggle navigation"
+                >
                 <Menu className="w-5 h-5" />
               </button>
 
@@ -2716,6 +2816,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             </main>
           </div>
         </div>
+      </div>
       )}
     </div>
   );

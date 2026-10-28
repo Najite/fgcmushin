@@ -38,8 +38,8 @@ export const ROLE_DEFINITIONS: Record<ChurchRole, RoleDefinition> = {
     id: 'admin',
     title: 'Church Administrator & IT Director',
     badge: 'Administrator',
-    badgeColor: '#60a5fa', // blue-400
-    badgeBg: 'rgba(59, 130, 246, 0.15)',
+    badgeColor: '#2866AD', // FGC Healer Blue
+    badgeBg: 'rgba(40, 102, 173, 0.08)',
     description: 'Complete system governance, CMS control, staff account provisioning, and operational management.',
     primaryDesk: 'Executive Operations & CMS Suite',
     permissions: [
@@ -56,8 +56,8 @@ export const ROLE_DEFINITIONS: Record<ChurchRole, RoleDefinition> = {
     id: 'district_overseer',
     title: 'District Overseer & Senior Pastor',
     badge: 'Senior Pastor / DO',
-    badgeColor: '#fbbf24', // amber-400
-    badgeBg: 'rgba(245, 158, 11, 0.15)',
+    badgeColor: '#B86B0E', // FGC Gold Dark
+    badgeBg: 'rgba(243, 166, 69, 0.12)',
     description: 'Spiritual leadership, district governance, preaching oversight, and pastoral growth trajectory.',
     primaryDesk: "District Overseer's Executive Study",
     permissions: [
@@ -71,8 +71,8 @@ export const ROLE_DEFINITIONS: Record<ChurchRole, RoleDefinition> = {
     id: 'resident_pastor',
     title: 'Resident Pastor',
     badge: 'Resident Pastor',
-    badgeColor: '#38bdf8', // sky-400
-    badgeBg: 'rgba(56, 189, 248, 0.15)',
+    badgeColor: '#1E4E85', // FGC Blue Dark
+    badgeBg: 'rgba(40, 102, 173, 0.10)',
     description: 'Congregational shepherding, first-time guest follow-up, pastoral counseling, and service coordination.',
     primaryDesk: "Resident Pastor's Shepherding Desk",
     permissions: [
@@ -85,8 +85,8 @@ export const ROLE_DEFINITIONS: Record<ChurchRole, RoleDefinition> = {
     id: 'secretariat',
     title: 'Church Secretariat & Records',
     badge: 'Secretariat',
-    badgeColor: '#34d399', // emerald-400
-    badgeBg: 'rgba(52, 211, 153, 0.15)',
+    badgeColor: '#A32371', // FGC Purple Dark
+    badgeBg: 'rgba(204, 70, 149, 0.10)',
     description: 'Church records, guest registry intake, official calendar scheduling, and public announcements.',
     primaryDesk: 'Church Secretariat & Office Operations',
     permissions: [
@@ -99,8 +99,8 @@ export const ROLE_DEFINITIONS: Record<ChurchRole, RoleDefinition> = {
     id: 'head_usher',
     title: 'Head Usher & Protocol Director',
     badge: 'Head Usher & Protocol',
-    badgeColor: '#f87171', // red-400
-    badgeBg: 'rgba(239, 68, 68, 0.15)',
+    badgeColor: '#C9242A', // FGC Red Dark
+    badgeBg: 'rgba(237, 59, 65, 0.10)',
     description: 'Service headcount logging (7:30 AM & 9:30 AM), sanctuary capacity, and guest reception protocol.',
     primaryDesk: 'Ushering & Protocol Operations Desk',
     permissions: [
