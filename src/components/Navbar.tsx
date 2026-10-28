@@ -194,10 +194,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <button
                 onClick={onOpenPlanVisit}
-                className="btn-island btn-teal"
+                className="btn-island btn-teal navbar-cta-btn"
                 style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem' }}
               >
-                <span>Plan A Visit</span>
+                <span className="navbar-cta-text-full">Plan A Visit</span>
+                <span className="navbar-cta-text-short">Visit</span>
                 <div className="btn-icon-bubble">
                   <ArrowUpRight size={14} />
                 </div>

@@ -56,7 +56,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
             className="double-bezel-inner"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
               alignItems: 'stretch',
               background: '#FFFFFF'
             }}
@@ -131,7 +131,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
             {/* Right: Message Details in Light Theme */}
             <div
               style={{
-                padding: 'clamp(2rem, 4vw, 3.5rem)',
+                padding: 'clamp(1.25rem, 4vw, 3.5rem)',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -207,8 +207,8 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '1.5rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: '1.25rem'
             }}
           >
             {sermonList.map((sermon) => {

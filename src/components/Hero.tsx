@@ -21,11 +21,11 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
       id="top"
       style={{
         position: 'relative',
-        minHeight: '92vh',
+        minHeight: '92svh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '6.5rem 1.5rem 4rem',
+        padding: 'clamp(5rem, 12vw, 6.5rem) clamp(1rem, 3vw, 1.5rem) 3.5rem',
         overflow: 'hidden'
       }}
     >
@@ -179,14 +179,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenPlanVisit, onOpenVideoModal })
           }}
         >
           <div
-            className="double-bezel-inner"
+            className="double-bezel-inner hero-gatherings-inner"
             style={{
-              padding: '1.25rem 2rem',
+              padding: '1.25rem clamp(1rem, 3vw, 2rem)',
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '1.5rem',
+              gap: '1.25rem',
               background: '#FFFFFF'
             }}
           >

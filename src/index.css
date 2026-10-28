@@ -72,6 +72,8 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
   text-rendering: optimizeLegibility;
   background-color: var(--bg-deep);
   color: var(--text-primary);
@@ -80,22 +82,38 @@ html {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   background-color: var(--bg-deep);
   line-height: 1.6;
 }
 
+/* Ensure inputs never trigger iOS 16px auto-zoom */
+input, textarea, select {
+  font-size: 16px !important;
+  font-family: inherit;
+}
+
 a {
   color: inherit;
   text-decoration: none;
+  touch-action: manipulation;
 }
 
-button {
+button, [role="button"], .btn-island {
   font-family: inherit;
   border: none;
   background: none;
   cursor: pointer;
   color: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+button:active, .btn-island:active, [role="button"]:active {
+  transform: scale(0.97);
 }
 
 img {
@@ -222,12 +240,6 @@ img {
   transition: transform 0.4s var(--ease-spring), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-.double-bezel:hover {
-  border-color: var(--border-medium);
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
-}
-
 .double-bezel-inner {
   background: var(--bg-surface);
   border: 1px solid rgba(0, 0, 0, 0.04);
@@ -255,28 +267,10 @@ img {
   transform: scale(0.97);
 }
 
-.btn-primary {
+.btn-primary, .btn-teal {
   background: var(--accent-teal);
   color: #FFFFFF;
   box-shadow: 0 4px 18px rgba(0, 118, 129, 0.28);
-}
-
-.btn-primary:hover {
-  background: var(--accent-teal-dark);
-  box-shadow: 0 8px 25px rgba(0, 118, 129, 0.4);
-  transform: translateY(-2px);
-}
-
-.btn-teal {
-  background: var(--accent-teal);
-  color: #FFFFFF;
-  box-shadow: 0 4px 18px rgba(0, 118, 129, 0.28);
-}
-
-.btn-teal:hover {
-  background: var(--accent-teal-dark);
-  box-shadow: 0 8px 25px rgba(0, 118, 129, 0.4);
-  transform: translateY(-2px);
 }
 
 .btn-ghost {
@@ -286,31 +280,29 @@ img {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.btn-ghost:hover {
-  background: var(--bg-surface-elevated);
-  border-color: var(--accent-teal);
-  transform: translateY(-2px);
-}
+/* Isolated Hover states only for pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  .double-bezel:hover {
+    border-color: var(--border-medium);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
 
-/* Nested Trailing Icon Circle */
-.btn-icon-bubble {
-  width: 28px;
-  height: 28px;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s var(--ease-spring);
-}
+  .btn-primary:hover, .btn-teal:hover {
+    background: var(--accent-teal-dark);
+    box-shadow: 0 8px 25px rgba(0, 118, 129, 0.4);
+    transform: translateY(-2px);
+  }
 
-.btn-ghost .btn-icon-bubble {
-  background: rgba(0, 118, 129, 0.1);
-  color: var(--accent-teal);
-}
+  .btn-ghost:hover {
+    background: var(--bg-surface-elevated);
+    border-color: var(--accent-teal);
+    transform: translateY(-2px);
+  }
 
-.btn-island:hover .btn-icon-bubble {
-  transform: translateX(3px) translateY(-1px) scale(1.05);
+  .btn-island:hover .btn-icon-bubble {
+    transform: translateX(3px) translateY(-1px) scale(1.05);
+  }
 }
 
 /* Circular Rotating Text Badge */
@@ -709,18 +701,20 @@ img {
   transform: scale(1) translateY(0);
 }
 
-/* Micro-interaction physics */
-.double-bezel:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(21, 26, 33, 0.08);
-}
+/* Micro-interaction physics (pointer-only) */
+@media (hover: hover) and (pointer: fine) {
+  .double-bezel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(21, 26, 33, 0.08);
+  }
 
-.btn-island:hover .btn-icon-bubble {
-  transform: translate(2px, -2px) scale(1.08);
-}
+  .btn-island:hover .btn-icon-bubble {
+    transform: translate(2px, -2px) scale(1.08);
+  }
 
-.rotating-badge-container:hover .rotating-text-svg {
-  animation-duration: 8s;
+  .rotating-badge-container:hover .rotating-text-svg {
+    animation-duration: 8s;
+  }
 }
 
 .reveal-stagger-1 { transition-delay: 0.04s; }
@@ -782,4 +776,110 @@ img {
     transition: none !important;
   }
 }
+
+/* ==========================================================================
+   Mobile-Native Responsive Design System
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  /* Container Padding Optimization */
+  .container-max {
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
+  }
+
+  .section-padding {
+    padding-top: clamp(2.75rem, 6vw, 4.5rem);
+    padding-bottom: clamp(2.75rem, 6vw, 4.5rem);
+  }
+
+  /* Upcoming Events Mobile Stream Transformation */
+  .event-stream-row {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+    padding: 1.35rem 1.25rem !important;
+    align-items: flex-start !important;
+  }
+
+  .event-rsvp-col {
+    width: 100%;
+    justify-content: stretch !important;
+  }
+
+  .event-rsvp-col button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hero Gatherings Bar Stacking on Mobile */
+  .hero-gatherings-inner {
+    padding: 1.25rem 1rem !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1.25rem !important;
+  }
+
+  .hero-gatherings-inner > div {
+    width: 100%;
+  }
+
+  /* Rotating Circular Badge Scaling on Mobile */
+  .rotating-badge-container {
+    width: 90px;
+    height: 90px;
+  }
+
+  .rotating-center-trigger {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* Modal Dialog Adaptations for Mobile Handhelds */
+  .modal-dialog-animate {
+    max-height: 94vh !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 20px !important;
+  }
+
+  .modal-dialog-animate .double-bezel-inner {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  /* Safe Area Padding for Notch & Home Indicator */
+  .top-color-ribbon {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* Floating pill safe bottom buffer */
+  .floating-pill-wrap {
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important;
+    right: 1rem !important;
+    left: 1rem !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading-display {
+    font-size: 2.35rem !important;
+    line-height: 1.12 !important;
+  }
+
+  .heading-h2 {
+    font-size: 1.95rem !important;
+  }
+
+  .btn-island {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .eyebrow-pill {
+    font-size: 0.68rem;
+    padding: 0.3rem 0.75rem;
+  }
+}
+
 

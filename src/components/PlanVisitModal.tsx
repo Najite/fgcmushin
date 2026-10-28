@@ -84,7 +84,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF', position: 'relative' }}>
+        <div className="double-bezel-inner" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', background: '#FFFFFF', position: 'relative' }}>
           {/* Top 4-Color Church Emblem Gradient Ribbon */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
 
@@ -100,7 +100,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                 </span>
                 <span>FIRST TIME GUEST EXPERIENCE</span>
               </div>
-              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)', lineHeight: 1.15 }}>
+              <h3 className="heading-h2 font-serif" style={{ fontSize: 'clamp(1.35rem, 4.5vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.15 }}>
                 {hasSubmitted ? "We're Ready for You!" : "Plan Your Sunday Visit"}
               </h3>
             </div>
@@ -234,7 +234,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
               </div>
 
               {/* Step 3: Party Size & Kids */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '0.85rem' }}>
                 <div style={{ background: '#FAF8F5', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
                   <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', fontWeight: 600 }}>
                     Number of Adults

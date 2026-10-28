@@ -19,13 +19,15 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
     <div style={{
       background: 'linear-gradient(90deg, #1E4E85 0%, #2866AD 50%, #A32371 100%)',
       color: '#FFFFFF',
-      padding: '0.55rem 1rem',
+      padding: '0.55rem 0.85rem',
       fontSize: '0.825rem',
       fontWeight: 500,
       display: 'flex',
+      flexWrap: 'wrap',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: '0.75rem',
+      gap: '0.5rem 0.75rem',
+      textAlign: 'center',
       position: 'relative',
       zIndex: 50,
       letterSpacing: '0.01em'

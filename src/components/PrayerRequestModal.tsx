@@ -81,7 +81,7 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF', position: 'relative' }}>
+        <div className="double-bezel-inner" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', background: '#FFFFFF', position: 'relative' }}>
           {/* Top 4-Color Church Emblem Gradient Ribbon */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
 
@@ -96,7 +96,7 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
                 </span>
                 <span>PRAYER & CARE MINISTRY</span>
               </div>
-              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>
+              <h3 className="heading-h2 font-serif" style={{ fontSize: 'clamp(1.35rem, 4.5vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.2 }}>
                 {submitted ? 'We Are Praying With You' : 'How Can We Pray For You?'}
               </h3>
             </div>

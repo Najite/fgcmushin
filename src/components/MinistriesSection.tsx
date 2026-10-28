@@ -43,8 +43,8 @@ export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlan
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '1.75rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+            gap: '1.5rem'
           }}
         >
           {MINISTRIES.map((ministry, idx) => {

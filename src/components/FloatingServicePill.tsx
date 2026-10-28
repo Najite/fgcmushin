@@ -7,7 +7,12 @@ interface FloatingServicePillProps {
 }
 
 export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpenPlanVisit }) => {
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640;
+    }
+    return false;
+  });
   const [isClosed, setIsClosed] = useState(false);
 
   if (isClosed) return null;
@@ -15,6 +20,7 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
   return (
     <aside
       aria-label="Service times and quick directions"
+      className="floating-pill-wrap"
       style={{
         position: 'fixed',
         bottom: '1.25rem',

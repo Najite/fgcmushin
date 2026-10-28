@@ -33,8 +33,8 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '3.5rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+            gap: 'clamp(2rem, 5vw, 3.5rem)',
             alignItems: 'center',
             marginBottom: '4.5rem'
           }}
@@ -188,8 +188,8 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-              gap: '1.5rem'
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))',
+              gap: '1.25rem'
             }}
           >
             {/* 1. Jesus the Savior (Red - Cross) */}

@@ -76,7 +76,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="double-bezel-inner" style={{ padding: '2.5rem', background: '#FFFFFF', position: 'relative' }}>
+        <div className="double-bezel-inner" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', background: '#FFFFFF', position: 'relative' }}>
           {/* Top 4-Color Church Emblem Gradient Ribbon */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3.5px', background: 'var(--fgc-gradient-4color)' }} />
 
@@ -91,7 +91,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                 </span>
                 <span>GENEROSITY & STEWARDSHIP</span>
               </div>
-              <h3 className="heading-h2 font-serif" style={{ fontSize: '2.2rem', color: 'var(--text-primary)' }}>
+              <h3 className="heading-h2 font-serif" style={{ fontSize: 'clamp(1.35rem, 4.5vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.2 }}>
                 {completed ? 'Thank You For Sowing!' : 'Give Generously'}
               </h3>
             </div>
@@ -144,7 +144,7 @@ export const GivingDrawer: React.FC<GivingDrawerProps> = ({ isOpen, onClose }) =
                 <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0.65rem' }}>
                   Select Gift Amount
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '0.5rem', marginBottom: '0.85rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(52px, 1fr))', gap: '0.5rem', marginBottom: '0.85rem' }}>
                   {presets.map((val) => (
                     <button
                       type="button"

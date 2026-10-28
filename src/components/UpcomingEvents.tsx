@@ -80,7 +80,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
               }}
             >
               <div
-                className="double-bezel-inner"
+                className="double-bezel-inner event-stream-row"
                 style={{
                   padding: '1.75rem 2rem',
                   display: 'grid',
@@ -126,7 +126,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
                 </div>
 
                 {/* RSVP Action */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="event-rsvp-col" style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     onClick={() => onRSVP(evt)}
                     className="btn-island btn-ghost"
