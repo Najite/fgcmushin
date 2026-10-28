@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow } from '../types/database';
 import type { Sermon, ChurchEvent, Ministry } from '../types';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://tmjuucclnumavnbyukmf.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtanV1Y2NsbnVtYXZuYnl1a21mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMDk3ODUsImV4cCI6MjEwODY4NTc4NX0.ijT1SQhmUz1FvYswxK1EI4Hepl5HSj8cuziHnWvJ7GI';
+const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://tmjuucclnumavnbyukmf.supabase.co';
+const supabaseAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRtanV1Y2NsbnVtYXZuYnl1a21mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxMDk3ODUsImV4cCI6MjEwODY4NTc4NX0.ijT1SQhmUz1FvYswxK1EI4Hepl5HSj8cuziHnWvJ7GI';
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
@@ -34,13 +34,14 @@ export async function getChurchSettings(): Promise<ChurchSettingsRow | null> {
  */
 export async function updateChurchSettings(settings: Partial<ChurchSettingsRow>): Promise<{ success: boolean; error?: string }> {
   try {
+    const targetId = settings.id || 'default';
     const { error } = await supabase
       .from('church_settings')
       .update({
         ...settings,
         updated_at: new Date().toISOString()
       })
-      .eq('id', 'fgc-mushin-dhq');
+      .or(`id.eq.${targetId},id.eq.default,id.eq.fgc-mushin-dhq`);
 
     if (error) return { success: false, error: error.message };
     return { success: true };
