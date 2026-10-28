@@ -62,6 +62,7 @@ import {
   getServiceAttendance,
   logServiceAttendance
 } from '../lib/supabase';
+import './AdminPortal.css';
 
 interface AdminPortalProps {
   isOpen: boolean;
@@ -551,8 +552,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   if (!isOpen) return null;
 
-  // Render Role Definition Metadata
-  const currentRoleDef = ROLE_DEFINITIONS[activeRole];
+  // Render Role Definition Metadata (with safe fallback)
+  const currentRoleDef = ROLE_DEFINITIONS[activeRole] || ROLE_DEFINITIONS.admin;
 
   // Calculate high-level attendance metrics
   const latestSundayAttendance = serviceAttendance.slice(0, 2);
@@ -560,7 +561,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex bg-[#060a12] text-slate-100 font-sans antialiased overflow-hidden"
+      className="admin-portal-root fixed inset-0 z-[1000] flex bg-[#060a12] text-slate-100 font-sans antialiased overflow-hidden"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 10000,
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#060a12',
+        color: '#f1f5f9',
+        overflow: 'hidden'
+      }}
       role="dialog"
       aria-modal="true"
     >
@@ -612,7 +623,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {staffUsers.map((user) => {
-                  const roleDef = ROLE_DEFINITIONS[user.role];
+                  const roleDef = ROLE_DEFINITIONS[user.role] || ROLE_DEFINITIONS.admin;
                   const isSelected = selectedLoginProfileId === user.id;
                   return (
                     <button
@@ -646,22 +657,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </div>
 
               {/* Selected Role Scope Card */}
-              {selectedLoginProfileId && (
-                <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 mt-3 flex items-start gap-3">
-                  <div 
-                    className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" 
-                    style={{ backgroundColor: ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].badgeColor }}
-                  />
-                  <div className="text-xs">
-                    <div className="font-bold text-white">
-                      {ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].primaryDesk}
-                    </div>
-                    <div className="text-[11px] text-slate-400 mt-0.5">
-                      {ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'].description}
+              {selectedLoginProfileId && (() => {
+                const selectedRoleDef = ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'] || ROLE_DEFINITIONS.admin;
+                return (
+                  <div className="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800/80 mt-3 flex items-start gap-3">
+                    <div 
+                      className="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" 
+                      style={{ backgroundColor: selectedRoleDef.badgeColor }}
+                    />
+                    <div className="text-xs">
+                      <div className="font-bold text-white">
+                        {selectedRoleDef.primaryDesk}
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {selectedRoleDef.description}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
             {/* Passkey Input Form */}
@@ -1320,7 +1334,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-white text-sm">{member.name}</span>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
-                              {ROLE_DEFINITIONS[member.role].badge}
+                              {(ROLE_DEFINITIONS[member.role] || ROLE_DEFINITIONS.admin).badge}
                             </span>
                           </div>
                           <div className="text-xs text-slate-400 mt-0.5">{member.title}</div>
@@ -1692,7 +1706,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Staff List Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {staffUsers.map((staff) => {
-                      const roleDef = ROLE_DEFINITIONS[staff.role];
+                      const roleDef = ROLE_DEFINITIONS[staff.role] || ROLE_DEFINITIONS.admin;
                       const isShowingPass = showPasskeys[staff.id];
                       return (
                         <div 

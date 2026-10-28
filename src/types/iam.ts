@@ -5,6 +5,14 @@ export type ChurchRole =
   | 'secretariat' 
   | 'head_usher';
 
+export const ChurchRole = {
+  admin: 'admin',
+  district_overseer: 'district_overseer',
+  resident_pastor: 'resident_pastor',
+  secretariat: 'secretariat',
+  head_usher: 'head_usher'
+} as const;
+
 export type ChurchPermission = 
   | 'manage_cms'             // Sermons, Events, Website Settings
   | 'manage_staff_iam'        // Staff accounts, roles, access
