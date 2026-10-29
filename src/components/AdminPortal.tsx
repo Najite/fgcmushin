@@ -20,19 +20,18 @@ import {
   ArrowLeft,
   Menu,
   Sparkles,
-  BarChart3,
   CheckCircle2,
   AlertCircle,
   LogOut,
-  UserCheck,
   FileText,
-  Award,
   Eye,
   Activity,
   ClipboardList,
   Bell,
   Key,
-  Wallet
+  Wallet,
+  Hash,
+  MessageSquare
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type { 
@@ -48,12 +47,9 @@ import type {
 import { ROLE_DEFINITIONS } from '../types/iam';
 import type { ChurchRole } from '../types/iam';
 import {
-  AdminDashboard,
-  DistrictOverseerDashboard,
-  ResidentPastorDashboard,
-  HeadUsherDashboard,
-  SecretariatDashboard
+  DistrictOverseerDashboard
 } from './RoleDashboards';
+import { LectorChurchDashboard } from './LectorChurchDashboard';
 import { FinancialAnalytics } from './FinancialAnalytics';
 import { AttendanceAnalytics } from './AttendanceAnalytics';
 import {
@@ -1094,84 +1090,113 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
           <div className="admin-portal-window-inner">
             {/* Top Bar Header */}
-            <header className="h-16 px-4 sm:px-6 bg-white border-b border-slate-800/80 flex items-center justify-between shrink-0 z-20">
+            <header className="h-16 px-4 sm:px-6 bg-white border-b border-[#f0e6f3] flex items-center justify-between shrink-0 z-20">
               <div className="flex items-center gap-3">
-                {/* Mobile hamburger toggle */}
+                {/* Mobile & Desktop hamburger toggle */}
                 <button
                   onClick={() => setMobileSidebarOpen(prev => !prev)}
-                  className="lg:hidden p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300"
+                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer"
                   aria-label="Toggle navigation"
                 >
-                <Menu className="w-5 h-5" />
-              </button>
+                  <Menu className="w-5 h-5" />
+                </button>
 
-              <div className="flex items-center gap-2.5">
-                <div 
-                  className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm border shadow-inner shrink-0"
-                  style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '50' }}
-                >
-                  {currentUser.avatar_initials}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-sm sm:text-base text-white tracking-tight truncate max-w-[200px] sm:max-w-xs">
-                      {currentUser.name}
-                    </span>
-                    <span 
-                      className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase border hidden sm:inline-block"
-                      style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '40' }}
-                    >
-                      {currentRoleDef.badge}
-                    </span>
+                <div className="flex items-center gap-2.5">
+                  <div 
+                    className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm border shadow-xs shrink-0"
+                    style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '40' }}
+                  >
+                    {currentUser.avatar_initials}
                   </div>
-                  <div className="text-[11px] text-slate-400 hidden sm:block truncate">
-                    {currentRoleDef.primaryDesk}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-sm sm:text-base text-[#1f2430] tracking-tight truncate max-w-[200px] sm:max-w-xs">
+                        {currentUser.name}
+                      </span>
+                      <span 
+                        className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase border hidden sm:inline-block"
+                        style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '40' }}
+                      >
+                        {currentRoleDef.badge}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-[#8a919e] font-medium hidden sm:block truncate">
+                      {currentRoleDef.primaryDesk}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Right Header Actions */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              {/* Executive View Switcher (Only visible to Admin) */}
-              {currentUser.role === 'admin' && (
-                <div className="hidden md:flex items-center gap-1.5 bg-slate-950/70 border border-slate-800 rounded-xl px-2.5 py-1.5">
-                  <Eye className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Switch View:</span>
-                  <select
-                    value={activeRole}
-                    onChange={(e) => handleSwitchRoleView(e.target.value as ChurchRole)}
-                    className="bg-transparent text-xs font-bold text-amber-400 focus:outline-none cursor-pointer"
-                  >
-                    <option value="admin" className="bg-slate-900 text-slate-200">Administrator & CMS</option>
-                    <option value="district_overseer" className="bg-slate-900 text-amber-400">District Overseer Study</option>
-                    <option value="resident_pastor" className="bg-slate-900 text-sky-400">Resident Pastor Desk</option>
-                    <option value="secretariat" className="bg-slate-900 text-emerald-400">Secretariat Desk</option>
-                    <option value="head_usher" className="bg-slate-900 text-rose-400">Head Usher Desk</option>
-                  </select>
-                </div>
-              )}
+              {/* Right Header Actions */}
+              <div className="flex items-center gap-2 sm:gap-3">
+                {/* Notification Bell with blue badge '3' */}
+                <button 
+                  onClick={() => setActiveTab('prayers')}
+                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer" 
+                  title="Notifications & Petitions (3)"
+                >
+                  <Bell size={18} />
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#06b6d4] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">3</span>
+                </button>
 
-              {/* View Live Site */}
-              <button
-                onClick={onClose}
-                className="px-3 py-1.5 rounded-xl border border-slate-700 hover:border-slate-600 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                <span className="hidden sm:inline">Live Site</span>
-              </button>
+                {/* Message bubble with pink badge '2' */}
+                <button 
+                  onClick={() => setActiveTab('guests')}
+                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer" 
+                  title="Visitor Registrations (2)"
+                >
+                  <MessageSquare size={18} />
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#ea1263] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">2</span>
+                </button>
 
-              {/* Logout / Switch Role */}
-              <button
-                onClick={handleLogout}
-                className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-rose-500/30 hover:border-rose-500/60 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-medium transition-colors flex items-center gap-1.5"
-                title="Switch Staff Account / Lock"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Lock</span>
-              </button>
-            </div>
-          </header>
+                {/* Executive View Switcher (Only visible to Admin) */}
+                {currentUser.role === 'admin' && (
+                  <div className="hidden md:flex items-center gap-1.5 bg-[#faf4fb] border border-[#f0e6f3] rounded-xl px-2.5 py-1.5">
+                    <Eye className="w-3.5 h-3.5 text-[#ea1263]" />
+                    <span className="text-[10px] font-extrabold text-[#8a919e] uppercase tracking-wider">Role View:</span>
+                    <select
+                      value={activeRole}
+                      onChange={(e) => handleSwitchRoleView(e.target.value as ChurchRole)}
+                      className="bg-transparent text-xs font-bold text-[#ea1263] focus:outline-none cursor-pointer"
+                    >
+                      <option value="admin">Administrator & CMS</option>
+                      <option value="district_overseer">District Overseer Study</option>
+                      <option value="resident_pastor">Resident Pastor Desk</option>
+                      <option value="secretariat">Secretariat Desk</option>
+                      <option value="head_usher">Head Usher Desk</option>
+                    </select>
+                  </div>
+                )}
+
+                {/* Settings Gear */}
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer"
+                  title="Church Settings & Announcements"
+                >
+                  <Settings size={18} />
+                </button>
+
+                {/* View Live Site */}
+                <button
+                  onClick={onClose}
+                  className="px-3 py-1.5 rounded-xl border border-[#e4d8e8] hover:border-[#d8c8dc] bg-[#faf4fb] hover:bg-[#f5eef8] text-[#4b5262] text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-[#707786]" />
+                  <span className="hidden sm:inline">Live Site</span>
+                </button>
+
+                {/* Logout / Switch Role */}
+                <button
+                  onClick={handleLogout}
+                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#ea1263]/30 hover:border-[#ea1263]/60 bg-[#ea1263]/10 hover:bg-[#ea1263]/20 text-[#ea1263] text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  title="Switch Staff Account / Lock"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Lock</span>
+                </button>
+              </div>
+            </header>
 
           {/* Body: Left Sidebar + Main Content Area */}
           <div className="flex-1 flex overflow-hidden relative min-h-0">
@@ -1185,455 +1210,212 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             {/* Left Sidebar */}
             <aside 
-              className={`admin-sidebar fixed lg:static top-16 bottom-0 left-0 bg-slate-900/95 lg:bg-slate-900/60 border-r border-slate-800 flex flex-col justify-between shrink-0 transition-transform duration-300 lg:translate-x-0 ${
+              className={`admin-sidebar fixed lg:static top-16 bottom-0 left-0 bg-white border-r border-[#f0e6f3] flex flex-col justify-between shrink-0 transition-transform duration-300 lg:translate-x-0 z-30 ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
-              {/* Navigation Items based on Active Role */}
-              <div className="p-3 space-y-1 overflow-y-auto">
-                <div className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                  {currentRoleDef.title}
+              <div>
+                {/* Brand Header: Lector style with Church Context */}
+                <div className="p-3.5 border-b border-[#f4ebf6]">
+                  <div className="bg-gradient-to-r from-[#ea1263] via-[#e81977] to-[#ec4899] text-white rounded-xl py-2 px-3 shadow-sm shadow-[#ea1263]/25 flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-[#facc15] text-[#1b212f] flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
+                      ⚡
+                    </div>
+                    <div className="font-black text-sm tracking-tight text-white flex-1 truncate">
+                      Lector.
+                    </div>
+                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-white/20 text-white uppercase tracking-wider">
+                      FGC
+                    </span>
+                  </div>
                 </div>
 
-                {/* 1. ADMINISTRATOR ROLE NAVIGATION */}
-                {activeRole === 'admin' && (
-                  <>
-                    <button
-                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overview' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <BarChart3 className="w-4 h-4 text-amber-400" />
-                      IT Systems & CMS Dashboard
-                    </button>
-                    <div className="pt-2 px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                      CMS Content
-                    </div>
-                    <button
-                      onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'sermons' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <BookOpen className="w-4 h-4" />
-                      Sermons & Series ({sermons.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'events' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Calendar & Events ({events.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'settings' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Settings className="w-4 h-4" />
-                      Church Info & Banner
-                    </button>
+                {/* Navigation Links */}
+                <div className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+                  {/* # Dashboard (Pink Active in Mockup) */}
+                  <button
+                    onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'overview'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Hash className="w-4 h-4 text-[#ea1263]" />
+                    <span>Dashboard</span>
+                  </button>
 
-                    <div className="pt-2 px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
-                      IAM & Governance
-                    </div>
-                    <button
-                      onClick={() => { setActiveTab('iam_staff'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'iam_staff' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Shield className="w-4 h-4 text-blue-400" />
-                      Staff Accounts & IAM ({staffUsers.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'guests' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Users className="w-4 h-4" />
-                      First-Time Guests ({guestVisits.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'prayers' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Heart className="w-4 h-4" />
-                      Prayer Care ({prayerRequests.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-emerald-400" />
-                      Attendance Telemetry (Sun/Wed/Thu)
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4 text-amber-400" />
-                      Treasury &amp; Financial Analytics
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'audit_logs' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <ClipboardList className="w-4 h-4 text-emerald-400" />
-                      Audit Trail &amp; Logs ({auditLogs.length})
-                    </button>
-                  </>
-                )}
+                  {/* Treasury & Finances */}
+                  <button
+                    onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      (activeTab === 'finances' || activeTab === 'giving')
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Wallet className="w-4 h-4 text-[#06b6d4]" />
+                    <span>Treasury & Finances</span>
+                  </button>
 
-                {/* 2. DISTRICT OVERSEER (SENIOR PASTOR) NAVIGATION */}
-                {activeRole === 'district_overseer' && (
-                  <>
-                    <button
-                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        (activeTab === 'overview' || activeTab === 'overseer_pulse') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Award className="w-4 h-4 text-amber-400" />
-                      Overseer Study &amp; Dashboard
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4 text-emerald-400" />
-                      Treasury &amp; Finance Oversight
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-amber-400" />
-                      Multi-Service Attendance Pulse
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'prayers' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Heart className="w-4 h-4 text-rose-400" />
-                      Pastoral Intercession ({prayerRequests.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'sermons' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <BookOpen className="w-4 h-4 text-sky-400" />
-                      Preaching Roster &amp; Series
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('overseer_directives'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overseer_directives' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <FileText className="w-4 h-4 text-indigo-400" />
-                      Pastoral Team &amp; Directives
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'audit_logs' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <ClipboardList className="w-4 h-4 text-emerald-400" />
-                      Audit Trail &amp; Governance ({auditLogs.length})
-                    </button>
-                  </>
-                )}
+                  {/* Attendance Telemetry */}
+                  <button
+                    onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'attendance'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Activity className="w-4 h-4 text-[#8b5cf6]" />
+                    <span>Attendance Telemetry</span>
+                  </button>
 
-                {/* 3. RESIDENT PASTOR NAVIGATION */}
-                {activeRole === 'resident_pastor' && (
-                  <>
-                    <button
-                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overview' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Heart className="w-4 h-4 text-sky-400" />
-                      Shepherding &amp; Care Dashboard
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-emerald-400" />
-                      Service Attendance (Sun/Wed/Thu)
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4 text-emerald-400" />
-                      Stewardship &amp; Welfare Treasury
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'guests' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Users className="w-4 h-4 text-sky-400" />
-                      First-Time Guest Care ({guestVisits.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'prayers' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Heart className="w-4 h-4 text-rose-400" />
-                      Pastoral Counseling &amp; Prayers ({prayerRequests.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'sermons' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <BookOpen className="w-4 h-4 text-amber-400" />
-                      Sermon Recordings &amp; Study ({sermons.length})
-                    </button>
-                  </>
-                )}
+                  {/* Log Headcount */}
+                  <button
+                    onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'headcount_logger'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Plus className="w-4 h-4 text-[#ea1263]" />
+                    <span>Log Headcount</span>
+                  </button>
 
-                {/* 4. SECRETARIAT NAVIGATION */}
-                {activeRole === 'secretariat' && (
-                  <>
-                    <button
-                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overview' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <ClipboardList className="w-4 h-4 text-emerald-400" />
-                      Secretariat &amp; Registry Dashboard
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Wallet className="w-4 h-4 text-emerald-400" />
-                      Treasury &amp; Collections Ledger
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-amber-400" />
-                      Official Attendance Registry
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'events' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Calendar className="w-4 h-4 text-emerald-400" />
-                      Events &amp; Church Calendar ({events.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'guests' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <ClipboardList className="w-4 h-4 text-emerald-400" />
-                      Guest Intake Registry ({guestVisits.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'settings' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Bell className="w-4 h-4 text-amber-400" />
-                      Public Announcements
-                    </button>
-                  </>
-                )}
+                  <div className="pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
+                    Ministries & Care
+                  </div>
 
-                {/* 5. HEAD USHER NAVIGATION */}
-                {activeRole === 'head_usher' && (
-                  <>
-                    <button
-                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overview' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-rose-400" />
-                      Protocol & Headcount Dashboard
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'headcount_logger' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Plus className="w-4 h-4 text-rose-400" />
-                      Log Service Headcount
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-amber-400" />
-                      Attendance History
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'guests' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <UserCheck className="w-4 h-4 text-sky-400" />
-                      Guest Welcome Arrivals ({guestVisits.length})
-                    </button>
-                  </>
-                )}
+                  {/* First-Time Guests */}
+                  <button
+                    onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'guests'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Users className="w-4 h-4 text-[#f59e0b]" />
+                    <span>First-Time Guests ({guestVisits.length})</span>
+                  </button>
+
+                  {/* Pastoral Prayers */}
+                  <button
+                    onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'prayers'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Heart className="w-4 h-4 text-[#ea1263]" />
+                    <span>Prayer Desk ({prayerRequests.length})</span>
+                  </button>
+
+                  {/* Sermons CMS */}
+                  <button
+                    onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'sermons'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4 text-[#06b6d4]" />
+                    <span>Sermons CMS ({sermons.length})</span>
+                  </button>
+
+                  {/* Events & Calendar */}
+                  <button
+                    onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'events'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4 text-[#10b981]" />
+                    <span>Calendar Events ({events.length})</span>
+                  </button>
+
+                  <div className="pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
+                    IAM & Governance
+                  </div>
+
+                  {/* Staff IAM */}
+                  <button
+                    onClick={() => { setActiveTab('iam_staff'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'iam_staff'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Shield className="w-4 h-4 text-[#6366f1]" />
+                    <span>Staff IAM ({staffUsers.length})</span>
+                  </button>
+
+                  {/* Audit Trail */}
+                  <button
+                    onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'audit_logs'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <ClipboardList className="w-4 h-4 text-[#8b5cf6]" />
+                    <span>Audit Trail ({auditLogs.length})</span>
+                  </button>
+
+                  {/* Church Settings */}
+                  <button
+                    onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'settings'
+                        ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
+                        : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
+                    }`}
+                  >
+                    <Settings className="w-4 h-4 text-[#707786]" />
+                    <span>Church Settings</span>
+                  </button>
+                </div>
               </div>
 
               {/* Sidebar Footer Info */}
-              <div className="p-3 border-t border-slate-800 text-[11px] text-slate-500">
-                <div className="flex items-center gap-1.5 mb-1 text-emerald-400 font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Supabase Backend Live
+              <div className="p-3.5 border-t border-[#f4ebf6] text-[11px] text-[#8a919e] bg-[#faf5fb]">
+                <div className="flex items-center gap-1.5 mb-0.5 text-[#10b981] font-bold">
+                  <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
+                  Supabase Cloud Live
                 </div>
-                <div className="truncate">Active: {currentUser.name}</div>
+                <div className="truncate font-semibold text-[#1f2430]">{currentUser.name}</div>
               </div>
             </aside>
 
             {/* Main Content Workspace */}
-            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#070d18] min-h-0 overscroll-contain">
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 bg-[#fbf8fc] text-[#1f2430] min-h-0 overscroll-contain">
 
               {/* ---------------------------------------------------- */}
-              {/* ROLE-SPECIFIC CHURCH OPERATIONS & STUDY DASHBOARDS  */}
+              {/* LECTOR OPERATIONS OVERVIEW DASHBOARD                */}
               {/* ---------------------------------------------------- */}
               {activeTab === 'overview' && (
-                <>
-                  {activeRole === 'admin' && (
-                    <AdminDashboard
-                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
-                      staffUsers={staffUsers}
-                      sermons={sermons}
-                      events={events}
-                      auditLogs={auditLogs}
-                      finances={finances}
-                      onSetActiveTab={setActiveTab}
-                      onOpenSermonModal={() => {
-                        setSermonForm({
-                          title: '',
-                          series: 'UNSHAKABLE',
-                          speaker: 'Rev. Dr. O. A. Babalola',
-                          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                          duration: '35 min',
-                          passage: 'Hebrews 13:8',
-                          thumbnail: '/images/sermon-series.jpg',
-                          summary: '',
-                          videoUrl: '',
-                          isFeatured: false
-                        });
-                        setIsEditingSermon(true);
-                        setActiveTab('sermons');
-                      }}
-                    />
-                  )}
-
-                  {activeRole === 'district_overseer' && (
-                    <DistrictOverseerDashboard
-                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
-                      serviceAttendance={serviceAttendance}
-                      prayerRequests={prayerRequests}
-                      sermons={sermons}
-                      staffUsers={staffUsers}
-                      finances={finances}
-                      onSetActiveTab={setActiveTab}
-                    />
-                  )}
-
-                  {activeRole === 'resident_pastor' && (
-                    <ResidentPastorDashboard
-                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
-                      prayerRequests={prayerRequests}
-                      guestVisits={guestVisits}
-                      sermons={sermons}
-                      serviceAttendance={serviceAttendance}
-                      finances={finances}
-                      onSetActiveTab={setActiveTab}
-                      onOpenGuestNotes={handleOpenGuestNotes}
-                    />
-                  )}
-
-                  {activeRole === 'head_usher' && (
-                    <HeadUsherDashboard
-                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
-                      latestSundayAttendance={latestSundayAttendance}
-                      serviceAttendance={serviceAttendance}
-                      guestVisits={guestVisits}
-                      onSetActiveTab={setActiveTab}
-                    />
-                  )}
-
-                  {activeRole === 'secretariat' && (
-                    <SecretariatDashboard
-                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
-                      guestVisits={guestVisits}
-                      events={events}
-                      serviceAttendance={serviceAttendance}
-                      finances={finances}
-                      onSetActiveTab={setActiveTab}
-                      onOpenEventModal={() => {
-                        setEventForm({
-                          title: '',
-                          date: new Date().toISOString().split('T')[0],
-                          time: '09:00 AM',
-                          location: 'Main Sanctuary, FGC Mushin DHQ',
-                          category: 'Worship',
-                          description: ''
-                        });
-                        setIsEditingEvent(true);
-                        setActiveTab('events');
-                      }}
-                    />
-                  )}
-                </>
+                <LectorChurchDashboard
+                  finances={finances}
+                  serviceAttendance={serviceAttendance}
+                  guestVisits={guestVisits}
+                  prayerRequests={prayerRequests}
+                  sermons={sermons}
+                  events={events}
+                  staffUsers={staffUsers}
+                  auditLogs={auditLogs}
+                  activeRole={activeRole}
+                  onSetActiveTab={setActiveTab}
+                  onOpenRecordFinanceModal={() => setActiveTab('finances')}
+                  onOpenLogAttendanceModal={() => setActiveTab('attendance')}
+                />
               )}
 
               {/* District Overseer Alternate Study View */}

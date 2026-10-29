@@ -6,7 +6,7 @@
    3. Official FGC Mushin 4-Color Fourfold Gospel System (index.css)
    ========================================================================== */
 
-/* Root Modal Backdrop with Warm Gaussian Blur */
+/* Root Modal Backdrop with Soft Lilac/Pink Background matching Lector reference */
 .admin-portal-root {
   position: fixed !important;
   inset: 0 !important;
@@ -14,10 +14,8 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  background: rgba(21, 26, 33, 0.65) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  padding: clamp(0.5rem, 1.5vw, 1.25rem) !important;
+  background: #f6edf7 !important;
+  padding: clamp(0.75rem, 2vw, 1.75rem) !important;
   font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif) !important;
   color: var(--text-primary, #151A21) !important;
   -webkit-font-smoothing: antialiased;
@@ -25,19 +23,19 @@
   overflow: hidden !important;
 }
 
-/* Master Double-Bezel Operations Suite Window */
+/* Master Operations Suite Window */
 .admin-portal-window {
   width: 100%;
-  max-width: 1520px;
+  max-width: 1540px;
   height: 96vh;
   max-height: 96vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #FAFAF9;
-  border: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.08));
-  border-radius: 28px;
-  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.15), 0 10px 25px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  border: 1px solid #f0e6f3;
+  border-radius: 26px;
+  box-shadow: 0 20px 50px rgba(225, 29, 72, 0.05), 0 4px 15px rgba(0, 0, 0, 0.03);
   position: relative;
 }
 
@@ -48,7 +46,7 @@
   overflow: hidden;
   background: #FFFFFF;
   border-radius: 22px;
-  margin: 4px;
+  margin: 0;
   position: relative;
   min-height: 0;
 }
@@ -619,25 +617,41 @@
   width: 100vw !important;
   height: 100vh !important;
   display: flex !important;
-  flex-direction: column !important;
-  background-color: #FAFAF9 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #f6edf7 !important;
+  padding: clamp(0.75rem, 2vw, 1.75rem) !important;
   color: var(--text-primary, #151A21) !important;
   font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif) !important;
   overflow: hidden !important;
 }
 
 .admin-workspace-fullscreen .admin-portal-window {
-  max-width: 100% !important;
-  height: 100% !important;
-  max-height: 100% !important;
-  border-radius: 0 !important;
-  border: none !important;
-  box-shadow: none !important;
+  max-width: 1540px !important;
+  height: 96vh !important;
+  max-height: 96vh !important;
+  border-radius: 26px !important;
+  border: 1px solid #f0e6f3 !important;
+  box-shadow: 0 20px 50px rgba(225, 29, 72, 0.05), 0 4px 15px rgba(0, 0, 0, 0.03) !important;
+  background: #ffffff !important;
 }
 
 .admin-workspace-fullscreen .admin-portal-window-inner {
-  border-radius: 0 !important;
+  border-radius: 22px !important;
   margin: 0 !important;
+  background: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+  .admin-workspace-fullscreen {
+    padding: 0 !important;
+  }
+  .admin-workspace-fullscreen .admin-portal-window {
+    border-radius: 0 !important;
+    border: none !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+  }
 }
 
 /* Sidebar Responsive Behavior */
