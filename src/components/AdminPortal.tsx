@@ -30,7 +30,6 @@ import {
   Award,
   Eye,
   Activity,
-  TrendingUp,
   ClipboardList,
   Bell,
   Key
@@ -48,6 +47,13 @@ import type {
 } from '../types/database';
 import { ROLE_DEFINITIONS } from '../types/iam';
 import type { ChurchRole } from '../types/iam';
+import {
+  AdminDashboard,
+  DistrictOverseerDashboard,
+  ResidentPastorDashboard,
+  HeadUsherDashboard,
+  SecretariatDashboard
+} from './RoleDashboards';
 import {
   saveSermon,
   deleteSermon,
@@ -317,10 +323,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         if (matched) {
           setCurrentUser(matched);
           setActiveRole(matched.role);
-          if (matched.role === 'district_overseer') setActiveTab(t => (t === 'overview' ? 'overseer_pulse' : t));
-          else if (matched.role === 'resident_pastor') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'guests' : t));
-          else if (matched.role === 'secretariat') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'events' : t));
-          else if (matched.role === 'head_usher') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'headcount_logger' : t));
         }
       }
       if (loadedAttendance) setServiceAttendance(loadedAttendance);
@@ -437,11 +439,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Executive Switcher for Administrator to inspect any role's desk
   const handleSwitchRoleView = (targetRole: ChurchRole) => {
     setActiveRole(targetRole);
-    if (targetRole === 'district_overseer') setActiveTab('overseer_pulse');
-    else if (targetRole === 'resident_pastor') setActiveTab('guests');
-    else if (targetRole === 'secretariat') setActiveTab('events');
-    else if (targetRole === 'head_usher') setActiveTab('headcount_logger');
-    else setActiveTab('overview');
+    setActiveTab('overview');
     showNotice(`Switched desk view to: ${ROLE_DEFINITIONS[targetRole].title}`);
   };
 
@@ -1199,7 +1197,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <BarChart3 className="w-4 h-4 text-amber-400" />
-                      Church Operations Dashboard
+                      IT Systems & CMS Dashboard
                     </button>
                     <div className="pt-2 px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                       CMS Content
@@ -1298,20 +1296,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <button
                       onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overview' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <BarChart3 className="w-4 h-4 text-amber-400" />
-                      Church Operations Dashboard
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('overseer_pulse'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'overseer_pulse' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        (activeTab === 'overview' || activeTab === 'overseer_pulse') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
                       <Award className="w-4 h-4 text-amber-400" />
-                      Executive Overseer Study
+                      Overseer Study & Dashboard
                     </button>
                     <button
                       onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
@@ -1370,8 +1359,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         activeTab === 'overview' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <BarChart3 className="w-4 h-4 text-sky-400" />
-                      Church Operations Dashboard
+                      <Heart className="w-4 h-4 text-sky-400" />
+                      Shepherding & Care Dashboard
                     </button>
                     <button
                       onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
@@ -1421,8 +1410,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         activeTab === 'overview' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <BarChart3 className="w-4 h-4 text-emerald-400" />
-                      Church Operations Dashboard
+                      <ClipboardList className="w-4 h-4 text-emerald-400" />
+                      Secretariat & Registry Dashboard
                     </button>
                     <button
                       onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
@@ -1463,8 +1452,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         activeTab === 'overview' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <BarChart3 className="w-4 h-4 text-rose-400" />
-                      Church Operations Dashboard
+                      <Activity className="w-4 h-4 text-rose-400" />
+                      Protocol & Headcount Dashboard
                     </button>
                     <button
                       onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
@@ -1511,19 +1500,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#070d18] min-h-0 overscroll-contain">
 
               {/* ---------------------------------------------------- */}
-              {/* TAB: OVERVIEW PULSE (ADMINISTRATOR)                 */}
+              {/* ROLE-SPECIFIC CHURCH OPERATIONS & STUDY DASHBOARDS  */}
               {/* ---------------------------------------------------- */}
               {activeTab === 'overview' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <h1 className="text-2xl font-black text-white tracking-tight">Church Operations &amp; Ministry Dashboard</h1>
-                      <p className="text-xs text-slate-400 mt-1">
-                        Unified operational overview of attendance trends, guest intakes, pastoral care, and church activities.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
+                <>
+                  {activeRole === 'admin' && (
+                    <AdminDashboard
+                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                      staffUsers={staffUsers}
+                      sermons={sermons}
+                      events={events}
+                      auditLogs={auditLogs}
+                      onSetActiveTab={setActiveTab}
+                      onOpenSermonModal={() => {
                         setSermonForm({
                           title: '',
                           series: 'UNSHAKABLE',
@@ -1539,371 +1528,74 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         setIsEditingSermon(true);
                         setActiveTab('sermons');
                       }}
-                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Publish New Sermon
-                    </button>
-                  </div>
+                    />
+                  )}
 
-                  {/* 4 KPI Cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
-                      <div className="flex items-center justify-between text-slate-400 mb-2">
-                        <span className="text-xs font-semibold uppercase tracking-wider">Sunday Attendance</span>
-                        <Activity className="w-4 h-4 text-emerald-400" />
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-white">{totalRecentSundayHeadcount || '1,220'}</div>
-                      <div className="text-[11px] text-emerald-400 mt-1 font-medium">Combined 1st & 2nd services</div>
-                    </div>
+                  {activeRole === 'district_overseer' && (
+                    <DistrictOverseerDashboard
+                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                      serviceAttendance={serviceAttendance}
+                      prayerRequests={prayerRequests}
+                      sermons={sermons}
+                      staffUsers={staffUsers}
+                      onSetActiveTab={setActiveTab}
+                    />
+                  )}
 
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
-                      <div className="flex items-center justify-between text-slate-400 mb-2">
-                        <span className="text-xs font-semibold uppercase tracking-wider">First-Time Guests</span>
-                        <Users className="w-4 h-4 text-amber-400" />
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-white">{guestVisits.length}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">Visitors registered online</div>
-                    </div>
+                  {activeRole === 'resident_pastor' && (
+                    <ResidentPastorDashboard
+                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                      prayerRequests={prayerRequests}
+                      guestVisits={guestVisits}
+                      sermons={sermons}
+                      onSetActiveTab={setActiveTab}
+                      onOpenGuestNotes={handleOpenGuestNotes}
+                    />
+                  )}
 
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
-                      <div className="flex items-center justify-between text-slate-400 mb-2">
-                        <span className="text-xs font-semibold uppercase tracking-wider">Prayer Intercession</span>
-                        <Heart className="w-4 h-4 text-rose-400" />
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-white">{prayerRequests.length}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">Active requests logged</div>
-                    </div>
+                  {activeRole === 'head_usher' && (
+                    <HeadUsherDashboard
+                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                      latestSundayAttendance={latestSundayAttendance}
+                      serviceAttendance={serviceAttendance}
+                      guestVisits={guestVisits}
+                      onSetActiveTab={setActiveTab}
+                    />
+                  )}
 
-                    <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
-                      <div className="flex items-center justify-between text-slate-400 mb-2">
-                        <span className="text-xs font-semibold uppercase tracking-wider">Active Staff Roles</span>
-                        <Shield className="w-4 h-4 text-blue-400" />
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-white">{staffUsers.filter(u => u.is_active).length} / 5</div>
-                      <div className="text-[11px] text-blue-400 mt-1 font-medium">RBAC profiles provisioned</div>
-                    </div>
-                  </div>
-
-                  {/* Operational Quick Actions Banner */}
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-900 to-amber-950/30 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                      <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold mb-2">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Administrator Quick Dispatch
-                      </div>
-                      <h3 className="text-lg font-bold text-white">Full CMS & Operations Governance Active</h3>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        You can manage all sermons, calendar gatherings, website announcements, and provision staff roles across the church.
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={() => setActiveTab('iam_staff')}
-                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Shield className="w-4 h-4" />
-                        Manage Staff IAM
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('guests')}
-                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Users className="w-4 h-4" />
-                        Review Guests
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('headcount_logger')}
-                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Activity className="w-4 h-4 text-emerald-400" />
-                        Log Headcount
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('settings')}
-                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Settings className="w-4 h-4" />
-                        Live Announcements
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 2-Column Live Operations Overview */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Column 1: Recent Attendance Logs & First-Time Guests */}
-                    <div className="space-y-6">
-                      {/* Recent Attendance */}
-                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <Activity className="w-4 h-4 text-emerald-400" />
-                            <h3 className="text-sm font-bold text-white">Recent Sunday Attendance</h3>
-                          </div>
-                          <button
-                            onClick={() => setActiveTab('attendance')}
-                            className="text-xs text-amber-400 hover:underline font-semibold"
-                          >
-                            View All Logs →
-                          </button>
-                        </div>
-                        {serviceAttendance.length > 0 ? (
-                          <div className="space-y-2.5">
-                            {serviceAttendance.slice(0, 3).map((att) => (
-                              <div
-                                key={att.id}
-                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs"
-                              >
-                                <div>
-                                  <div className="font-bold text-white">{att.service_name}</div>
-                                  <div className="text-[11px] text-slate-400">{att.service_date} • {att.head_usher_name}</div>
-                                </div>
-                                <div className="text-right">
-                                  <div className="text-sm font-black text-emerald-400">{att.total_count} Attendees</div>
-                                  <div className="text-[10px] text-slate-500">M: {att.men_count} | W: {att.women_count} | K: {att.children_count}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-xs text-slate-500 py-4 text-center">
-                            No attendance records logged yet. Head Ushers can record Sunday services in the Headcount tab.
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Recent Guest Intakes */}
-                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-amber-400" />
-                            <h3 className="text-sm font-bold text-white">First-Time Guest Registrations</h3>
-                          </div>
-                          <button
-                            onClick={() => setActiveTab('guests')}
-                            className="text-xs text-amber-400 hover:underline font-semibold"
-                          >
-                            Guest Dossier ({guestVisits.length}) →
-                          </button>
-                        </div>
-                        {guestVisits.length > 0 ? (
-                          <div className="space-y-2.5">
-                            {guestVisits.slice(0, 3).map((guest) => (
-                              <div
-                                key={guest.id}
-                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs"
-                              >
-                                <div>
-                                  <div className="font-bold text-white">{guest.full_name}</div>
-                                  <div className="text-[11px] text-slate-400">{guest.service_time} • Party of {(guest.adults_count || 1) + (guest.kids_count || 0)}</div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                                    guest.status === 'confirmed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
-                                  }`}>
-                                    {guest.status || 'pending'}
-                                  </span>
-                                  <button
-                                    onClick={() => handleOpenGuestNotes(guest)}
-                                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
-                                    title="Add pastoral note"
-                                  >
-                                    <FileText className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-xs text-slate-500 py-4 text-center">
-                            No guest registrations yet. First-time visitors booking through the website will appear here.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Column 2: Active Prayers & Fast Department Shortcuts */}
-                    <div className="space-y-6">
-                      {/* Active Prayer Requests */}
-                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center gap-2">
-                            <Heart className="w-4 h-4 text-rose-400" />
-                            <h3 className="text-sm font-bold text-white">Active Prayer Intercession Requests</h3>
-                          </div>
-                          <button
-                            onClick={() => setActiveTab('prayers')}
-                            className="text-xs text-rose-400 hover:underline font-semibold"
-                          >
-                            Prayer Desk ({prayerRequests.length}) →
-                          </button>
-                        </div>
-                        {prayerRequests.length > 0 ? (
-                          <div className="space-y-2.5">
-                            {prayerRequests.slice(0, 3).map((prayer) => (
-                              <div
-                                key={prayer.id}
-                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <span className="font-bold text-white">{prayer.full_name}</span>
-                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400">
-                                    {prayer.category}
-                                  </span>
-                                </div>
-                                <p className="text-slate-400 text-[11px] line-clamp-2">
-                                  "{prayer.request}"
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-xs text-slate-500 py-4 text-center">
-                            No prayer requests logged yet. Submissions from the website prayer modal appear here.
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Fast Ministry Shortcuts Grid */}
-                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Sparkles className="w-4 h-4 text-amber-400" />
-                          <h3 className="text-sm font-bold text-white">Quick Ministry Desks</h3>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <button
-                            onClick={() => setActiveTab('sermons')}
-                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
-                          >
-                            <BookOpen className="w-4 h-4 text-sky-400 mb-1" />
-                            <div className="font-bold text-white">Sermons CMS</div>
-                            <div className="text-[10px] text-slate-400">{sermons.length} recordings</div>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('events')}
-                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
-                          >
-                            <Calendar className="w-4 h-4 text-emerald-400 mb-1" />
-                            <div className="font-bold text-white">Events Calendar</div>
-                            <div className="text-[10px] text-slate-400">{events.length} gatherings</div>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('giving')}
-                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
-                          >
-                            <DollarSign className="w-4 h-4 text-amber-400 mb-1" />
-                            <div className="font-bold text-white">Stewardship</div>
-                            <div className="text-[10px] text-slate-400">{givingRecords.length} records</div>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('audit_logs')}
-                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
-                          >
-                            <ClipboardList className="w-4 h-4 text-purple-400 mb-1" />
-                            <div className="font-bold text-white">Audit Trail</div>
-                            <div className="text-[10px] text-slate-400">{auditLogs.length} events logged</div>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  {activeRole === 'secretariat' && (
+                    <SecretariatDashboard
+                      totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                      guestVisits={guestVisits}
+                      events={events}
+                      onSetActiveTab={setActiveTab}
+                      onOpenEventModal={() => {
+                        setEventForm({
+                          title: '',
+                          date: new Date().toISOString().split('T')[0],
+                          time: '09:00 AM',
+                          location: 'Main Sanctuary, FGC Mushin DHQ',
+                          category: 'Worship',
+                          description: ''
+                        });
+                        setIsEditingEvent(true);
+                        setActiveTab('events');
+                      }}
+                    />
+                  )}
+                </>
               )}
 
-              {/* ---------------------------------------------------- */}
-              {/* TAB: DISTRICT OVERSEER EXECUTIVE STUDY               */}
-              {/* ---------------------------------------------------- */}
+              {/* District Overseer Alternate Study View */}
               {activeTab === 'overseer_pulse' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-950 border border-amber-500/30 shadow-xl">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="p-2.5 rounded-2xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
-                        <Award className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-amber-400">
-                          Executive Study • District Governance
-                        </span>
-                        <h1 className="text-2xl font-black text-white">Rev. Dr. O. A. Babalola</h1>
-                      </div>
-                    </div>
-                    <p className="text-xs text-slate-300 max-w-2xl mt-2 leading-relaxed">
-                      District Overseer pastoral oversight for FGC Mushin District Headquarters. Review Sunday attendance trajectories, spiritual care escalations, preaching roadmap, and district communications.
-                    </p>
-                  </div>
-
-                  {/* 4 Overseer Executive Cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-semibold uppercase text-slate-400 mb-1">Total Sunday Attendance</div>
-                      <div className="text-3xl font-black text-amber-400">{totalRecentSundayHeadcount || '1,220'}</div>
-                      <div className="text-[11px] text-emerald-400 mt-1 font-medium">Across 1st & 2nd Services</div>
-                    </div>
-                    <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-semibold uppercase text-slate-400 mb-1">First-Time Visitors</div>
-                      <div className="text-3xl font-black text-white">{guestVisits.length}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">Pending welcoming follow-up</div>
-                    </div>
-                    <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-semibold uppercase text-slate-400 mb-1">Confidential Prayers</div>
-                      <div className="text-3xl font-black text-rose-400">{prayerRequests.length}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">Intercession requests</div>
-                    </div>
-                    <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-semibold uppercase text-slate-400 mb-1">Preaching Series</div>
-                      <div className="text-3xl font-black text-sky-400">{sermons.length}</div>
-                      <div className="text-[11px] text-slate-400 mt-1">Active recorded messages</div>
-                    </div>
-                  </div>
-
-                  {/* Recent Attendance Breakdown */}
-                  <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-base font-bold text-white flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-emerald-400" />
-                        Sunday Service Headcount Breakdown
-                      </h3>
-                      <span className="text-xs text-slate-400">Logged by Head Usher</span>
-                    </div>
-
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead>
-                          <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
-                            <th className="py-2.5 px-3">Date</th>
-                            <th className="py-2.5 px-3">Service</th>
-                            <th className="py-2.5 px-3 text-right">Men</th>
-                            <th className="py-2.5 px-3 text-right">Women</th>
-                            <th className="py-2.5 px-3 text-right">Children</th>
-                            <th className="py-2.5 px-3 text-right font-bold text-white">Total</th>
-                            <th className="py-2.5 px-3">Ushering Notes</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/60">
-                          {serviceAttendance.length === 0 ? (
-                            <tr>
-                              <td colSpan={7} className="py-4 text-center text-slate-500">
-                                No attendance records logged yet.
-                              </td>
-                            </tr>
-                          ) : (
-                            serviceAttendance.slice(0, 5).map((rec) => (
-                              <tr key={rec.id} className="hover:bg-slate-800/30">
-                                <td className="py-3 px-3 text-slate-300 font-mono">{rec.service_date}</td>
-                                <td className="py-3 px-3 text-white font-semibold">{rec.service_name}</td>
-                                <td className="py-3 px-3 text-right text-slate-300">{rec.men_count}</td>
-                                <td className="py-3 px-3 text-right text-slate-300">{rec.women_count}</td>
-                                <td className="py-3 px-3 text-right text-slate-300">{rec.children_count}</td>
-                                <td className="py-3 px-3 text-right font-bold text-emerald-400">{rec.total_count}</td>
-                                <td className="py-3 px-3 text-slate-400 text-[11px] max-w-xs truncate">{rec.notes || '—'}</td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
+                <DistrictOverseerDashboard
+                  totalRecentSundayHeadcount={totalRecentSundayHeadcount}
+                  serviceAttendance={serviceAttendance}
+                  prayerRequests={prayerRequests}
+                  sermons={sermons}
+                  staffUsers={staffUsers}
+                  onSetActiveTab={setActiveTab}
+                />
               )}
 
               {/* ---------------------------------------------------- */}
