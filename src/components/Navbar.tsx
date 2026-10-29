@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Heart, MapPin, Clock, Lock } from 'lucide-react';
+import { Menu, X, ArrowUpRight, Heart, MapPin, Clock, BarChart3 } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface NavbarProps {
@@ -194,19 +194,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.35rem',
-                    color: 'var(--text-muted)',
-                    fontSize: '0.85rem',
-                    transition: 'color 0.2s',
-                    padding: '0.2rem 0.4rem',
-                    borderRadius: '6px'
+                    gap: '0.4rem',
+                    color: 'var(--fgc-blue-dark)',
+                    fontSize: '0.825rem',
+                    fontWeight: 700,
+                    transition: 'all 0.2s ease',
+                    padding: '0.35rem 0.75rem',
+                    borderRadius: '9999px',
+                    background: 'var(--fgc-blue-subtle)',
+                    border: '1px solid var(--fgc-blue-border)',
+                    cursor: 'pointer'
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--fgc-blue)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
-                  title="Staff Operations Suite (Alt+A)"
+                  title="Staff Operations & Ministry Dashboard (Alt+A)"
                 >
-                  <Lock size={12} />
-                  <span>Staff</span>
+                  <BarChart3 size={13} color="var(--fgc-blue)" />
+                  <span>Dashboard</span>
                 </button>
               )}
             </div>
@@ -415,20 +417,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     onOpenAdmin();
                   }}
+                  className="btn-island"
                   style={{
                     width: '100%',
+                    justifyContent: 'center',
+                    padding: '0.75rem',
                     marginTop: '0.75rem',
-                    padding: '0.35rem',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    fontSize: '0.75rem',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    textDecoration: 'underline'
+                    background: 'var(--fgc-blue-subtle)',
+                    borderColor: 'var(--fgc-blue-border)',
+                    color: 'var(--fgc-blue-dark)',
+                    fontWeight: 700,
+                    fontSize: '0.85rem'
                   }}
                 >
-                  Staff CMS Portal
+                  <BarChart3 size={15} color="var(--fgc-blue)" />
+                  <span>Staff Ministry Dashboard</span>
                 </button>
               )}
             </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Clock, ArrowUpRight, Lock } from 'lucide-react';
+import { MapPin, Clock, ArrowUpRight, BarChart3 } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
 interface FooterProps {
@@ -234,8 +234,8 @@ export const Footer: React.FC<FooterProps> = ({
                       padding: '0.3rem 0'
                     }}
                   >
-                    <Lock size={13} />
-                    <span>Staff CMS Portal</span>
+                    <BarChart3 size={14} />
+                    <span>Staff Ministry Dashboard</span>
                   </button>
                 </li>
               )}
@@ -309,8 +309,8 @@ export const Footer: React.FC<FooterProps> = ({
                   textDecoration: 'underline'
                 }}
               >
-                <Lock size={12} />
-                <span>Staff CMS Portal</span>
+                <BarChart3 size={13} />
+                <span>Staff Ministry Dashboard</span>
               </button>
             )}
           </div>

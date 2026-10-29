@@ -160,20 +160,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
     return false;
   });
-  const [passkeyInput, setPasskeyInput] = useState('');
-  const [authError, setAuthError] = useState('');
   const [selectedLoginProfileId, setSelectedLoginProfileId] = useState<string>('admin');
+  const [passkeyInput, setPasskeyInput] = useState<string>(DEFAULT_STAFF_USERS[0].passkey);
+  const [authError, setAuthError] = useState('');
   const [showDevCredentialsHelper, setShowDevCredentialsHelper] = useState(false);
 
-  // Active Tab & Mobile Sidebar State
-  const [activeTab, setActiveTab] = useState<string>(() => {
-    const role = sessionStorage.getItem('fgc_staff_role');
-    if (role === 'district_overseer') return 'overseer_pulse';
-    if (role === 'resident_pastor') return 'guests';
-    if (role === 'secretariat') return 'events';
-    if (role === 'head_usher') return 'headcount_logger';
-    return 'overview';
-  });
+  // Active Tab & Mobile Sidebar State (Default to Church Operations Dashboard for all roles)
+  const [activeTab, setActiveTab] = useState<string>('overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Loading & Notification Notice
@@ -377,12 +370,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       sessionStorage.setItem('fgc_staff_user_id', matchedUser.id);
       sessionStorage.setItem('fgc_staff_role', matchedUser.role);
 
-      // Default opening tab per role
-      if (matchedUser.role === 'district_overseer') setActiveTab('overseer_pulse');
-      else if (matchedUser.role === 'resident_pastor') setActiveTab('guests');
-      else if (matchedUser.role === 'secretariat') setActiveTab('events');
-      else if (matchedUser.role === 'head_usher') setActiveTab('headcount_logger');
-      else setActiveTab('overview');
+      // Default opening tab is always the Church Dashboard
+      setActiveTab('overview');
 
       // Record audit event
       logAuditEvent({
@@ -398,6 +387,31 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     } else {
       setAuthError('Invalid administrative passkey. Please check your credentials.');
     }
+  };
+
+  // 1-Click login helper for rapid development testing
+  const loginAsUser = (targetUser: StaffUserRow) => {
+    setIsAuthenticated(true);
+    setCurrentUser(targetUser);
+    setActiveRole(targetUser.role);
+    setPasskeyInput(targetUser.passkey);
+    setSelectedLoginProfileId(targetUser.id);
+    setAuthError('');
+    sessionStorage.setItem('fgc_staff_auth', 'true');
+    sessionStorage.setItem('fgc_staff_user_id', targetUser.id);
+    sessionStorage.setItem('fgc_staff_role', targetUser.role);
+    setActiveTab('overview');
+
+    logAuditEvent({
+      staff_id: targetUser.id,
+      staff_name: targetUser.name,
+      staff_role: targetUser.role,
+      action: 'STAFF_LOGIN',
+      entity_type: 'AUTH',
+      details: `1-Click Direct Authenticated into ${ROLE_DEFINITIONS[targetUser.role].title} desk.`
+    }).then(() => loadPortalData()).catch(console.warn);
+
+    showNotice(`Welcome, ${targetUser.name} (${ROLE_DEFINITIONS[targetUser.role].badge})`);
   };
 
   const handleLogout = () => {
@@ -771,10 +785,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </p>
             </div>
 
+            {/* Development Mode Helper Notice */}
+            <div style={{
+              padding: '0.65rem 0.85rem',
+              borderRadius: '12px',
+              background: 'rgba(243, 166, 69, 0.12)',
+              border: '1px solid rgba(243, 166, 69, 0.35)',
+              color: 'var(--fgc-gold-dark)',
+              fontSize: '0.78rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              marginBottom: '1.25rem'
+            }}>
+              <Sparkles size={16} style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Testing &amp; Development Mode:</strong> Clicking any role below instantly populates its passkey into the password field. You can also click <strong>1-Click Instant Login</strong>.
+              </span>
+            </div>
+
             {/* Quick Profile Selector Cards */}
             <div className="mb-6">
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                Select Your Role Desk:
+                Select Your Role Desk (Click to Auto-Fill Password):
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {staffUsers.map((user) => {
@@ -786,7 +820,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       type="button"
                       onClick={() => {
                         setSelectedLoginProfileId(user.id);
-                        setPasskeyInput('');
+                        setPasskeyInput(user.passkey); // Auto-fill passkey immediately
                         setAuthError('');
                       }}
                       style={{
@@ -799,7 +833,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         gap: '0.75rem',
                         textAlign: 'left',
                         boxShadow: isSelected ? 'var(--shadow-card)' : 'none',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer'
                       }}
                     >
                       <div 
@@ -824,8 +859,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         <div style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           {user.name}
                         </div>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: roleDef.badgeColor, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {roleDef.badge}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.15rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: roleDef.badgeColor }}>
+                            {roleDef.badge}
+                          </span>
+                          <span style={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 600, padding: '0.05rem 0.35rem', borderRadius: '4px', background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)' }}>
+                            {user.passkey}
+                          </span>
                         </div>
                       </div>
                       {isSelected && <Check size={16} color={roleDef.badgeColor} style={{ flexShrink: 0 }} />}
@@ -834,9 +874,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 })}
               </div>
 
-              {/* Selected Role Scope Card */}
+              {/* Selected Role Scope Card & 1-Click Login Trigger */}
               {selectedLoginProfileId && (() => {
-                const selectedRoleDef = ROLE_DEFINITIONS[staffUsers.find(u => u.id === selectedLoginProfileId)?.role || 'admin'] || ROLE_DEFINITIONS.admin;
+                const selectedUser = staffUsers.find(u => u.id === selectedLoginProfileId) || staffUsers[0];
+                const selectedRoleDef = ROLE_DEFINITIONS[selectedUser.role] || ROLE_DEFINITIONS.admin;
                 return (
                   <div style={{
                     padding: '0.85rem 1rem',
@@ -845,26 +886,46 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     border: `1px solid ${selectedRoleDef.badgeColor}30`,
                     marginTop: '0.75rem',
                     display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.75rem'
+                    flexDirection: 'column',
+                    gap: '0.65rem'
                   }}>
-                    <div 
-                      style={{
-                        width: '10px',
-                        height: '10px',
-                        borderRadius: '50%',
-                        marginTop: '0.35rem',
-                        flexShrink: 0,
-                        backgroundColor: selectedRoleDef.badgeColor
-                      }} 
-                    />
-                    <div style={{ fontSize: '0.75rem' }}>
-                      <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {selectedRoleDef.primaryDesk}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.65rem', flex: 1, minWidth: '220px' }}>
+                        <div 
+                          style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            marginTop: '0.35rem',
+                            flexShrink: 0,
+                            backgroundColor: selectedRoleDef.badgeColor
+                          }} 
+                        />
+                        <div style={{ fontSize: '0.75rem' }}>
+                          <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                            {selectedRoleDef.primaryDesk} • <span style={{ color: selectedRoleDef.badgeColor, fontWeight: 700 }}>Passkey: <code style={{ fontFamily: 'monospace', fontWeight: 800 }}>{selectedUser.passkey}</code> (Auto-filled)</span>
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem', lineHeight: 1.45 }}>
+                            {selectedRoleDef.description}
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem', lineHeight: 1.5 }}>
-                        {selectedRoleDef.description}
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => loginAsUser(selectedUser)}
+                        className="btn-island btn-teal"
+                        style={{
+                          padding: '0.45rem 0.85rem',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                        title="Instant access under development"
+                      >
+                        <Sparkles size={13} />
+                        <span>1-Click Enter Desk</span>
+                      </button>
                     </div>
                   </div>
                 );
@@ -874,13 +935,26 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             {/* Passkey Input Form */}
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-                  Administrative Passkey
-                </label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)' }}>
+                    Administrative Passkey
+                  </label>
+                  {(() => {
+                    const sel = staffUsers.find(u => u.id === selectedLoginProfileId);
+                    if (sel && passkeyInput === sel.passkey) {
+                      return (
+                        <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <Check size={12} /> Auto-populated ({sel.name})
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
                 <div style={{ position: 'relative' }}>
                   <Lock size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                   <input
-                    type="password"
+                    type="text"
                     value={passkeyInput}
                     onChange={(e) => {
                       setPasskeyInput(e.target.value);
@@ -1124,8 +1198,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         activeTab === 'overview' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <BarChart3 className="w-4 h-4" />
-                      Executive Pulse
+                      <BarChart3 className="w-4 h-4 text-amber-400" />
+                      Church Operations Dashboard
                     </button>
                     <div className="pt-2 px-3 text-[10px] font-extrabold uppercase tracking-widest text-slate-400">
                       CMS Content
@@ -1222,6 +1296,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {activeRole === 'district_overseer' && (
                   <>
                     <button
+                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'overview' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4 text-amber-400" />
+                      Church Operations Dashboard
+                    </button>
+                    <button
                       onClick={() => { setActiveTab('overseer_pulse'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                         activeTab === 'overseer_pulse' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1282,6 +1365,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {activeRole === 'resident_pastor' && (
                   <>
                     <button
+                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'overview' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4 text-sky-400" />
+                      Church Operations Dashboard
+                    </button>
+                    <button
                       onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                         activeTab === 'guests' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1324,6 +1416,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {activeRole === 'secretariat' && (
                   <>
                     <button
+                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'overview' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4 text-emerald-400" />
+                      Church Operations Dashboard
+                    </button>
+                    <button
                       onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
                         activeTab === 'events' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
@@ -1356,6 +1457,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {/* 5. HEAD USHER NAVIGATION */}
                 {activeRole === 'head_usher' && (
                   <>
+                    <button
+                      onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'overview' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <BarChart3 className="w-4 h-4 text-rose-400" />
+                      Church Operations Dashboard
+                    </button>
                     <button
                       onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
@@ -1407,9 +1517,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 <div className="space-y-6 max-w-7xl mx-auto">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                      <h1 className="text-2xl font-black text-white tracking-tight">Executive Church Operations Pulse</h1>
+                      <h1 className="text-2xl font-black text-white tracking-tight">Church Operations &amp; Ministry Dashboard</h1>
                       <p className="text-xs text-slate-400 mt-1">
-                        High-level ministry performance metrics, visitor engagement, and operational status.
+                        Unified operational overview of attendance trends, guest intakes, pastoral care, and church activities.
                       </p>
                     </div>
                     <button
@@ -1429,7 +1539,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         setIsEditingSermon(true);
                         setActiveTab('sermons');
                       }}
-                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 self-start sm:self-auto"
+                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 self-start sm:self-auto cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
                       Publish New Sermon
@@ -1490,25 +1600,211 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => setActiveTab('iam_staff')}
-                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Shield className="w-4 h-4" />
                         Manage Staff IAM
                       </button>
                       <button
                         onClick={() => setActiveTab('guests')}
-                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Users className="w-4 h-4" />
                         Review Guests
                       </button>
                       <button
+                        onClick={() => setActiveTab('headcount_logger')}
+                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Activity className="w-4 h-4 text-emerald-400" />
+                        Log Headcount
+                      </button>
+                      <button
                         onClick={() => setActiveTab('settings')}
-                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5"
+                        className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                       >
                         <Settings className="w-4 h-4" />
                         Live Announcements
                       </button>
+                    </div>
+                  </div>
+
+                  {/* 2-Column Live Operations Overview */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Column 1: Recent Attendance Logs & First-Time Guests */}
+                    <div className="space-y-6">
+                      {/* Recent Attendance */}
+                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Activity className="w-4 h-4 text-emerald-400" />
+                            <h3 className="text-sm font-bold text-white">Recent Sunday Attendance</h3>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab('attendance')}
+                            className="text-xs text-amber-400 hover:underline font-semibold"
+                          >
+                            View All Logs →
+                          </button>
+                        </div>
+                        {serviceAttendance.length > 0 ? (
+                          <div className="space-y-2.5">
+                            {serviceAttendance.slice(0, 3).map((att) => (
+                              <div
+                                key={att.id}
+                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs"
+                              >
+                                <div>
+                                  <div className="font-bold text-white">{att.service_name}</div>
+                                  <div className="text-[11px] text-slate-400">{att.service_date} • {att.head_usher_name}</div>
+                                </div>
+                                <div className="text-right">
+                                  <div className="text-sm font-black text-emerald-400">{att.total_count} Attendees</div>
+                                  <div className="text-[10px] text-slate-500">M: {att.men_count} | W: {att.women_count} | K: {att.children_count}</div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-500 py-4 text-center">
+                            No attendance records logged yet. Head Ushers can record Sunday services in the Headcount tab.
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Recent Guest Intakes */}
+                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-amber-400" />
+                            <h3 className="text-sm font-bold text-white">First-Time Guest Registrations</h3>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab('guests')}
+                            className="text-xs text-amber-400 hover:underline font-semibold"
+                          >
+                            Guest Dossier ({guestVisits.length}) →
+                          </button>
+                        </div>
+                        {guestVisits.length > 0 ? (
+                          <div className="space-y-2.5">
+                            {guestVisits.slice(0, 3).map((guest) => (
+                              <div
+                                key={guest.id}
+                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs"
+                              >
+                                <div>
+                                  <div className="font-bold text-white">{guest.full_name}</div>
+                                  <div className="text-[11px] text-slate-400">{guest.service_time} • Party of {(guest.adults_count || 1) + (guest.kids_count || 0)}</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                    guest.status === 'confirmed' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-amber-500/15 text-amber-400'
+                                  }`}>
+                                    {guest.status || 'pending'}
+                                  </span>
+                                  <button
+                                    onClick={() => handleOpenGuestNotes(guest)}
+                                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
+                                    title="Add pastoral note"
+                                  >
+                                    <FileText className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-500 py-4 text-center">
+                            No guest registrations yet. First-time visitors booking through the website will appear here.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Column 2: Active Prayers & Fast Department Shortcuts */}
+                    <div className="space-y-6">
+                      {/* Active Prayer Requests */}
+                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-2">
+                            <Heart className="w-4 h-4 text-rose-400" />
+                            <h3 className="text-sm font-bold text-white">Active Prayer Intercession Requests</h3>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab('prayers')}
+                            className="text-xs text-rose-400 hover:underline font-semibold"
+                          >
+                            Prayer Desk ({prayerRequests.length}) →
+                          </button>
+                        </div>
+                        {prayerRequests.length > 0 ? (
+                          <div className="space-y-2.5">
+                            {prayerRequests.slice(0, 3).map((prayer) => (
+                              <div
+                                key={prayer.id}
+                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-xs space-y-1"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-white">{prayer.full_name}</span>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400">
+                                    {prayer.category}
+                                  </span>
+                                </div>
+                                <p className="text-slate-400 text-[11px] line-clamp-2">
+                                  "{prayer.request}"
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-xs text-slate-500 py-4 text-center">
+                            No prayer requests logged yet. Submissions from the website prayer modal appear here.
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Fast Ministry Shortcuts Grid */}
+                      <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          <h3 className="text-sm font-bold text-white">Quick Ministry Desks</h3>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <button
+                            onClick={() => setActiveTab('sermons')}
+                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
+                          >
+                            <BookOpen className="w-4 h-4 text-sky-400 mb-1" />
+                            <div className="font-bold text-white">Sermons CMS</div>
+                            <div className="text-[10px] text-slate-400">{sermons.length} recordings</div>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('events')}
+                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
+                          >
+                            <Calendar className="w-4 h-4 text-emerald-400 mb-1" />
+                            <div className="font-bold text-white">Events Calendar</div>
+                            <div className="text-[10px] text-slate-400">{events.length} gatherings</div>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('giving')}
+                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
+                          >
+                            <DollarSign className="w-4 h-4 text-amber-400 mb-1" />
+                            <div className="font-bold text-white">Stewardship</div>
+                            <div className="text-[10px] text-slate-400">{givingRecords.length} records</div>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('audit_logs')}
+                            className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-slate-700 text-left transition-colors cursor-pointer"
+                          >
+                            <ClipboardList className="w-4 h-4 text-purple-400 mb-1" />
+                            <div className="font-bold text-white">Audit Trail</div>
+                            <div className="text-[10px] text-slate-400">{auditLogs.length} events logged</div>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
