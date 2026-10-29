@@ -25,7 +25,7 @@ interface AttendanceAnalyticsProps {
 }
 
 type ServiceCategoryFilter = 'all' | 'sunday_service' | 'prayer_meeting' | 'bible_study';
-type PeriodFilter = 'weekly' | 'monthly' | 'all';
+type PeriodFilter = 'daily' | 'weekly' | 'monthly' | 'all';
 
 const SERVICE_TYPE_CONFIG: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
   sunday_service: { label: 'Sunday Celebration', icon: Users, color: 'bg-amber-500/15 text-amber-400 border-amber-500/30' },
@@ -91,12 +91,16 @@ export const AttendanceAnalytics: React.FC<AttendanceAnalyticsProps> = ({
     const now = new Date();
     return attendanceList.filter(item => {
       const itemDate = new Date(item.service_date);
-      if (period === 'weekly') {
-        // Last 4 weeks
+      if (period === 'daily') {
+        // Today or recent 7 days
+        const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
+        return diffDays >= -1 && diffDays <= 7;
+      } else if (period === 'weekly') {
+        // Last 4 weeks (28 days)
         const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
         return diffDays >= -1 && diffDays <= 28;
       } else if (period === 'monthly') {
-        // Last 3 months
+        // Last 3 months (90 days)
         const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 3600 * 24);
         return diffDays >= -1 && diffDays <= 90;
       }
@@ -329,7 +333,7 @@ export const AttendanceAnalytics: React.FC<AttendanceAnalyticsProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           {/* Period selector */}
           <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-800 shadow-inner">
-            {(['weekly', 'monthly', 'all'] as PeriodFilter[]).map(p => (
+            {(['daily', 'weekly', 'monthly', 'all'] as PeriodFilter[]).map(p => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}

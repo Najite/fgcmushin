@@ -17,6 +17,22 @@ const MINISTRY_COLORS = [
 export const MinistriesSection: React.FC<MinistriesSectionProps> = ({ onOpenPlanVisit }) => {
   const [selectedMinistry, setSelectedMinistry] = useState<Ministry | null>(null);
 
+  React.useEffect(() => {
+    if (!selectedMinistry) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedMinistry(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedMinistry]);
+
   return (
     <section id="ministries" className="section-padding" style={{ position: 'relative', background: '#FFFFFF' }}>
       <div className="container-max">

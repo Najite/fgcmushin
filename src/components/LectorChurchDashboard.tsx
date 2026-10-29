@@ -90,14 +90,32 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
   }, [serviceAttendance]);
 
   const midweekHeadcount = useMemo(() => {
+    if (midweekFilter === 'Hour of Power') {
+      const hop = serviceAttendance.filter((s) => {
+        const type = (s.service_type || '').toLowerCase();
+        const name = s.service_name.toLowerCase();
+        return type.includes('prayer') || name.includes('power');
+      });
+      if (!hop.length) return 240;
+      return hop.reduce((sum, s) => sum + s.total_count, 0);
+    }
+    if (midweekFilter === 'Digging Deep') {
+      const dd = serviceAttendance.filter((s) => {
+        const type = (s.service_type || '').toLowerCase();
+        const name = s.service_name.toLowerCase();
+        return type.includes('bible') || name.includes('deep');
+      });
+      if (!dd.length) return 128;
+      return dd.reduce((sum, s) => sum + s.total_count, 0);
+    }
     const midweek = serviceAttendance.filter((s) => {
       const type = (s.service_type || '').toLowerCase();
       const name = s.service_name.toLowerCase();
       return type.includes('prayer') || type.includes('bible') || name.includes('hour of power') || name.includes('digging deep');
     });
-    if (!midweek.length) return 485;
+    if (!midweek.length) return 368;
     return midweek.slice(0, 2).reduce((sum, s) => sum + s.total_count, 0);
-  }, [serviceAttendance]);
+  }, [serviceAttendance, midweekFilter]);
 
   // Financial aggregates (Only computed if user has financial oversight)
   const totalInflow = useMemo(() => {
@@ -153,16 +171,28 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
     return { menPct, womenPct, childrenPct };
   }, [serviceAttendance]);
 
-  // Dynamic Header & Metrics Config tailored strictly to active role
+  // Dynamic Header & Metrics Config tailored strictly to active role and selected timeframe
   const roleConfig = useMemo(() => {
     if (isHeadUsher) {
+      const primaryCount = 
+        timeframe === 'DAILY' ? sunday1stServiceCount + sunday2ndServiceCount :
+        timeframe === 'WEEKLY' ? sunday1stServiceCount + sunday2ndServiceCount + 285 :
+        timeframe === 'MONTHLY' ? totalRecentHeadcount :
+        Math.round(totalRecentHeadcount * 4.2);
+
+      const primaryLabel =
+        timeframe === 'DAILY' ? "Today's Sunday & Midweek Headcount" :
+        timeframe === 'WEEKLY' ? "Weekly Sunday & Midweek Aggregate" :
+        timeframe === 'MONTHLY' ? "Combined Sunday Sanctuary Headcount" :
+        "Year-to-Date Sanctuary Worshippers Served";
+
       return {
-        title: 'Sanctuary Ushend & Protocol Desk',
+        title: 'Sanctuary Ushering & Protocol Desk',
         subtitle: 'FGC Mushin District Headquarters · Service Headcount & Capacity Telemetry',
         curve1Label: '1st Service (7:30 AM)',
         curve2Label: '2nd Service (9:30 AM)',
-        primaryMetric: `${totalRecentHeadcount.toLocaleString()} Worshippers`,
-        primaryMetricLabel: 'Combined Sunday Sanctuary Headcount',
+        primaryMetric: `${primaryCount.toLocaleString()} Worshippers`,
+        primaryMetricLabel: primaryLabel,
         secondaryMetric: '88% Capacity',
         secondaryMetricLabel: 'Sanctuary Hall Seating Utilization (1,400 Seats)',
         ctaLabel: 'Log Headcount',
@@ -181,13 +211,25 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
     }
 
     if (isResidentPastor) {
+      const petitionCount = 
+        timeframe === 'DAILY' ? Math.max(3, Math.round((prayerRequests.length || 24) * 0.15)) :
+        timeframe === 'WEEKLY' ? Math.round((prayerRequests.length || 24) * 0.5) :
+        timeframe === 'MONTHLY' ? (prayerRequests.length || 24) :
+        (prayerRequests.length || 24) * 4;
+
+      const primaryLabel =
+        timeframe === 'DAILY' ? "Today's Pastoral Petitions" :
+        timeframe === 'WEEKLY' ? "This Week's Intercessory Petitions" :
+        timeframe === 'MONTHLY' ? "Active Pastoral Care & Intercessory Petitions" :
+        "Annual Pastoral Care Petitions Handled";
+
       return {
         title: 'Congregational Shepherding & Care Desk',
         subtitle: 'FGC Mushin District Headquarters · Pastoral Counseling, Petitions & Discipleship',
         curve1Label: 'Prayer Petitions',
         curve2Label: 'Guest Follow-Up',
-        primaryMetric: `${prayerRequests.length || 24} Active Petitions`,
-        primaryMetricLabel: 'Intercessory & Pastoral Care Petitions',
+        primaryMetric: `${petitionCount} Active Petitions`,
+        primaryMetricLabel: primaryLabel,
         secondaryMetric: `${guestVisits.length || 38} Souls in Care`,
         secondaryMetricLabel: 'First-Time Visitors in Active Assimilation',
         ctaLabel: 'Prayer Desk',
@@ -224,46 +266,71 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
       };
     }
 
+    // Default & District Overseer: Financial stewardship
+    const multiplier = 
+      timeframe === 'DAILY' ? 0.05 :
+      timeframe === 'WEEKLY' ? 0.28 :
+      timeframe === 'MONTHLY' ? 1.0 : 4.8;
+
+    const baseInflow = totalInflow || 3468960;
+    const computedInflow = Math.round(baseInflow * multiplier);
+    const primaryLabel =
+      timeframe === 'DAILY' ? "Today's Tithes, Offerings & Inflows" :
+      timeframe === 'WEEKLY' ? "Current Week Collections & District Remittances" :
+      timeframe === 'MONTHLY' ? "Current Month Collections & Inflows" :
+      "Year-to-Date Ministry Stewardship & Inflows";
+
+    const attendanceMulti = 
+      timeframe === 'DAILY' ? 0.08 :
+      timeframe === 'WEEKLY' ? 0.45 :
+      timeframe === 'MONTHLY' ? 1.0 : 4.5;
+    const computedAttendance = Math.round(totalRecentHeadcount * attendanceMulti);
+    const secondaryLabel =
+      timeframe === 'DAILY' ? "Today's Sanctuary / Midweek Count" :
+      timeframe === 'WEEKLY' ? "Weekly Sunday & Midweek Aggregate" :
+      timeframe === 'MONTHLY' ? "Current Month Sanctuary Attendance" :
+      "Year-to-Date Cumulative Congregation Attendance";
+
     if (isDistrictOverseer) {
       return {
         title: 'District Overseer Executive Study',
         subtitle: 'FGC Mushin District Headquarters · Senior Pastor Stewardship & Oversight',
         curve1Label: 'Digital Giving',
         curve2Label: 'Sanctuary Tithes',
-        primaryMetric: totalInflow ? `₦${(totalInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 2 })}k` : '₦3,468.96k',
-        primaryMetricLabel: 'Current Month Inflows & District Tithes',
-        secondaryMetric: `${totalRecentHeadcount.toLocaleString()} Worshippers`,
-        secondaryMetricLabel: 'Combined Sunday Sanctuary Congregation',
+        primaryMetric: `₦${(computedInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k`,
+        primaryMetricLabel: primaryLabel,
+        secondaryMetric: `${computedAttendance.toLocaleString()} Worshippers`,
+        secondaryMetricLabel: secondaryLabel,
         ctaLabel: 'Financial Statement',
         ctaIcon: <FileText size={13} />,
         ctaAction: () => onSetActiveTab('finances'),
         statsRow: [
-          { label: 'Pastoral Welfare', val: totalWelfareOutflow ? `₦${(totalWelfareOutflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦456.75k', icon: <Heart size={14} />, bg: 'bg-[#fdf2f7] text-[#ea1263]' },
-          { label: 'Sanctuary Project', val: totalBuildingFund ? `₦${(totalBuildingFund / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦1,689.50k', icon: <Wallet size={14} />, bg: 'bg-[#f5f3ff] text-[#8b5cf6]' },
-          { label: 'Global Missions', val: totalMissions ? `₦${(totalMissions / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦285.15k', icon: <TrendingUp size={14} />, bg: 'bg-[#ecfeff] text-[#06b6d4]' },
-          { label: 'General Reserve', val: totalInflow ? `₦${(totalInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦5,256.75k', icon: <Sparkles size={14} />, bg: 'bg-[#fffbeb] text-[#f59e0b]' }
+          { label: 'Pastoral Welfare', val: totalWelfareOutflow ? `₦${(Math.round(totalWelfareOutflow * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦456.75k', icon: <Heart size={14} />, bg: 'bg-[#fdf2f7] text-[#ea1263]' },
+          { label: 'Sanctuary Project', val: totalBuildingFund ? `₦${(Math.round(totalBuildingFund * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦1,689.50k', icon: <Wallet size={14} />, bg: 'bg-[#f5f3ff] text-[#8b5cf6]' },
+          { label: 'Global Missions', val: totalMissions ? `₦${(Math.round(totalMissions * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦285.15k', icon: <TrendingUp size={14} />, bg: 'bg-[#ecfeff] text-[#06b6d4]' },
+          { label: 'General Reserve', val: `₦${(computedInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k`, icon: <Sparkles size={14} />, bg: 'bg-[#fffbeb] text-[#f59e0b]' }
         ]
       };
     }
 
-    // Default: Admin
+    // Administrator
     return {
       title: 'Financial & Ministry Stewardship',
       subtitle: 'FGC Mushin District Headquarters · Executive IT & Operations Desk',
       curve1Label: 'Digital Giving',
       curve2Label: 'Sanctuary Tithes',
-      primaryMetric: totalInflow ? `₦${(totalInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 2 })}k` : '₦3,468.96k',
-      primaryMetricLabel: 'Current Month Collections & Inflows',
-      secondaryMetric: `${totalRecentHeadcount.toLocaleString()} Worshippers`,
-      secondaryMetricLabel: 'Current Month Sanctuary Attendance',
+      primaryMetric: `₦${(computedInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k`,
+      primaryMetricLabel: primaryLabel,
+      secondaryMetric: `${computedAttendance.toLocaleString()} Worshippers`,
+      secondaryMetricLabel: secondaryLabel,
       ctaLabel: 'Financial Statement',
       ctaIcon: <FileText size={13} />,
       ctaAction: () => onSetActiveTab('finances'),
       statsRow: [
-        { label: 'Pastoral Welfare', val: totalWelfareOutflow ? `₦${(totalWelfareOutflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦456.75k', icon: <Heart size={14} />, bg: 'bg-[#fdf2f7] text-[#ea1263]' },
-        { label: 'Sanctuary Project', val: totalBuildingFund ? `₦${(totalBuildingFund / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦1,689.50k', icon: <Wallet size={14} />, bg: 'bg-[#f5f3ff] text-[#8b5cf6]' },
-        { label: 'Global Missions', val: totalMissions ? `₦${(totalMissions / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦285.15k', icon: <TrendingUp size={14} />, bg: 'bg-[#ecfeff] text-[#06b6d4]' },
-        { label: 'General Reserve', val: totalInflow ? `₦${(totalInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦5,256.75k', icon: <Sparkles size={14} />, bg: 'bg-[#fffbeb] text-[#f59e0b]' }
+        { label: 'Pastoral Welfare', val: totalWelfareOutflow ? `₦${(Math.round(totalWelfareOutflow * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦456.75k', icon: <Heart size={14} />, bg: 'bg-[#fdf2f7] text-[#ea1263]' },
+        { label: 'Sanctuary Project', val: totalBuildingFund ? `₦${(Math.round(totalBuildingFund * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦1,689.50k', icon: <Wallet size={14} />, bg: 'bg-[#f5f3ff] text-[#8b5cf6]' },
+        { label: 'Global Missions', val: totalMissions ? `₦${(Math.round(totalMissions * multiplier) / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k` : '₦285.15k', icon: <TrendingUp size={14} />, bg: 'bg-[#ecfeff] text-[#06b6d4]' },
+        { label: 'General Reserve', val: `₦${(computedInflow / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k`, icon: <Sparkles size={14} />, bg: 'bg-[#fffbeb] text-[#f59e0b]' }
       ]
     };
   }, [
@@ -271,6 +338,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
     isResidentPastor,
     isSecretariat,
     isDistrictOverseer,
+    timeframe,
     totalRecentHeadcount,
     sunday1stServiceCount,
     sunday2ndServiceCount,
@@ -310,17 +378,17 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           value: `${s.total_count.toLocaleString()} Worshippers`,
           date: s.service_date,
           status: 'Verified',
-          statusColor: 'bg-[#6366f1] text-white'
+          statusColor: 'chip-verified'
         });
       });
 
       if (list.length === 0) {
         return [
-          { id: '1', code: 'SRV-20261', title: '2nd Sunday Celebration Service (9:30 AM)', category: 'Usher: Bro. Emmanuel Kalu', value: '780 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-          { id: '2', code: 'SRV-20262', title: '1st Sunday Early Manna (7:30 AM)', category: 'Usher: Sis. Ngozi Adebisi', value: '470 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-          { id: '3', code: 'SRV-20263', title: 'Wednesday Hour of Power Intercession', category: 'Usher: Bro. Daniel Okafor', value: '285 Attendees', date: '2026-10-21', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-          { id: '4', code: 'SRV-20264', title: 'Thursday Digging Deep Bible Study', category: 'Usher: Sis. Faith Bassey', value: '210 Attendees', date: '2026-10-15', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-          { id: '5', code: 'SRV-20265', title: 'Sunday Youth Church (Sanctuary Overflow)', category: 'Usher: Bro. Kelechi Paul', value: '185 Worshippers', date: '2026-10-18', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' }
+          { id: '1', code: 'SRV-20261', title: '2nd Sunday Celebration Service (9:30 AM)', category: 'Usher: Bro. Emmanuel Kalu', value: '780 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'chip-verified' },
+          { id: '2', code: 'SRV-20262', title: '1st Sunday Early Manna (7:30 AM)', category: 'Usher: Sis. Ngozi Adebisi', value: '470 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'chip-verified' },
+          { id: '3', code: 'SRV-20263', title: 'Wednesday Hour of Power Intercession', category: 'Usher: Bro. Daniel Okafor', value: '285 Attendees', date: '2026-10-21', status: 'Verified', statusColor: 'chip-verified' },
+          { id: '4', code: 'SRV-20264', title: 'Thursday Digging Deep Bible Study', category: 'Usher: Sis. Faith Bassey', value: '210 Attendees', date: '2026-10-15', status: 'Verified', statusColor: 'chip-verified' },
+          { id: '5', code: 'SRV-20265', title: 'Sunday Youth Church (Sanctuary Overflow)', category: 'Usher: Bro. Kelechi Paul', value: '185 Worshippers', date: '2026-10-18', status: 'Verified', statusColor: 'chip-verified' }
         ];
       }
       return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -339,7 +407,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           value: g.phone ? `Phone: ${g.phone}` : 'Assigned: Pastoral Care Desk',
           date: visitDate,
           status: isCompleted ? 'Followed Up' : 'Active Care',
-          statusColor: isCompleted ? 'bg-[#10b981] text-white' : 'bg-[#e11d48] text-white'
+          statusColor: isCompleted ? 'chip-followed' : 'chip-care'
         });
       });
 
@@ -352,16 +420,16 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           value: p.is_confidential ? 'Confidential Intercession' : 'General Care',
           date: p.created_at ? p.created_at.split('T')[0] : '2026-10-25',
           status: p.status === 'answered' ? 'Answered' : 'Interceding',
-          statusColor: p.status === 'answered' ? 'bg-[#10b981] text-white' : 'bg-[#6366f1] text-white'
+          statusColor: p.status === 'answered' ? 'chip-followed' : 'chip-interceding'
         });
       });
 
       if (list.length === 0) {
         return [
-          { id: '1', code: 'VIS-1041', title: 'Bro. Chijioke Nwosu (First-Time Visitor)', category: 'Service: Sunday 2nd Service', value: 'Assigned: Pastor Resident', date: '2026-10-25', status: 'Active Care', statusColor: 'bg-[#e11d48] text-white' },
-          { id: '2', code: 'PRY-5021', title: 'Sis. Abigail Adekunle (Healing Intercession)', category: 'Intercessory Petition', value: 'Urgent Pastoral Intercession', date: '2026-10-24', status: 'Interceding', statusColor: 'bg-[#6366f1] text-white' },
-          { id: '3', code: 'VIS-1042', title: 'Sis. Blessing Alabi (First-Time Visitor)', category: 'Service: Sunday 1st Service', value: 'Assigned: Guest Care Desk', date: '2026-10-25', status: 'Followed Up', statusColor: 'bg-[#10b981] text-white' },
-          { id: '4', code: 'PRY-5022', title: 'Bro. Emmanuel & Family (Thanksgiving Vow)', category: 'Intercessory Petition', value: 'Congregational Vow', date: '2026-10-22', status: 'Answered', statusColor: 'bg-[#10b981] text-white' }
+          { id: '1', code: 'VIS-1041', title: 'Bro. Chijioke Nwosu (First-Time Visitor)', category: 'Service: Sunday 2nd Service', value: 'Assigned: Pastor Resident', date: '2026-10-25', status: 'Active Care', statusColor: 'chip-care' },
+          { id: '2', code: 'PRY-5021', title: 'Sis. Abigail Adekunle (Healing Intercession)', category: 'Intercessory Petition', value: 'Urgent Pastoral Intercession', date: '2026-10-24', status: 'Interceding', statusColor: 'chip-interceding' },
+          { id: '3', code: 'VIS-1042', title: 'Sis. Blessing Alabi (First-Time Visitor)', category: 'Service: Sunday 1st Service', value: 'Assigned: Guest Care Desk', date: '2026-10-25', status: 'Followed Up', statusColor: 'chip-followed' },
+          { id: '4', code: 'PRY-5022', title: 'Bro. Emmanuel & Family (Thanksgiving Vow)', category: 'Intercessory Petition', value: 'Congregational Vow', date: '2026-10-22', status: 'Answered', statusColor: 'chip-followed' }
         ];
       }
       return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -378,7 +446,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           value: `Category: ${ev.category || 'Parish'}`,
           date: ev.date,
           status: 'Scheduled',
-          statusColor: 'bg-[#10b981] text-white'
+          statusColor: 'chip-scheduled'
         });
       });
 
@@ -392,15 +460,15 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           value: g.phone || 'Phone on File',
           date: visitDate,
           status: 'Digitized',
-          statusColor: 'bg-[#06b6d4] text-white'
+          statusColor: 'chip-digitized'
         });
       });
 
       if (list.length === 0) {
         return [
-          { id: '1', code: 'EVT-3011', title: 'Monthly District Leadership Assembly', category: 'Location: Executive Boardroom', value: 'Category: District', date: '2026-11-05', status: 'Scheduled', statusColor: 'bg-[#10b981] text-white' },
-          { id: '2', code: 'REG-4011', title: 'Bro. Samuel Adeleke (Reception Slip)', category: 'Guest Reception Intake', value: '+234 803 123 4567', date: '2026-10-25', status: 'Digitized', statusColor: 'bg-[#06b6d4] text-white' },
-          { id: '3', code: 'EVT-3012', title: 'All-Night Miracle & Breakthrough Service', category: 'Location: Main Auditorium', value: 'Category: Parish', date: '2026-11-07', status: 'Scheduled', statusColor: 'bg-[#10b981] text-white' }
+          { id: '1', code: 'EVT-3011', title: 'Monthly District Leadership Assembly', category: 'Location: Executive Boardroom', value: 'Category: District', date: '2026-11-05', status: 'Scheduled', statusColor: 'chip-scheduled' },
+          { id: '2', code: 'REG-4011', title: 'Bro. Samuel Adeleke (Reception Slip)', category: 'Guest Reception Intake', value: '+234 803 123 4567', date: '2026-10-25', status: 'Digitized', statusColor: 'chip-digitized' },
+          { id: '3', code: 'EVT-3012', title: 'All-Night Miracle & Breakthrough Service', category: 'Location: Main Auditorium', value: 'Category: Parish', date: '2026-11-07', status: 'Scheduled', statusColor: 'chip-scheduled' }
         ];
       }
       return list.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -418,7 +486,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
         value: `₦${Number(f.amount).toLocaleString('en-NG')}`,
         date: f.transaction_date,
         status: isOutflow ? 'Disbursed' : 'Audited',
-        statusColor: isOutflow ? 'bg-[#06b6d4] text-white' : 'bg-[#10b981] text-white'
+        statusColor: isOutflow ? 'chip-disbursed' : 'chip-audited'
       });
     });
 
@@ -431,17 +499,17 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
         value: `${s.total_count.toLocaleString()} Worshippers`,
         date: s.service_date,
         status: 'Verified',
-        statusColor: 'bg-[#6366f1] text-white'
+        statusColor: 'chip-verified'
       });
     });
 
     if (list.length === 0) {
       return [
-        { id: '1', code: 'TXN-84920', title: 'Sunday Covenant Tithes & Offertory', category: 'General Treasury', value: '₦450,000', date: '2026-10-25', status: 'Audited', statusColor: 'bg-[#10b981] text-white' },
-        { id: '2', code: 'SRV-20261', title: '2nd Sunday Celebration Service (9:30 AM)', category: 'Sanctuary Ushend', value: '780 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-        { id: '3', code: 'SRV-20262', title: '1st Sunday Early Manna (7:30 AM)', category: 'Sanctuary Ushend', value: '470 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'bg-[#6366f1] text-white' },
-        { id: '4', code: 'WLF-30192', title: 'Community Welfare & Widows Benevolence', category: 'Pastoral Benevolence', value: '₦85,000', date: '2026-10-22', status: 'Disbursed', statusColor: 'bg-[#06b6d4] text-white' },
-        { id: '5', code: 'BLD-10294', title: 'Sanctuary Acoustic Treatment Renovation', category: 'Building Fund', value: '₦200,000', date: '2026-10-20', status: 'Processing', statusColor: 'bg-[#e11d48] text-white' }
+        { id: '1', code: 'TXN-84920', title: 'Sunday Covenant Tithes & Offertory', category: 'General Treasury', value: '₦450,000', date: '2026-10-25', status: 'Audited', statusColor: 'chip-audited' },
+        { id: '2', code: 'SRV-20261', title: '2nd Sunday Celebration Service (9:30 AM)', category: 'Sanctuary Ushering', value: '780 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'chip-verified' },
+        { id: '3', code: 'SRV-20262', title: '1st Sunday Early Manna (7:30 AM)', category: 'Sanctuary Ushering', value: '470 Worshippers', date: '2026-10-25', status: 'Verified', statusColor: 'chip-verified' },
+        { id: '4', code: 'WLF-30192', title: 'Community Welfare & Widows Benevolence', category: 'Pastoral Benevolence', value: '₦85,000', date: '2026-10-22', status: 'Disbursed', statusColor: 'chip-disbursed' },
+        { id: '5', code: 'BLD-10294', title: 'Sanctuary Acoustic Treatment Renovation', category: 'Building Fund', value: '₦200,000', date: '2026-10-20', status: 'Processing', statusColor: 'chip-processing' }
       ];
     }
 
@@ -499,21 +567,107 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
   const menStroke = (demographics.menPct / 100) * circumference;
   const childrenStroke = (demographics.childrenPct / 100) * circumference;
 
+  // Dynamic Bezier Wave paths, peak markers and X-ticks driven by selected timeframe
+  const chartData = useMemo(() => {
+    switch (timeframe) {
+      case 'DAILY':
+        return {
+          curve1Area: 'M 30,170 C 60,150 110,80 160,110 C 210,140 260,60 320,70 C 380,80 430,130 490,165 L 490,180 L 30,180 Z',
+          curve1Path: 'M 30,170 C 60,150 110,80 160,110 C 210,140 260,60 320,70 C 380,80 430,130 490,165',
+          curve2Area: 'M 30,180 C 70,160 120,120 170,130 C 220,140 270,90 330,85 C 390,80 440,30 490,170 L 490,180 L 30,180 Z',
+          curve2Path: 'M 30,180 C 70,160 120,120 170,130 C 220,140 270,90 330,85 C 390,80 440,30 490,170',
+          peaks: [
+            { cx: 160, cy: 110, r: 4.5, fill: '#f59e0b' },
+            { cx: 320, cy: 70, r: 4.5, fill: '#f59e0b' },
+            { cx: 440, cy: 30, r: 5, fill: '#ea1263' }
+          ],
+          xTicks: [
+            { label: 'Mon', x: 35 },
+            { label: 'Tue', x: 110 },
+            { label: 'Wed', x: 185 },
+            { label: 'Thu', x: 260 },
+            { label: 'Fri', x: 335 },
+            { label: 'Sat', x: 410 },
+            { label: 'Sun', x: 470 }
+          ]
+        };
+      case 'WEEKLY':
+        return {
+          curve1Area: 'M 30,175 C 90,130 150,145 230,90 C 310,40 390,110 490,160 L 490,180 L 30,180 Z',
+          curve1Path: 'M 30,175 C 90,130 150,145 230,90 C 310,40 390,110 490,160',
+          curve2Area: 'M 30,180 C 80,155 160,110 240,125 C 320,140 400,35 490,175 L 490,180 L 30,180 Z',
+          curve2Path: 'M 30,180 C 80,155 160,110 240,125 C 320,140 400,35 490,175',
+          peaks: [
+            { cx: 230, cy: 90, r: 4.5, fill: '#f59e0b' },
+            { cx: 400, cy: 35, r: 5, fill: '#ea1263' }
+          ],
+          xTicks: [
+            { label: 'Wk 1', x: 45 },
+            { label: 'Wk 2', x: 155 },
+            { label: 'Wk 3', x: 265 },
+            { label: 'Wk 4', x: 375 },
+            { label: 'Current', x: 460 }
+          ]
+        };
+      case 'YEARLY':
+        return {
+          curve1Area: 'M 30,180 C 80,150 140,120 210,130 C 280,140 350,70 420,60 C 455,55 475,110 490,165 L 490,180 L 30,180 Z',
+          curve1Path: 'M 30,180 C 80,150 140,120 210,130 C 280,140 350,70 420,60 C 455,55 475,110 490,165',
+          curve2Area: 'M 30,180 C 70,160 130,140 200,105 C 270,70 340,120 410,50 C 450,20 475,90 490,175 L 490,180 L 30,180 Z',
+          curve2Path: 'M 30,180 C 70,160 130,140 200,105 C 270,70 340,120 410,50 C 450,20 475,90 490,175',
+          peaks: [
+            { cx: 200, cy: 105, r: 4.5, fill: '#f59e0b' },
+            { cx: 420, cy: 60, r: 4.5, fill: '#f59e0b' },
+            { cx: 450, cy: 20, r: 5, fill: '#ea1263' }
+          ],
+          xTicks: [
+            { label: '2021', x: 35 },
+            { label: '2022', x: 120 },
+            { label: '2023', x: 210 },
+            { label: '2024', x: 305 },
+            { label: '2025', x: 395 },
+            { label: '2026', x: 470 }
+          ]
+        };
+      case 'MONTHLY':
+      default:
+        return {
+          curve1Area: 'M 30,180 C 70,165 90,95 125,95 C 160,95 190,140 220,135 C 260,130 280,75 320,80 C 350,85 375,120 405,100 C 435,80 460,110 490,175 L 490,180 L 30,180 Z',
+          curve1Path: 'M 30,180 C 70,165 90,95 125,95 C 160,95 190,140 220,135 C 260,130 280,75 320,80 C 350,85 375,120 405,100 C 435,80 460,110 490,175',
+          curve2Area: 'M 30,180 C 60,150 95,140 135,145 C 170,150 195,160 230,145 C 270,130 295,110 330,135 C 370,160 400,25 435,40 C 460,50 475,120 490,180 L 490,180 L 30,180 Z',
+          curve2Path: 'M 30,180 C 60,150 95,140 135,145 C 170,150 195,160 230,145 C 270,130 295,110 330,135 C 370,160 400,25 435,40 C 460,50 475,120 490,180',
+          peaks: [
+            { cx: 125, cy: 95, r: 4.5, fill: '#f59e0b' },
+            { cx: 320, cy: 80, r: 4.5, fill: '#f59e0b' },
+            { cx: 435, cy: 40, r: 5, fill: '#ea1263' }
+          ],
+          xTicks: [
+            { label: 'Jan', x: 35 },
+            { label: 'Feb', x: 120 },
+            { label: 'Mar', x: 210 },
+            { label: 'Apr', x: 305 },
+            { label: 'May', x: 395 },
+            { label: 'Jun', x: 470 }
+          ]
+        };
+    }
+  }, [timeframe]);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 -webkit-font-smoothing-antialiased">
       {/* ======================================================== */}
       {/* ROW 1: ROLE-TAILORED DUAL-WAVE CHART + DEMOGRAPHICS DONUT */}
       {/* ======================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 dash-row-animate">
         {/* Left Card: Primary Telemetry & Wave Chart */}
-        <div className="lg:col-span-8 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-white rounded-[22px] p-5 lg:p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
           <div>
             {/* Header: Title + Timeframe Tabs */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#f7f0f8]">
               <div>
-                <h1 className="text-lg font-extrabold text-[#1f2430] tracking-tight text-balance">
+                <h2 className="text-lg font-extrabold text-[#1f2430] tracking-tight text-balance">
                   {roleConfig.title}
-                </h1>
+                </h2>
                 <p className="text-xs text-[#8a919e] font-medium mt-0.5">
                   {roleConfig.subtitle}
                 </p>
@@ -536,7 +690,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                     >
                       {tab}
                       {isActive && (
-                        <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#ea1263] rounded-full" />
+                        <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#ea1263] rounded-full timeframe-tab-active-bar" />
                       )}
                     </button>
                   );
@@ -554,22 +708,22 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
             </div>
 
             {/* Metrics & Wave Chart Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-5">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-5 dash-card-stagger">
               {/* Left Column: Key Figures */}
               <div className="md:col-span-4 flex flex-col justify-between pr-2">
                 <div>
-                  <div className="text-3xl font-black text-[#1b212f] tracking-tight tabular-nums">
+                  <div className="hero-metric-primary">
                     {roleConfig.primaryMetric}
                   </div>
-                  <div className="text-xs text-[#8a919e] font-semibold mt-0.5">
+                  <div className="text-xs text-[#8a919e] font-semibold mt-0.5 text-pretty">
                     {roleConfig.primaryMetricLabel}
                   </div>
 
                   <div className="mt-6">
-                    <div className="text-2xl font-black text-[#1b212f] tracking-tight tabular-nums">
+                    <div className="hero-metric-secondary">
                       {roleConfig.secondaryMetric}
                     </div>
-                    <div className="text-xs text-[#8a919e] font-semibold mt-0.5">
+                    <div className="text-xs text-[#8a919e] font-semibold mt-0.5 text-pretty">
                       {roleConfig.secondaryMetricLabel}
                     </div>
                   </div>
@@ -614,50 +768,69 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                   <line x1="30" y1="180" x2="490" y2="180" stroke="#f0e6f2" strokeWidth="1" />
 
                   {/* Y-axis Ticks */}
-                  <text x="10" y="24" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">35</text>
-                  <text x="10" y="64" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">25</text>
-                  <text x="10" y="104" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">15</text>
-                  <text x="10" y="144" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">5</text>
-                  <text x="10" y="184" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">0</text>
+                  <text x="10" y="24" fill="#a4aab8" fontSize="10" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif" style={{ fontVariantNumeric: 'tabular-nums' }}>35</text>
+                  <text x="10" y="64" fill="#a4aab8" fontSize="10" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif" style={{ fontVariantNumeric: 'tabular-nums' }}>25</text>
+                  <text x="10" y="104" fill="#a4aab8" fontSize="10" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif" style={{ fontVariantNumeric: 'tabular-nums' }}>15</text>
+                  <text x="10" y="144" fill="#a4aab8" fontSize="10" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif" style={{ fontVariantNumeric: 'tabular-nums' }}>5</text>
+                  <text x="10" y="184" fill="#a4aab8" fontSize="10" fontFamily="'Plus Jakarta Sans', system-ui, sans-serif" style={{ fontVariantNumeric: 'tabular-nums' }}>0</text>
 
                   {/* Curve 1: Orange/Amber */}
                   <path
-                    d="M 30,180 C 70,165 90,95 125,95 C 160,95 190,140 220,135 C 260,130 280,75 320,80 C 350,85 375,120 405,100 C 435,80 460,110 490,175 L 490,180 L 30,180 Z"
+                    d={chartData.curve1Area}
                     fill="url(#amberWaveGrad)"
+                    className="transition-all duration-300"
                   />
                   <path
-                    d="M 30,180 C 70,165 90,95 125,95 C 160,95 190,140 220,135 C 260,130 280,75 320,80 C 350,85 375,120 405,100 C 435,80 460,110 490,175"
+                    d={chartData.curve1Path}
                     fill="none"
                     stroke="#f59e0b"
                     strokeWidth="2.5"
                     strokeLinecap="round"
+                    className="transition-all duration-300"
                   />
 
                   {/* Curve 2: Hot Pink */}
                   <path
-                    d="M 30,180 C 60,150 95,140 135,145 C 170,150 195,160 230,145 C 270,130 295,110 330,135 C 370,160 400,25 435,40 C 460,50 475,120 490,180 L 490,180 L 30,180 Z"
+                    d={chartData.curve2Area}
                     fill="url(#pinkWaveGrad)"
+                    className="transition-all duration-300"
                   />
                   <path
-                    d="M 30,180 C 60,150 95,140 135,145 C 170,150 195,160 230,145 C 270,130 295,110 330,135 C 370,160 400,25 435,40 C 460,50 475,120 490,180"
+                    d={chartData.curve2Path}
                     fill="none"
                     stroke="#ea1263"
                     strokeWidth="2.5"
                     strokeLinecap="round"
+                    className="transition-all duration-300"
                   />
 
                   {/* Peak Markers */}
-                  <circle cx="125" cy="95" r="4.5" fill="#f59e0b" stroke="#ffffff" strokeWidth="2" />
-                  <circle cx="320" cy="80" r="4.5" fill="#f59e0b" stroke="#ffffff" strokeWidth="2" />
-                  <circle cx="435" cy="40" r="5" fill="#ea1263" stroke="#ffffff" strokeWidth="2.5" />
+                  {chartData.peaks.map((p, idx) => (
+                    <circle
+                      key={idx}
+                      cx={p.cx}
+                      cy={p.cy}
+                      r={p.r}
+                      fill={p.fill}
+                      stroke="#ffffff"
+                      strokeWidth="2"
+                    />
+                  ))}
 
-                  {/* X-axis Labels */}
-                  <text x="35" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">Jan</text>
-                  <text x="120" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">Feb</text>
-                  <text x="210" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">Mar</text>
-                  <text x="305" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">Apr</text>
-                  <text x="395" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">May</text>
-                  <text x="470" y="196" fill="#a4aab8" fontSize="10" fontFamily="sans-serif">Jun</text>
+                  {/* Dynamic X-axis Labels */}
+                  {chartData.xTicks.map((tick, idx) => (
+                    <text
+                      key={idx}
+                      x={tick.x}
+                      y="196"
+                      fill="#a4aab8"
+                      fontSize="10"
+                      fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+                      style={{ fontVariantNumeric: 'tabular-nums' }}
+                    >
+                      {tick.label}
+                    </text>
+                  ))}
                 </svg>
               </div>
             </div>
@@ -680,7 +853,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
         </div>
 
         {/* Right Card: Fellowship Demographics Donut Chart */}
-        <div className="lg:col-span-4 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-white rounded-[22px] p-5 lg:p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
           <div>
             <h2 className="text-base font-extrabold text-[#1f2430] tracking-tight">
               Fellowship Demographics
@@ -691,7 +864,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           </div>
 
           {/* SVG 3-Segment Donut Chart */}
-          <div className="py-5 flex items-center justify-center">
+          <div className="py-3 lg:py-4 flex items-center justify-center">
             <div className="relative w-40 h-40">
               <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 140 140">
                 <circle
@@ -787,10 +960,10 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
       {/* ======================================================== */}
       {/* ROW 2: 4 ROLE-SPECIFIC HARMONIZED GRADIENT ACTION CARDS  */}
       {/* ======================================================== */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Card 1 */}
-        <div className="rounded-[18px] p-5 text-white shadow-lg shadow-[#be123c]/20 relative overflow-hidden bg-gradient-to-r from-[#b91c1c] via-[#be123c] to-[#e11d48] flex flex-col justify-between h-[135px]">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-white/90">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 dash-card-stagger dash-row-animate" style={{ animationDelay: '80ms' }}>
+        {/* Card 1: Crimson / Ruby */}
+        <div className="rounded-[18px] p-5 text-white card-gradient-crimson relative overflow-hidden flex flex-col justify-between min-h-[148px] gradient-action-card">
+          <div className="relative z-10 text-[11px] font-bold uppercase tracking-wider text-white/95">
             {isHeadUsher
               ? '1st Sunday Service (7:30 AM)'
               : isResidentPastor
@@ -800,17 +973,17 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
               : 'Sanctuary Tithes & Inflows'}
           </div>
 
-          <div className="flex items-end justify-between">
+          <div className="relative z-10 flex items-end justify-between mt-2">
             <div className="flex items-end gap-1.5 h-10 pb-1">
-              <span className="w-2 h-4 bg-white/75 rounded-xs" />
-              <span className="w-2 h-7 bg-white/95 rounded-xs" />
-              <span className="w-2 h-3 bg-white/60 rounded-xs" />
-              <span className="w-2 h-9 bg-white rounded-xs" />
-              <span className="w-2 h-6 bg-white/80 rounded-xs" />
+              <span className="w-2 h-4 bg-white/75 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-7 bg-white/95 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-3 bg-white/60 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-9 bg-white rounded-xs bar-chart-bar" />
+              <span className="w-2 h-6 bg-white/80 rounded-xs bar-chart-bar" />
             </div>
 
             <div className="text-right">
-              <div className="text-2xl font-black tracking-tight text-white tabular-nums">
+              <div className="card-value-metric">
                 {isHeadUsher
                   ? `${sunday1stServiceCount} Souls`
                   : isResidentPastor
@@ -821,7 +994,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                   ? `₦${(totalTithes / 1000).toLocaleString('en-NG', { maximumFractionDigits: 1 })}k`
                   : '₦1,432.00k'}
               </div>
-              <div className="text-[10px] font-medium text-white/80 mt-0.5">
+              <div className="text-[10px] font-medium text-white/85 mt-0.5">
                 {isHeadUsher
                   ? 'Early Manna Service'
                   : isResidentPastor
@@ -834,10 +1007,10 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           </div>
         </div>
 
-        {/* Card 2 */}
-        <div className="rounded-[18px] p-5 text-white shadow-lg shadow-[#4338ca]/20 relative overflow-hidden bg-gradient-to-r from-[#3730a3] via-[#4338ca] to-[#6366f1] flex flex-col justify-between h-[135px]">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-white/90">
+        {/* Card 2: Deep Indigo / Violet */}
+        <div className="rounded-[18px] p-5 text-white card-gradient-indigo relative overflow-hidden flex flex-col justify-between min-h-[148px] gradient-action-card">
+          <div className="relative z-10">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-white/95">
               {isHeadUsher
                 ? '2nd Sunday Service (9:30 AM)'
                 : isResidentPastor
@@ -846,14 +1019,14 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                 ? 'Guest Registry & Intake'
                 : 'Sunday Sanctuary Headcount'}
             </div>
-            <div className="text-2xl font-black tracking-tight text-white mt-1 tabular-nums">
+            <div className="card-value-metric mt-1.5">
               {isHeadUsher
                 ? `${sunday2ndServiceCount} Souls`
                 : isResidentPastor || isSecretariat
                 ? `${guestVisits.length || 38} Souls in Care`
                 : `${totalRecentHeadcount.toLocaleString()} Worshippers`}
             </div>
-            <div className="text-[10px] font-medium text-white/80 mt-0.5">
+            <div className="text-[10px] font-medium text-white/85 mt-0.5">
               {isHeadUsher
                 ? 'Main Celebration Service'
                 : isResidentPastor
@@ -864,17 +1037,17 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
             </div>
           </div>
 
-          <div className="absolute -bottom-1 left-0 right-0 h-12 pointer-events-none">
-            <svg viewBox="0 0 200 60" preserveAspectRatio="none" className="w-full h-full opacity-30">
-              <path d="M 0,40 Q 50,10 100,30 T 200,20 L 200,60 L 0,60 Z" fill="#ffffff" />
+          <div className="absolute -bottom-1 left-0 right-0 h-11 pointer-events-none z-0">
+            <svg viewBox="0 0 200 60" preserveAspectRatio="none" className="w-full h-full">
+              <path d="M 0,35 Q 50,15 100,28 T 200,18 L 200,60 L 0,60 Z" fill="rgba(255, 255, 255, 0.15)" />
             </svg>
           </div>
         </div>
 
-        {/* Card 3 */}
-        <div className="rounded-[18px] p-5 text-white shadow-lg shadow-[#0f766e]/20 relative overflow-hidden bg-gradient-to-r from-[#0f766e] via-[#0284c7] to-[#06b6d4] flex flex-col justify-between h-[135px]">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-wider text-white/90">
+        {/* Card 3: Ocean Teal / Cyan */}
+        <div className="rounded-[18px] p-5 text-white card-gradient-teal relative overflow-hidden flex flex-col justify-between min-h-[148px] gradient-action-card">
+          <div className="relative z-10">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-white/95">
               {isHeadUsher
                 ? 'Midweek Discipleship & Prayer'
                 : isResidentPastor
@@ -883,14 +1056,14 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                 ? 'Congregational Records Archived'
                 : 'Midweek Discipleship & Prayer'}
             </div>
-            <div className="text-2xl font-black tracking-tight text-white mt-1 tabular-nums">
+            <div className="card-value-metric mt-1.5">
               {isResidentPastor || isSecretariat
                 ? `${totalRecentHeadcount} Souls`
                 : `${midweekHeadcount} Attendees`}
             </div>
           </div>
 
-          <div className="flex items-center justify-between z-10">
+          <div className="relative z-10 flex items-center justify-between mt-2">
             <button
               type="button"
               onClick={() => {
@@ -898,7 +1071,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                 else if (midweekFilter === 'Hour of Power') setMidweekFilter('Digging Deep');
                 else setMidweekFilter('All Midweek');
               }}
-              className="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 active:scale-[0.96] backdrop-blur text-[10px] font-bold flex items-center gap-1 transition-colors duration-150 cursor-pointer"
+              className="px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 active:scale-[0.96] backdrop-blur text-[10px] font-bold flex items-center gap-1 transition-colors duration-150 cursor-pointer text-white"
             >
               <span>{midweekFilter}</span>
               <ChevronDown size={12} />
@@ -920,9 +1093,9 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
           </div>
         </div>
 
-        {/* Card 4 */}
-        <div className="rounded-[18px] p-5 text-white shadow-lg shadow-[#c2410c]/20 relative overflow-hidden bg-gradient-to-r from-[#c2410c] via-[#d97706] to-[#f59e0b] flex flex-col justify-between h-[135px]">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-white/90">
+        {/* Card 4: Burnt Amber / Gold */}
+        <div className="rounded-[18px] p-5 text-white card-gradient-amber relative overflow-hidden flex flex-col justify-between min-h-[148px] gradient-action-card">
+          <div className="relative z-10 text-[11px] font-bold uppercase tracking-wider text-white/95">
             {isHeadUsher
               ? 'Sanctuary Seating Capacity'
               : isResidentPastor
@@ -932,17 +1105,17 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
               : 'First-Time Visitors (Souls)'}
           </div>
 
-          <div className="flex items-end justify-between">
+          <div className="relative z-10 flex items-end justify-between mt-2">
             <div className="flex items-end gap-1.5 h-10 pb-1">
-              <span className="w-2 h-8 bg-white rounded-xs" />
-              <span className="w-2 h-4 bg-white/70 rounded-xs" />
-              <span className="w-2 h-9 bg-white/95 rounded-xs" />
-              <span className="w-2 h-5 bg-white/80 rounded-xs" />
-              <span className="w-2 h-7 bg-white/85 rounded-xs" />
+              <span className="w-2 h-8 bg-white rounded-xs bar-chart-bar" />
+              <span className="w-2 h-4 bg-white/70 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-9 bg-white/95 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-5 bg-white/80 rounded-xs bar-chart-bar" />
+              <span className="w-2 h-7 bg-white/85 rounded-xs bar-chart-bar" />
             </div>
 
             <div className="text-right">
-              <div className="text-2xl font-black tracking-tight text-white tabular-nums">
+              <div className="card-value-metric">
                 {isHeadUsher
                   ? '88% Capacity'
                   : isResidentPastor
@@ -951,7 +1124,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
                   ? '5 Active Bulletins'
                   : `${guestVisits.length || 38} Souls`}
               </div>
-              <div className="text-[10px] font-medium text-white/80 mt-0.5">
+              <div className="text-[10px] font-medium text-white/85 mt-0.5">
                 {isHeadUsher
                   ? '1,400 Total Hall Seats'
                   : isResidentPastor
@@ -968,9 +1141,9 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
       {/* ======================================================== */}
       {/* ROW 3: ROLE-SPECIFIC ACTIVITIES + AUDITED RECORD TABLE   */}
       {/* ======================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 dash-row-animate" style={{ animationDelay: '160ms' }}>
         {/* Left Card: Role Activities */}
-        <div className="lg:col-span-5 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
+        <div className="lg:col-span-4 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
           <div>
             <h2 className="text-base font-extrabold text-[#1f2430] tracking-tight">
               {isHeadUsher
@@ -985,10 +1158,10 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
               Live desk updates for {roleConfig.title}
             </p>
 
-            <div className="space-y-4">
+            <div className="activity-timeline space-y-0">
               {isHeadUsher ? (
                 <>
-                  <div className="flex items-center justify-between gap-3 text-xs">
+                  <div className="activity-timeline-item flex items-start justify-between gap-3 text-xs">
                     <span className="text-[11px] font-semibold text-[#8b919e] w-20 shrink-0 tabular-nums">42 Mins Ago</span>
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                       <div className="w-8 h-8 rounded-full bg-[#ea1263] text-white flex items-center justify-center shrink-0 shadow-sm shadow-[#ea1263]/30">
@@ -1186,7 +1359,7 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
         </div>
 
         {/* Right Card: Role Audited Table */}
-        <div className="lg:col-span-7 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
+        <div className="lg:col-span-8 bg-white rounded-[22px] p-6 border border-[#f0e4f3] shadow-[0_4px_24px_rgba(235,18,119,0.04)] flex flex-col justify-between">
           <div>
             {/* Header & Subtitle */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -1260,41 +1433,41 @@ export const LectorChurchDashboard: React.FC<LectorChurchDashboardProps> = ({
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto rounded-xl">
-              <table className="w-full text-left text-xs border-collapse">
+            <div className="overflow-hidden rounded-xl">
+              <table className="w-full text-left text-xs border-collapse table-fixed">
                 <thead>
-                  <tr className="bg-[#1b2234] text-white text-[10px] font-bold uppercase tracking-wider">
-                    <th className="py-2.5 px-3 rounded-l-lg">REF CODE</th>
-                    <th className="py-2.5 px-3">
+                  <tr className="admin-table-head text-[10px] font-bold uppercase tracking-wider">
+                    <th className="py-2.5 px-2.5 w-[15%] rounded-l-lg">REF CODE</th>
+                    <th className="py-2.5 px-2.5 w-[27%]">
                       {isHeadUsher ? 'SERVICE NAME' : isResidentPastor ? 'NAME / CONGREGANT' : isSecretariat ? 'PROGRAM / INTAKE' : 'CONTRIBUTOR / SOURCE'}
                     </th>
-                    <th className="py-2.5 px-3">
+                    <th className="py-2.5 px-2.5 w-[23%]">
                       {isHeadUsher ? 'PROTOCOL OFFICER' : isResidentPastor ? 'SERVICE ATTENDED' : isSecretariat ? 'LOCATION / DETAILS' : 'MINISTRY CATEGORY'}
                     </th>
-                    <th className="py-2.5 px-3">
+                    <th className="py-2.5 px-2.5 w-[18%]">
                       {isHeadUsher ? 'HEADCOUNT' : isResidentPastor ? 'CARE ASSIGNMENT' : isSecretariat ? 'CATEGORY' : 'AMOUNT / COUNT'}
                     </th>
-                    <th className="py-2.5 px-3 text-right rounded-r-lg">STATUS</th>
+                    <th className="py-2.5 px-2.5 text-right w-[17%] rounded-r-lg">STATUS</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#f5eef7] text-[#2b2f38]">
                   {paginatedLedger.length > 0 ? (
                     paginatedLedger.map((row) => (
-                      <tr key={row.id} className="hover:bg-[#fbf7fc] transition-colors duration-150">
-                        <td className="py-3 px-3 font-semibold text-[#4b5262] whitespace-nowrap tabular-nums">
+                      <tr key={row.id} className="ledger-table-row">
+                        <td className="py-2.5 px-2.5 font-semibold text-[#4b5262] truncate tabular-nums" title={row.code}>
                           {row.code}
                         </td>
-                        <td className="py-3 px-3 font-bold text-[#1f2430] max-w-[190px] truncate">
+                        <td className="py-2.5 px-2.5 font-bold text-[#1f2430] truncate" title={row.title}>
                           {row.title}
                         </td>
-                        <td className="py-3 px-3 text-[#4b5262] whitespace-nowrap">
+                        <td className="py-2.5 px-2.5 text-[#4b5262] truncate" title={row.category}>
                           {row.category}
                         </td>
-                        <td className="py-3 px-3 font-bold text-[#1f2430] whitespace-nowrap tabular-nums">
+                        <td className="py-2.5 px-2.5 font-bold text-[#1f2430] truncate tabular-nums" title={row.value}>
                           {row.value}
                         </td>
-                        <td className="py-3 px-3 text-right whitespace-nowrap">
-                          <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold capitalize ${row.statusColor}`}>
+                        <td className="py-2.5 px-2.5 text-right">
+                          <span className={`status-chip ${row.statusColor}`}>
                             {row.status}
                           </span>
                         </td>

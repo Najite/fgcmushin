@@ -118,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.1, color: 'var(--text-primary)' }}>
                   FGC MUSHIN
                 </span>
-                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--accent-teal)', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.12em', color: 'var(--fgc-blue, #2866AD)', textTransform: 'uppercase' }}>
                   DISTRICT HEADQUARTERS
                 </span>
               </div>
@@ -170,7 +170,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <button
                 onClick={onOpenGiving}
                 style={{ color: 'var(--text-secondary)', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--accent-teal)')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--fgc-blue)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
               >
                 Give
@@ -181,13 +181,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.35rem',
-                  color: 'var(--accent-gold)',
-                  fontSize: '0.85rem'
+                  color: 'var(--fgc-gold-dark, #D97706)',
+                  fontSize: '0.875rem',
+                  fontWeight: 600
                 }}
               >
                 <Heart size={14} />
                 <span>Prayer</span>
               </button>
+            </div>
+
+            {/* Right Action Island */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               {onOpenAdmin && (
                 <button
                   onClick={onOpenAdmin}
@@ -195,26 +200,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.4rem',
-                    color: 'var(--fgc-blue-dark)',
-                    fontSize: '0.825rem',
+                    color: 'var(--fgc-blue, #2866AD)',
+                    fontSize: '0.8125rem',
                     fontWeight: 700,
                     transition: 'all 0.2s ease',
-                    padding: '0.35rem 0.75rem',
+                    padding: '0.45rem 0.85rem',
                     borderRadius: '9999px',
-                    background: 'var(--fgc-blue-subtle)',
-                    border: '1px solid var(--fgc-blue-border)',
+                    background: 'rgba(40, 102, 173, 0.08)',
+                    border: '1px solid rgba(40, 102, 173, 0.2)',
                     cursor: 'pointer'
                   }}
+                  className="navbar-staff-portal-btn hidden md:inline-flex"
                   title="Staff Operations & Ministry Dashboard (Alt+A)"
                 >
                   <BarChart3 size={13} color="var(--fgc-blue)" />
-                  <span>Dashboard</span>
+                  <span>Staff Portal</span>
                 </button>
               )}
-            </div>
 
-            {/* Right Action Island */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <button
                 onClick={onOpenPlanVisit}
                 className="btn-island btn-teal navbar-cta-btn"
@@ -440,12 +443,23 @@ export const Navbar: React.FC<NavbarProps> = ({
       )}
 
       <style>{`
+        .navbar-cta-text-short {
+          display: none !important;
+        }
         @media (min-width: 860px) {
           .desktop-links {
             display: flex !important;
           }
           .mobile-trigger {
             display: none !important;
+          }
+        }
+        @media (max-width: 1024px) and (min-width: 860px) {
+          .navbar-cta-text-full {
+            display: none !important;
+          }
+          .navbar-cta-text-short {
+            display: inline !important;
           }
         }
         @media (max-width: 859px) {

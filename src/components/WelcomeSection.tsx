@@ -96,8 +96,8 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
             <div
               style={{
                 position: 'absolute',
-                top: '-25px',
-                right: '-20px',
+                top: '-22px',
+                right: '-18px',
                 zIndex: 10
               }}
               className="rotating-badge-container welcome-rotating-badge"
@@ -108,13 +108,13 @@ export const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onOpenPlanVisit,
                   d="M 60, 60 m -45, 0 a 45,45 0 1,1 90,0 a 45,45 0 1,1 -90,0"
                   fill="none"
                 />
-                <text fill="#007681" fontSize="9.2" fontWeight="800" letterSpacing="0.16em">
+                <text fill="#2866AD" fontSize="9.2" fontWeight="800" letterSpacing="0.17em">
                   <textPath href="#circlePathLight" startOffset="0%">
-                    JOIN US SUNDAYS • 9:00 & 11:15 AM •
+                    JOIN US SUNDAYS • 7:30 & 9:30 AM •
                   </textPath>
                 </text>
               </svg>
-              <div className="rotating-center-trigger">
+              <div className="rotating-center-trigger" style={{ background: 'var(--fgc-blue)' }}>
                 <Sparkles size={20} color="#FFFFFF" />
               </div>
             </div>

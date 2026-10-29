@@ -42,7 +42,7 @@ export const PrayerRequestModal: React.FC<PrayerRequestModalProps> = ({ isOpen, 
       particleCount: 50,
       spread: 60,
       origin: { y: 0.6 },
-      colors: ['#007681', '#B45309', '#10B981']
+      colors: ['#ED3B41', '#2866AD', '#F3A645', '#CC4695']
     });
 
     setSubmitted(true);

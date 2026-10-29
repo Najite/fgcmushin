@@ -20,10 +20,11 @@ export const AnnouncementBar: React.FC<AnnouncementBarProps> = ({
       onClick={onOpenPlanVisit}
       className="announcement-bar-wrap"
       style={{
-        background: 'linear-gradient(90deg, #1E4E85 0%, #2866AD 50%, #A32371 100%)',
+        background: 'linear-gradient(90deg, #16365C 0%, #2866AD 50%, #16365C 100%)',
+        borderBottom: '1px solid rgba(243, 166, 69, 0.25)',
         color: '#FFFFFF',
-        padding: '0.5rem 1rem',
-        fontSize: '0.825rem',
+        padding: '0.45rem 1rem',
+        fontSize: '0.8125rem',
         fontWeight: 500,
         display: 'flex',
         alignItems: 'center',

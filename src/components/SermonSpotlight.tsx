@@ -222,7 +222,7 @@ export const SermonSpotlight: React.FC<SermonSpotlightProps> = ({ onPlaySermon, 
                     cursor: 'pointer',
                     background: '#FFFFFF',
                     borderColor: isCurrent ? 'var(--accent-teal)' : 'var(--border-subtle)',
-                    boxShadow: isCurrent ? '0 8px 25px rgba(0, 118, 129, 0.2)' : 'var(--shadow-card)'
+                    boxShadow: isCurrent ? '0 8px 25px rgba(40, 102, 173, 0.22)' : 'var(--shadow-card)'
                   }}
                 >
                   <div

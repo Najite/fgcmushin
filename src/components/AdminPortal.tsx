@@ -32,7 +32,11 @@ import {
   Wallet,
   Hash,
   MessageSquare,
-  Church
+  Church,
+  ChevronRight,
+  Globe,
+  Search,
+  ShieldCheck
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type { 
@@ -173,9 +177,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [authError, setAuthError] = useState('');
   const [showDevCredentialsHelper, setShowDevCredentialsHelper] = useState(false);
 
-  // Active Tab & Mobile Sidebar State
+  // Active Tab & Sidebar Responsiveness State (Desktop Collapse + Mobile Drawer)
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [desktopSidebarCollapsed, setDesktopSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      setDesktopSidebarCollapsed(prev => !prev);
+    } else {
+      setMobileSidebarOpen(prev => !prev);
+    }
+  };
 
   // Guard activeTab against activeRole permissions so users only access authorized modules
   useEffect(() => {
@@ -714,9 +727,40 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   if (!isOpen) return null;
 
-  // Calculate high-level attendance metrics
-  const latestSundayAttendance = serviceAttendance.slice(0, 2);
-  const totalRecentSundayHeadcount = latestSundayAttendance.reduce((acc, curr) => acc + (curr.total_count || 0), 0);
+  // Tab metadata for clean executive breadcrumb display in the header
+  const getTabMeta = (tab: string): { category: string; title: string } => {
+    switch (tab) {
+      case 'overview':
+        return { category: 'Operations', title: 'Executive Overview' };
+      case 'finances':
+      case 'giving':
+        return { category: 'Stewardship', title: 'Treasury & Finances' };
+      case 'attendance':
+        return { category: 'Telemetry', title: 'Attendance Analytics' };
+      case 'headcount_logger':
+        return { category: 'Telemetry', title: 'Sunday Headcount Logger' };
+      case 'guests':
+        return { category: 'Ministries & Care', title: `First-Time Guests (${guestVisits.length})` };
+      case 'prayers':
+        return { category: 'Ministries & Care', title: `Pastoral Prayers (${prayerRequests.length})` };
+      case 'sermons':
+        return { category: 'Media & CMS', title: `Sermons CMS (${sermons.length})` };
+      case 'events':
+        return { category: 'Cathedral', title: `Calendar Events (${events.length})` };
+      case 'iam_staff':
+        return { category: 'Governance', title: `Staff IAM Directory (${staffUsers.length})` };
+      case 'audit_logs':
+        return { category: 'Governance', title: `Security Audit Trail (${auditLogs.length})` };
+      case 'settings':
+        return { category: 'Configuration', title: 'Church Settings' };
+      case 'overseer_pulse':
+        return { category: 'Overseer Study', title: 'District Pastoral Pulse' };
+      case 'overseer_directives':
+        return { category: 'Overseer Study', title: 'Ministerial Directives' };
+      default:
+        return { category: 'Staff Portal', title: 'Operations Suite' };
+    }
+  };
 
   return (
     <div 
@@ -800,7 +844,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </span>
                 <span>STAFF OPERATIONS &amp; PASTORAL SUITE</span>
               </div>
-              <h2 className="heading-h2 font-serif" style={{ fontSize: 'clamp(1.5rem, 3.8vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.15 }}>
+              <h2 className="heading-h2 font-sans font-extrabold tracking-tight text-balance" style={{ fontSize: 'clamp(1.5rem, 3.8vw, 2.2rem)', color: 'var(--text-primary)', lineHeight: 1.15 }}>
                 Enter Ministry Desk &amp; Pastoral Suite
               </h2>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem', lineHeight: 1.55 }}>
@@ -886,7 +930,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                           <span style={{ fontSize: '0.72rem', fontWeight: 700, color: roleDef.badgeColor }}>
                             {roleDef.badge}
                           </span>
-                          <span style={{ fontSize: '0.68rem', fontFamily: 'monospace', fontWeight: 600, padding: '0.05rem 0.35rem', borderRadius: '4px', background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)' }}>
+                          <span style={{ fontSize: '0.68rem', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', fontWeight: 600, padding: '0.05rem 0.35rem', borderRadius: '4px', background: 'rgba(0,0,0,0.06)', color: 'var(--text-muted)' }}>
                             {user.passkey}
                           </span>
                         </div>
@@ -926,7 +970,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         />
                         <div style={{ fontSize: '0.75rem' }}>
                           <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
-                            {selectedRoleDef.primaryDesk} • <span style={{ color: selectedRoleDef.badgeColor, fontWeight: 700 }}>Passkey: <code style={{ fontFamily: 'monospace', fontWeight: 800 }}>{selectedUser.passkey}</code> (Auto-filled)</span>
+                            {selectedRoleDef.primaryDesk} • <span style={{ color: selectedRoleDef.badgeColor, fontWeight: 700 }}>Passkey: <code style={{ fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums', fontWeight: 800 }}>{selectedUser.passkey}</code> (Auto-filled)</span>
                           </div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.15rem', lineHeight: 1.45 }}>
                             {selectedRoleDef.description}
@@ -1110,77 +1154,52 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           <div className="top-color-ribbon" />
 
           <div className="admin-portal-window-inner">
-            {/* Top Bar Header */}
-            <header className="h-16 px-4 sm:px-6 bg-white border-b border-[#f0e6f3] flex items-center justify-between shrink-0 z-20">
-              <div className="flex items-center gap-3">
-                {/* Mobile & Desktop hamburger toggle */}
+            {/* Top Bar Header (World-Class Executive Operating Suite Topbar) */}
+            <header className="portal-topbar">
+              {/* Left Section: Nav Toggle + Divider + Hierarchy Breadcrumb + Status Pill */}
+              <div className="portal-topbar-left">
                 <button
-                  onClick={() => setMobileSidebarOpen(prev => !prev)}
-                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer"
+                  onClick={toggleSidebar}
+                  className="portal-icon-button"
+                  title={desktopSidebarCollapsed ? "Expand sidebar navigation" : "Collapse sidebar navigation"}
                   aria-label="Toggle navigation"
                 >
-                  <Menu className="w-5 h-5" />
+                  <Menu size={16} />
                 </button>
 
-                <div className="flex items-center gap-2.5">
-                  <div 
-                    className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm border shadow-xs shrink-0"
-                    style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '40' }}
-                  >
-                    {currentUser.avatar_initials}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm sm:text-base text-[#1f2430] tracking-tight truncate max-w-[200px] sm:max-w-xs">
-                        {currentUser.name}
-                      </span>
-                      <span 
-                        className="px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase border hidden sm:inline-block"
-                        style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor, borderColor: currentRoleDef.badgeColor + '40' }}
-                      >
-                        {currentRoleDef.badge}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-[#8a919e] font-medium hidden sm:block truncate">
-                      {currentRoleDef.primaryDesk}
-                    </div>
-                  </div>
+                <div className="portal-topbar-divider hidden sm:block" />
+
+                {/* Dynamic Breadcrumb Hierarchy */}
+                <div className="flex items-center gap-1.5 truncate">
+                  <span className="portal-breadcrumb-category hidden sm:inline">
+                    {getTabMeta(activeTab).category}
+                  </span>
+                  <ChevronRight size={13} className="text-slate-300 hidden sm:inline shrink-0" />
+                  <span className="portal-breadcrumb-title">
+                    {getTabMeta(activeTab).title}
+                  </span>
+                </div>
+
+                {/* Live Desk Status Indicator */}
+                <div className="portal-status-pill hidden lg:inline-flex">
+                  <span className="portal-status-dot animate-pulse" />
+                  <span>Live Desk</span>
                 </div>
               </div>
 
-              {/* Right Header Actions */}
-              <div className="flex items-center gap-2 sm:gap-3">
-                {/* Notification Bell with blue badge '3' */}
-                <button 
-                  onClick={() => setActiveTab('prayers')}
-                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer" 
-                  title="Notifications & Petitions (3)"
-                  aria-label="Pending Notifications and Prayer Petitions"
-                >
-                  <Bell size={18} />
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#06b6d4] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs tabular-nums">3</span>
-                </button>
-
-                {/* Message bubble with pink badge '2' */}
-                <button 
-                  onClick={() => setActiveTab('guests')}
-                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer" 
-                  title="Visitor Registrations (2)"
-                  aria-label="First-Time Guest Registrations"
-                >
-                  <MessageSquare size={18} />
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#ea1263] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs tabular-nums">2</span>
-                </button>
-
-                {/* Executive View Switcher (Only visible to Admin) */}
+              {/* Right Section: Role Switcher, Quick Indicators, Profile, Live Site & Lock */}
+              <div className="portal-topbar-right">
+                {/* Executive Role Switcher (Admins Only) */}
                 {currentUser.role === 'admin' && (
-                  <div className="hidden md:flex items-center gap-1.5 bg-[#faf4fb] border border-[#f0e6f3] rounded-xl px-2.5 py-1.5">
-                    <Eye className="w-3.5 h-3.5 text-[#ea1263]" />
-                    <span className="text-[10px] font-extrabold text-[#8a919e] uppercase tracking-wider">Role View:</span>
+                  <div className="portal-role-pill hidden md:flex">
+                    <ShieldCheck size={14} color="var(--fgc-blue)" className="shrink-0" />
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }} className="hidden xl:inline">
+                      Desk:
+                    </span>
                     <select
                       value={activeRole}
                       onChange={(e) => handleSwitchRoleView(e.target.value as ChurchRole)}
-                      className="bg-transparent text-xs font-bold text-[#ea1263] focus:outline-none cursor-pointer"
+                      className="portal-role-select"
                       aria-label="Switch staff role view"
                     >
                       <option value="admin">Administrator & CMS</option>
@@ -1192,35 +1211,81 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </div>
                 )}
 
-                {/* Settings Gear */}
+                {/* Notifications: Prayer Petitions */}
+                <button 
+                  onClick={() => setActiveTab('prayers')}
+                  className="portal-icon-button" 
+                  title="Pastoral Prayer Petitions (3)"
+                  aria-label="Pastoral Prayer Petitions"
+                >
+                  <Bell size={16} />
+                  <span className="header-badge-bubble header-badge-blue">3</span>
+                </button>
+
+                {/* Notifications: First-Time Guest Registrations */}
+                <button 
+                  onClick={() => setActiveTab('guests')}
+                  className="portal-icon-button" 
+                  title="First-Time Guest Registrations (2)"
+                  aria-label="First-Time Guest Registrations"
+                >
+                  <MessageSquare size={16} />
+                  <span className="header-badge-bubble header-badge-pink">2</span>
+                </button>
+
+                {/* Church Settings & Announcements */}
                 <button
                   onClick={() => setActiveTab('settings')}
-                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer"
+                  className="portal-icon-button"
                   title="Church Settings & Announcements"
                   aria-label="Church Settings and Announcements"
                 >
-                  <Settings size={18} />
+                  <Settings size={16} />
                 </button>
 
-                {/* View Live Site */}
+                <div className="portal-topbar-divider hidden sm:block" />
+
+                {/* Current Staff Officer Profile Chip */}
+                <div 
+                  className="portal-officer-chip hidden sm:flex"
+                  title={`${currentUser.name} • ${currentRoleDef.primaryDesk}`}
+                >
+                  <div 
+                    className="portal-officer-avatar"
+                    style={{ backgroundColor: currentRoleDef.badgeColor || '#2866AD' }}
+                  >
+                    {currentUser.avatar_initials}
+                  </div>
+                  <div className="portal-officer-text">
+                    <span className="portal-officer-name">
+                      {currentUser.name}
+                    </span>
+                    <span className="portal-officer-badge">
+                      {currentRoleDef.badge}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Return to Live Site */}
                 <button
                   onClick={onClose}
-                  className="px-3 py-1.5 rounded-xl border border-[#e4d8e8] hover:border-[#d8c8dc] bg-[#faf4fb] hover:bg-[#f5eef8] active:scale-[0.96] text-[#4b5262] text-xs font-bold transition-transform duration-150 flex items-center gap-1.5 cursor-pointer"
+                  className="portal-btn-live"
+                  title="Return to Public Church Website"
                   aria-label="Return to Live Church Website"
                 >
-                  <ArrowLeft className="w-3.5 h-3.5 text-[#707786]" />
-                  <span className="hidden sm:inline">Live Site</span>
+                  <Globe size={14} color="var(--fgc-blue)" />
+                  <span className="hidden md:inline">Live Site</span>
                 </button>
 
-                {/* Logout / Switch Role */}
+                {/* Lock / Exit Desk */}
                 <button
                   onClick={handleLogout}
-                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#ea1263]/30 hover:border-[#ea1263]/60 bg-[#ea1263]/10 hover:bg-[#ea1263]/20 active:scale-[0.96] text-[#ea1263] text-xs font-bold transition-transform duration-150 flex items-center gap-1.5 cursor-pointer"
-                  title="Switch Staff Account / Lock"
+                  className="portal-btn-lock"
+                  title="Switch Staff Account / Lock Desk"
                   aria-label="Lock and Switch Staff Account"
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Lock</span>
+                  <Lock size={13} color="#E11D48" />
+                  <span className="hidden md:inline">Lock</span>
                 </button>
               </div>
             </header>
@@ -1237,21 +1302,28 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             {/* Left Sidebar */}
             <aside 
-              className={`admin-sidebar fixed lg:static top-16 bottom-0 left-0 bg-white border-r border-[#f0e6f3] flex flex-col justify-between shrink-0 transition-transform duration-300 lg:translate-x-0 z-30 ${
+              className={`admin-sidebar bg-white border-r border-[#f0e6f3] flex flex-col justify-between shrink-0 ${
+                desktopSidebarCollapsed ? 'admin-sidebar-collapsed' : ''
+              } ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
               <div>
                 {/* Brand Header: FGC Mushin District Headquarters */}
-                <div className="p-3.5 border-b border-[#f4ebf6]">
-                  <div className="bg-gradient-to-r from-[#be123c] via-[#e11d48] to-[#ea1263] text-white rounded-xl py-2 px-3 shadow-sm shadow-[#e11d48]/25 flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-white text-[#be123c] flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
-                      <Church className="w-3.5 h-3.5 text-[#be123c]" />
+                <div className="p-3 border-b border-[#f0e6f3] sidebar-brand-container">
+                  <div className="portal-sidebar-brand-card">
+                    <div className="portal-sidebar-brand-icon" title="FGC Mushin DHQ">
+                      <Church size={15} />
                     </div>
-                    <div className="font-black text-sm tracking-tight text-white flex-1 truncate">
-                      FGC Mushin
+                    <div className="flex flex-col min-w-0 flex-1 sidebar-brand-text">
+                      <span className="portal-sidebar-brand-title truncate">
+                        FGC Mushin
+                      </span>
+                      <span className="portal-sidebar-brand-sub truncate">
+                        District HQ
+                      </span>
                     </div>
-                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-white/20 text-white uppercase tracking-wider">
+                    <span className="portal-sidebar-brand-badge sidebar-brand-text">
                       DHQ
                     </span>
                   </div>
@@ -1262,28 +1334,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* # Dashboard (Always visible, tailored to role desk) */}
                   <button
                     onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                    title="Dashboard"
+                    className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'overview'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                     }`}
                   >
-                    <Hash className="w-4 h-4 text-[#ea1263]" />
-                    <span>Dashboard</span>
+                    <Hash className="w-4 h-4 shrink-0" style={{ color: 'currentColor' }} />
+                    <span className="sidebar-item-text truncate">Dashboard</span>
                   </button>
 
                   {/* Treasury & Finances (Requires view_financials permission) */}
                   {currentRoleDef.permissions.includes('view_financials') && (
                     <button
                       onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title="Treasury & Finances"
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         (activeTab === 'finances' || activeTab === 'giving')
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Wallet className="w-4 h-4 text-[#06b6d4]" />
-                      <span>Treasury & Finances</span>
+                      <Wallet className="w-4 h-4 shrink-0" style={{ opacity: 0.75, transition: "opacity 150ms" }} />
+                      <span className="sidebar-item-text truncate">Treasury & Finances</span>
                     </button>
                   )}
 
@@ -1291,14 +1365,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {currentRoleDef.permissions.includes('log_attendance') && (
                     <button
                       onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title="Attendance Telemetry"
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'attendance'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Activity className="w-4 h-4 text-[#8b5cf6]" />
-                      <span>Attendance Telemetry</span>
+                      <Activity className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'attendance' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Attendance Telemetry</span>
                     </button>
                   )}
 
@@ -1306,14 +1381,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {currentRoleDef.permissions.includes('log_attendance') && (
                     <button
                       onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title="Log Headcount"
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'headcount_logger'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Plus className="w-4 h-4 text-[#ea1263]" />
-                      <span>Log Headcount</span>
+                      <Plus className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'headcount_logger' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Log Headcount</span>
                     </button>
                   )}
 
@@ -1321,7 +1397,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_pastoral_care') ||
                     currentRoleDef.permissions.includes('manage_secretariat') ||
                     currentRoleDef.permissions.includes('manage_cms')) && (
-                    <div className="pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
+                    <div className="sidebar-section-header pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
                       Ministries & Care
                     </div>
                   )}
@@ -1330,14 +1406,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_pastoral_care') || currentRoleDef.permissions.includes('manage_secretariat')) && (
                     <button
                       onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`First-Time Guests (${guestVisits.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'guests'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Users className="w-4 h-4 text-[#f59e0b]" />
-                      <span>First-Time Guests ({guestVisits.length})</span>
+                      <Users className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'guests' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">First-Time Guests ({guestVisits.length})</span>
                     </button>
                   )}
 
@@ -1345,14 +1422,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_pastoral_care') || currentRoleDef.permissions.includes('manage_secretariat')) && (
                     <button
                       onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`Prayer Desk (${prayerRequests.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'prayers'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Heart className="w-4 h-4 text-[#ea1263]" />
-                      <span>Prayer Desk ({prayerRequests.length})</span>
+                      <Heart className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'prayers' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Prayer Desk ({prayerRequests.length})</span>
                     </button>
                   )}
 
@@ -1360,14 +1438,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {currentRoleDef.permissions.includes('manage_cms') && (
                     <button
                       onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`Sermons CMS (${sermons.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'sermons'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <BookOpen className="w-4 h-4 text-[#06b6d4]" />
-                      <span>Sermons CMS ({sermons.length})</span>
+                      <BookOpen className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'sermons' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Sermons CMS ({sermons.length})</span>
                     </button>
                   )}
 
@@ -1375,14 +1454,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_secretariat') || currentRoleDef.permissions.includes('manage_cms')) && (
                     <button
                       onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`Calendar Events (${events.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'events'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Calendar className="w-4 h-4 text-[#10b981]" />
-                      <span>Calendar Events ({events.length})</span>
+                      <Calendar className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'events' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Calendar Events ({events.length})</span>
                     </button>
                   )}
 
@@ -1390,7 +1470,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_staff_iam') ||
                     currentRoleDef.permissions.includes('view_executive_pulse') ||
                     currentRoleDef.permissions.includes('manage_cms')) && (
-                    <div className="pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
+                    <div className="sidebar-section-header pt-2 pb-1 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#a0a6b4]">
                       IAM & Governance
                     </div>
                   )}
@@ -1399,14 +1479,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {currentRoleDef.permissions.includes('manage_staff_iam') && (
                     <button
                       onClick={() => { setActiveTab('iam_staff'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`Staff IAM (${staffUsers.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'iam_staff'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Shield className="w-4 h-4 text-[#6366f1]" />
-                      <span>Staff IAM ({staffUsers.length})</span>
+                      <Shield className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'iam_staff' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Staff IAM ({staffUsers.length})</span>
                     </button>
                   )}
 
@@ -1414,14 +1495,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {(currentRoleDef.permissions.includes('manage_staff_iam') || currentRoleDef.permissions.includes('view_executive_pulse')) && (
                     <button
                       onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title={`Audit Trail (${auditLogs.length})`}
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'audit_logs'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <ClipboardList className="w-4 h-4 text-[#8b5cf6]" />
-                      <span>Audit Trail ({auditLogs.length})</span>
+                      <ClipboardList className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'audit_logs' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Audit Trail ({auditLogs.length})</span>
                     </button>
                   )}
 
@@ -1429,26 +1511,36 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {currentRoleDef.permissions.includes('manage_cms') && (
                     <button
                       onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
+                      title="Church Settings"
+                      className={`sidebar-nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                         activeTab === 'settings'
                           ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                           : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
                       }`}
                     >
-                      <Settings className="w-4 h-4 text-[#707786]" />
-                      <span>Church Settings</span>
+                      <Settings className="w-4 h-4 shrink-0" style={{ opacity: activeTab === 'settings' ? 1 : 0.7, transition: 'opacity 150ms' }} />
+                      <span className="sidebar-item-text truncate">Church Settings</span>
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Sidebar Footer Info */}
-              <div className="p-3.5 border-t border-[#f4ebf6] text-[11px] text-[#8a919e] bg-[#faf5fb]">
-                <div className="flex items-center gap-1.5 mb-0.5 text-[#10b981] font-bold">
-                  <span className="w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
-                  Supabase Cloud Live
+              {/* Sidebar User Card Footer */}
+              <div className="sidebar-user-card">
+                <div
+                  className="sidebar-user-card-avatar"
+                  style={{ backgroundColor: currentRoleDef.badgeBg, color: currentRoleDef.badgeColor }}
+                  title={`${currentUser.name} (${currentUser.title})`}
+                >
+                  {currentUser.avatar_initials}
                 </div>
-                <div className="truncate font-semibold text-[#1f2430]">{currentUser.name}</div>
+                <div className="sidebar-user-card-info">
+                  <div className="sidebar-user-card-name">{currentUser.name}</div>
+                  <div className="sidebar-user-card-status">
+                    <span className="sidebar-user-card-status-dot" />
+                    Live
+                  </div>
+                </div>
               </div>
             </aside>
 
@@ -2170,7 +2262,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                               <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(21, 26, 33, 0.85)', backdropFilter: 'blur(8px)', color: '#FFFFFF', padding: '4px 10px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 {sermonForm.series || 'SUNDAY CELEBRATION'}
                               </div>
-                              <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: 'rgba(0,0,0,0.7)', color: '#FFFFFF', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontFamily: 'monospace' }}>
+                              <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: 'rgba(0,0,0,0.7)', color: '#FFFFFF', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontFamily: 'var(--font-mono)', fontVariantNumeric: 'tabular-nums' }}>
                                 {sermonForm.duration || '35 min'}
                               </div>
                             </div>

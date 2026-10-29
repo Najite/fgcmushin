@@ -26,7 +26,7 @@ export const FEATURED_SERMON: Sermon = {
   id: 'unshakable-pt1',
   title: 'Hope In The Storm',
   series: 'UNSHAKABLE',
-  speaker: 'Lead Pastor Marcus Vance',
+  speaker: 'Rev. O. Adebayo (District Overseer)',
   date: 'October 25, 2026',
   duration: '38 min',
   passage: 'Hebrews 6:19-20',
@@ -40,7 +40,7 @@ export const RECENT_SERMONS: Sermon[] = [
     id: 'unshakable-pt1',
     title: 'Hope In The Storm',
     series: 'UNSHAKABLE',
-    speaker: 'Pastor Marcus Vance',
+    speaker: 'Rev. O. Adebayo',
     date: 'Oct 25, 2026',
     duration: '38 min',
     passage: 'Hebrews 6:19-20',
@@ -51,7 +51,7 @@ export const RECENT_SERMONS: Sermon[] = [
     id: 'living-generous',
     title: 'Hands Wide Open',
     series: 'KINGDOM HEARTS',
-    speaker: 'Pastor Elena Vance',
+    speaker: 'Pastor (Mrs.) Toyin Adebayo',
     date: 'Oct 18, 2026',
     duration: '34 min',
     passage: '2 Corinthians 9:6-11',
@@ -62,7 +62,7 @@ export const RECENT_SERMONS: Sermon[] = [
     id: 'breath-of-life',
     title: 'The Room Shook',
     series: 'EMPOWERED',
-    speaker: 'Guest Speaker David Ortiz',
+    speaker: 'Pastor Emmanuel Kalu',
     date: 'Oct 11, 2026',
     duration: '42 min',
     passage: 'Acts 4:23-31',
@@ -80,7 +80,7 @@ export const MINISTRIES: Ministry[] = [
     schedule: 'Every Sunday at 7:30 AM & 9:30 AM',
     description: 'Safe, background-checked environments designed specifically for children to experience God’s great love through interactive stories, creative crafts, and caring leaders.',
     image: '/images/ministry-kids.jpg',
-    lead: 'Sarah Jenkins, Children Church Director',
+    lead: 'Deaconess Funmi Adeleke, Children Church Director',
     highlights: ['Secure check-in & parent paging', 'Sensory-friendly spaces', 'Age-appropriate worship & lessons']
   },
   {
@@ -91,7 +91,7 @@ export const MINISTRIES: Ministry[] = [
     schedule: 'Wednesday Evenings at 6:00 PM',
     description: 'High energy, authentic friendships, and culturally relevant teaching that empowers students to discover their identity in Christ and lead bold lives.',
     image: '/images/ministry-youth.jpg',
-    lead: 'Jordan & Maya Brooks, Youth Pastors',
+    lead: 'Pastor & Mrs. Tunde Ogundipe, Youth Pastors',
     highlights: ['Live youth worship', 'Small group breakout circles', 'Annual retreats & camps']
   },
   {
@@ -102,7 +102,7 @@ export const MINISTRIES: Ministry[] = [
     schedule: '1st & 3rd Thursdays at 6:30 PM',
     description: 'Students, young professionals, and creatives gathering around tables for food, Scripture discussion, and mutual encouragement across Lagos.',
     image: '/images/community-welcome.jpg',
-    lead: 'Caleb Evans, YA Coordinator',
+    lead: 'Bro. Kelechi Okafor, YA Coordinator',
     highlights: ['Fellowship hub dinners', 'Career & vocational mentorship', 'Community retreats']
   },
   {
@@ -113,7 +113,7 @@ export const MINISTRIES: Ministry[] = [
     schedule: 'Monthly Community Serve Days',
     description: 'We believe a healthy church blesses the city outside its walls. From food distribution to medical outreaches, we serve with dignity and compassion.',
     image: '/images/ministry-outreach.jpg',
-    lead: 'Dr. Kimberly Adams, Missions Director',
+    lead: 'Elder Dr. Seyi Alabi, Missions & Welfare Director',
     highlights: ['Community food pantry & relief', 'Family support network', 'Mission outreaches']
   }
 ];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Clock, MapPin, X, ChevronUp, ArrowUpRight, Minus } from 'lucide-react';
 import { CHURCH_INFO } from '../data/churchData';
 
@@ -7,13 +7,23 @@ interface FloatingServicePillProps {
 }
 
 export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpenPlanVisit }) => {
-  const [isMinimized, setIsMinimized] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 640;
-    }
-    return false;
-  });
+  const [isVisible, setIsVisible] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [isClosed, setIsClosed] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Reveal pill only after user scrolls past the hero section (~450px)
+      if (window.scrollY > 450) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   if (isClosed) return null;
 
@@ -27,8 +37,12 @@ export const FloatingServicePill: React.FC<FloatingServicePillProps> = ({ onOpen
         right: '1.25rem',
         zIndex: 45,
         maxWidth: isMinimized ? 'auto' : '360px',
-        width: 'calc(100vw - 2.5rem)',
-        pointerEvents: 'none'
+        width: isMinimized ? 'auto' : 'calc(100vw - 2.5rem)',
+        pointerEvents: 'none',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0)' : 'translateY(24px)',
+        transition: 'opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        visibility: isVisible ? 'visible' : 'hidden'
       }}
     >
       <div

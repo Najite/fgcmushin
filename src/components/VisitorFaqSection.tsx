@@ -42,7 +42,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                   className="double-bezel-inner"
                   style={{
                     background: '#FFFFFF',
-                    transition: 'all 0.3s ease'
+                    transition: 'background-color 0.25s ease, border-color 0.25s ease'
                   }}
                 >
                   <button
@@ -99,7 +99,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
           className="double-bezel reveal-item reveal-stagger-2"
           style={{
             background: 'var(--accent-teal-subtle)',
-            borderColor: 'rgba(0, 118, 129, 0.25)'
+            borderColor: 'var(--fgc-blue-border)'
           }}
         >
           <div

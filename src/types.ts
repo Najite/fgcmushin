@@ -39,7 +39,7 @@ export interface VisitPlanData {
   email: string;
   phone: string;
   serviceDate: string;
-  serviceTime: '9:00 AM' | '11:15 AM';
+  serviceTime: '7:30 AM' | '9:30 AM';
   adultsCount: number;
   kidsCount: number;
   hasKidsForChildcare: boolean;

@@ -57,7 +57,7 @@ export const UpcomingEvents: React.FC<UpcomingEventsProps> = ({ onRSVP, events }
                   borderRadius: '9999px',
                   fontSize: '0.85rem',
                   fontWeight: 700,
-                  transition: 'all 0.25s var(--ease-spring)',
+                  transition: 'background-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-spring)',
                   background: filter === cat ? 'var(--fgc-blue)' : 'transparent',
                   color: filter === cat ? '#FFFFFF' : 'var(--text-secondary)'
                 }}
