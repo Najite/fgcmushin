@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow, ServiceAttendanceRow, StaffUserRow } from '../types/database';
+import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow, ServiceAttendanceRow, StaffUserRow, PastoralNoteRow, AuditLogRow } from '../types/database';
 import type { Sermon, ChurchEvent, Ministry } from '../types';
 
 const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://tmjuucclnumavnbyukmf.supabase.co';
@@ -491,6 +491,114 @@ export async function logServiceAttendance(entry: {
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     return { success: false, error: message };
+  }
+}
+
+/**
+ * Fetch pastoral follow-up notes for guest visits
+ */
+export async function getPastoralNotes(guestId?: string): Promise<PastoralNoteRow[]> {
+  try {
+    let query = supabase.from('pastoral_notes').select('*').order('created_at', { ascending: false });
+    if (guestId) {
+      query = query.eq('guest_id', guestId);
+    }
+    const { data, error } = await query;
+    if (error) {
+      console.warn('Error fetching pastoral_notes:', error.message);
+      return [];
+    }
+    return (data as unknown as PastoralNoteRow[]) || [];
+  } catch (err) {
+    console.warn('Network error fetching pastoral_notes:', err);
+    return [];
+  }
+}
+
+/**
+ * Add a pastoral interaction / counseling note
+ */
+export async function addPastoralNote(entry: {
+  guest_id: string;
+  staff_id: string;
+  staff_name: string;
+  staff_role: string;
+  note: string;
+  category?: string;
+}): Promise<{ success: boolean; data?: PastoralNoteRow; error?: string }> {
+  try {
+    const { data, error } = await supabase.from('pastoral_notes').insert({
+      guest_id: entry.guest_id,
+      staff_id: entry.staff_id,
+      staff_name: entry.staff_name,
+      staff_role: entry.staff_role,
+      note: entry.note,
+      category: entry.category || 'follow_up'
+    }).select().single();
+
+    if (error) return { success: false, error: error.message };
+
+    // Also write an audit log
+    await logAuditEvent({
+      staff_id: entry.staff_id,
+      staff_name: entry.staff_name,
+      staff_role: entry.staff_role,
+      action: 'PASTORAL_NOTE_ADDED',
+      entity_type: 'guest_visit',
+      details: `Logged pastoral note on guest (${entry.guest_id.slice(0, 8)}...): ${entry.note.slice(0, 50)}...`
+    });
+
+    return { success: true, data: data as unknown as PastoralNoteRow };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+
+/**
+ * Fetch enterprise audit logs for governance & compliance
+ */
+export async function getAuditLogs(limit: number = 50): Promise<AuditLogRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.warn('Error fetching audit_logs:', error.message);
+      return [];
+    }
+    return (data as unknown as AuditLogRow[]) || [];
+  } catch (err) {
+    console.warn('Network error fetching audit_logs:', err);
+    return [];
+  }
+}
+
+/**
+ * Record an audit log event
+ */
+export async function logAuditEvent(entry: {
+  staff_id: string;
+  staff_name: string;
+  staff_role: string;
+  action: string;
+  entity_type: string;
+  details?: string;
+}): Promise<void> {
+  try {
+    await supabase.from('audit_logs').insert({
+      staff_id: entry.staff_id,
+      staff_name: entry.staff_name,
+      staff_role: entry.staff_role,
+      action: entry.action,
+      entity_type: entry.entity_type,
+      details: entry.details || null
+    });
+  } catch (err) {
+    console.warn('Audit logging note:', err);
   }
 }
 

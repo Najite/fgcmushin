@@ -217,7 +217,7 @@ export const PlanVisitModal: React.FC<PlanVisitModalProps> = ({ isOpen, onClose 
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      placeholder="(804) 555-0199"
+                      placeholder="0803 123 4567"
                       style={{
                         width: '100%',
                         padding: '0.85rem 1rem',

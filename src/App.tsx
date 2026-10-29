@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation } from 'wouter';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -21,6 +22,7 @@ import { FEATURED_SERMON, RECENT_SERMONS, UPCOMING_EVENTS } from './data/churchD
 import { getChurchSettings, getSermons, getEvents } from './lib/supabase';
 
 export const App: React.FC = () => {
+  const [location, setLocation] = useLocation();
   const [isPlanVisitOpen, setIsPlanVisitOpen] = useState(false);
   const [isGivingOpen, setIsGivingOpen] = useState(false);
   const [isPrayerOpen, setIsPrayerOpen] = useState(false);
@@ -102,9 +104,9 @@ export const App: React.FC = () => {
     };
   }, []);
 
-  // Lock background scroll when any modal or full-screen portal is active
+  // Lock background scroll when modal is active
   useEffect(() => {
-    const isAnyModalOpen = isPlanVisitOpen || isGivingOpen || isPrayerOpen || isAdminOpen || !!activeVideoSermon;
+    const isAnyModalOpen = isPlanVisitOpen || isGivingOpen || isPrayerOpen || !!activeVideoSermon;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -113,13 +115,13 @@ export const App: React.FC = () => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [isPlanVisitOpen, isGivingOpen, isPrayerOpen, isAdminOpen, activeVideoSermon]);
+  }, [isPlanVisitOpen, isGivingOpen, isPrayerOpen, activeVideoSermon]);
 
-  // Support direct URL #admin hash navigation and Alt+A / Ctrl+Shift+A hotkeys
+  // Support direct URL #admin and #staff hash navigation
   useEffect(() => {
     const handleHash = () => {
-      if (window.location.hash === '#admin') {
-        setIsAdminOpen(true);
+      if (window.location.hash === '#admin' || window.location.hash === '#staff') {
+        setLocation('/staff');
       }
     };
     handleHash();
@@ -128,7 +130,7 @@ export const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.altKey && e.key.toLowerCase() === 'a') || (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a')) {
         e.preventDefault();
-        setIsAdminOpen((prev) => !prev);
+        setLocation(location.startsWith('/staff') ? '/' : '/staff');
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -137,7 +139,7 @@ export const App: React.FC = () => {
       window.removeEventListener('hashchange', handleHash);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [location, setLocation]);
 
   const handleSelectSection = (sectionId: string) => {
     const el = document.getElementById(sectionId);
@@ -151,6 +153,29 @@ export const App: React.FC = () => {
   };
 
   const featuredSermon = sermons.length > 0 ? sermons[0] : FEATURED_SERMON;
+
+  // Dedicated Route: Staff Operations Suite (Decoupled Full-Screen Enterprise Workspace)
+  const isStaffRoute = location.startsWith('/staff') || isAdminOpen;
+
+  if (isStaffRoute) {
+    return (
+      <AdminPortal
+        isOpen={true}
+        isStandalone={true}
+        onClose={() => {
+          setIsAdminOpen(false);
+          setLocation('/');
+          if (window.location.hash === '#admin' || window.location.hash === '#staff') {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
+        sermons={sermons}
+        events={events}
+        churchSettings={churchSettings}
+        onDataRefresh={loadSupabaseData}
+      />
+    );
+  }
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', background: 'var(--bg-deep)' }}>
@@ -172,7 +197,7 @@ export const App: React.FC = () => {
         onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
         onOpenGiving={() => setIsGivingOpen(true)}
         onOpenPrayer={() => setIsPrayerOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={() => setLocation('/staff')}
         onSelectSection={handleSelectSection}
       />
 
@@ -220,7 +245,7 @@ export const App: React.FC = () => {
         onOpenPlanVisit={() => setIsPlanVisitOpen(true)}
         onOpenGiving={() => setIsGivingOpen(true)}
         onOpenPrayer={() => setIsPrayerOpen(true)}
-        onOpenAdmin={() => setIsAdminOpen(true)}
+        onOpenAdmin={() => setLocation('/staff')}
         onSelectSection={handleSelectSection}
       />
 
@@ -252,21 +277,6 @@ export const App: React.FC = () => {
       <GivingDrawer
         isOpen={isGivingOpen}
         onClose={() => setIsGivingOpen(false)}
-      />
-
-      {/* Staff & Pastoral Content Management Portal (CMS) */}
-      <AdminPortal
-        isOpen={isAdminOpen}
-        onClose={() => {
-          setIsAdminOpen(false);
-          if (window.location.hash === '#admin') {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-          }
-        }}
-        sermons={sermons}
-        events={events}
-        churchSettings={churchSettings}
-        onDataRefresh={loadSupabaseData}
       />
     </div>
   );

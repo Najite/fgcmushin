@@ -21,14 +21,14 @@ export const Footer: React.FC<FooterProps> = ({
     <footer style={{ background: '#F3EFEA', borderTop: '1px solid var(--border-subtle)', position: 'relative' }}>
       {/* 4-Color Church Emblem Gradient Ribbon */}
       <div className="top-color-ribbon" aria-hidden="true" />
-      <div className="container-max" style={{ paddingTop: '5rem', paddingBottom: '3.5rem' }}>
+      <div className="container-max" style={{ paddingTop: 'clamp(3rem, 6vw, 5rem)', paddingBottom: 'clamp(2rem, 5vw, 3.5rem)' }}>
         {/* Top Grid */}
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '3rem',
-            marginBottom: '4rem'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+            gap: '2.5rem',
+            marginBottom: '3.5rem'
           }}
         >
           {/* Column 1: Brand & Identity */}
@@ -69,12 +69,12 @@ export const Footer: React.FC<FooterProps> = ({
               </div>
             </div>
 
-            <p className="footer-brand-desc" style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+            <p className="footer-brand-desc" style={{ color: 'var(--text-secondary)', fontSize: '0.925rem', lineHeight: 1.6 }}>
               Foursquare Gospel Church Mushin District Headquarters — Jesus Christ, the Same Yesterday, Today, and Forever. A vibrant family following Jesus together.
             </p>
 
-            {/* Social Icons Inline SVGs */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '0.5rem' }}>
+            {/* Social Icons Inline SVGs with 44x44px touch targets */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingTop: '0.25rem' }}>
               {/* Instagram */}
               <a
                 href={CHURCH_INFO.socials.instagram}
@@ -82,8 +82,8 @@ export const Footer: React.FC<FooterProps> = ({
                 rel="noreferrer"
                 aria-label="Instagram"
                 style={{
-                  width: '38px',
-                  height: '38px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
                   background: '#FFFFFF',
                   border: '1px solid var(--border-subtle)',
@@ -91,10 +91,11 @@ export const Footer: React.FC<FooterProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'var(--text-primary)',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                  touchAction: 'manipulation'
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
                   <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
@@ -108,8 +109,8 @@ export const Footer: React.FC<FooterProps> = ({
                 rel="noreferrer"
                 aria-label="YouTube"
                 style={{
-                  width: '38px',
-                  height: '38px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
                   background: '#FFFFFF',
                   border: '1px solid var(--border-subtle)',
@@ -117,10 +118,11 @@ export const Footer: React.FC<FooterProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'var(--text-primary)',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                  touchAction: 'manipulation'
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/>
                   <polygon points="10 15 15 12 10 9 10 15"/>
                 </svg>
@@ -133,8 +135,8 @@ export const Footer: React.FC<FooterProps> = ({
                 rel="noreferrer"
                 aria-label="Facebook"
                 style={{
-                  width: '38px',
-                  height: '38px',
+                  width: '44px',
+                  height: '44px',
                   borderRadius: '50%',
                   background: '#FFFFFF',
                   border: '1px solid var(--border-subtle)',
@@ -142,10 +144,11 @@ export const Footer: React.FC<FooterProps> = ({
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'var(--text-primary)',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                  touchAction: 'manipulation'
                 }}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                 </svg>
               </a>
@@ -187,34 +190,34 @@ export const Footer: React.FC<FooterProps> = ({
             <h4 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--accent-teal)', fontWeight: 700, marginBottom: '1.25rem' }}>
               Quick Links
             </h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.925rem', color: 'var(--text-secondary)' }}>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.925rem', color: 'var(--text-secondary)' }}>
               <li>
-                <button onClick={() => onSelectSection('welcome')} style={{ color: 'inherit' }}>
+                <button onClick={() => onSelectSection('welcome')} style={{ color: 'inherit', padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Who We Are
                 </button>
               </li>
               <li>
-                <button onClick={() => onSelectSection('ministries')} style={{ color: 'inherit' }}>
+                <button onClick={() => onSelectSection('ministries')} style={{ color: 'inherit', padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Ministries & Generations
                 </button>
               </li>
               <li>
-                <button onClick={() => onSelectSection('sermons')} style={{ color: 'inherit' }}>
+                <button onClick={() => onSelectSection('sermons')} style={{ color: 'inherit', padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Message Archive & Teaching
                 </button>
               </li>
               <li>
-                <button onClick={() => onSelectSection('events')} style={{ color: 'inherit' }}>
+                <button onClick={() => onSelectSection('events')} style={{ color: 'inherit', padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Events & Outreach Calendar
                 </button>
               </li>
               <li>
-                <button onClick={onOpenGiving} style={{ color: 'inherit' }}>
+                <button onClick={onOpenGiving} style={{ color: 'inherit', padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Generosity & Tithes
                 </button>
               </li>
               <li>
-                <button onClick={onOpenPrayer} style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>
+                <button onClick={onOpenPrayer} style={{ color: 'var(--accent-gold)', fontWeight: 600, padding: '0.3rem 0', width: '100%', textAlign: 'left' }}>
                   Submit Prayer Request
                 </button>
               </li>
@@ -227,7 +230,8 @@ export const Footer: React.FC<FooterProps> = ({
                       fontWeight: 700,
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '0.4rem'
+                      gap: '0.4rem',
+                      padding: '0.3rem 0'
                     }}
                   >
                     <Lock size={13} />
@@ -316,7 +320,8 @@ export const Footer: React.FC<FooterProps> = ({
       <style>{`
         @media (max-width: 640px) {
           .footer-brand-desc {
-            display: none !important;
+            font-size: 0.88rem !important;
+            line-height: 1.5 !important;
           }
         }
       `}</style>

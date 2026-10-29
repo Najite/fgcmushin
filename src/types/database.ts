@@ -366,6 +366,72 @@ export type Database = {
         }
         Relationships: []
       }
+      pastoral_notes: {
+        Row: {
+          id: string
+          guest_id: string
+          staff_id: string
+          staff_name: string
+          staff_role: string
+          note: string
+          category: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          guest_id: string
+          staff_id: string
+          staff_name: string
+          staff_role: string
+          note: string
+          category?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          guest_id?: string
+          staff_id?: string
+          staff_name?: string
+          staff_role?: string
+          note?: string
+          category?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          id: string
+          staff_id: string
+          staff_name: string
+          staff_role: string
+          action: string
+          entity_type: string
+          details: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          staff_id: string
+          staff_name: string
+          staff_role: string
+          action: string
+          entity_type: string
+          details?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          staff_id?: string
+          staff_name?: string
+          staff_role?: string
+          action?: string
+          entity_type?: string
+          details?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -416,5 +482,27 @@ export interface StaffUserRow {
   last_login_at?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface PastoralNoteRow {
+  id: string;
+  guest_id: string;
+  staff_id: string;
+  staff_name: string;
+  staff_role: string;
+  note: string;
+  category?: string;
+  created_at?: string;
+}
+
+export interface AuditLogRow {
+  id: string;
+  staff_id: string;
+  staff_name: string;
+  staff_role: string;
+  action: string;
+  entity_type: string;
+  details?: string | null;
+  created_at?: string;
 }
 

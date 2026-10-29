@@ -49,15 +49,16 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                     onClick={() => toggle(index)}
                     style={{
                       width: '100%',
-                      padding: '1.5rem 2rem',
+                      padding: 'clamp(1rem, 3.5vw, 1.5rem) clamp(1rem, 4vw, 2rem)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       textAlign: 'left',
-                      gap: '1rem',
+                      gap: '0.75rem',
                       color: isOpen ? 'var(--accent-teal)' : 'var(--text-primary)',
                       fontWeight: 700,
-                      fontSize: '1.15rem'
+                      fontSize: 'clamp(1.02rem, 2.5vw, 1.15rem)',
+                      lineHeight: 1.4
                     }}
                   >
                     <span>{faq.q}</span>
@@ -72,7 +73,8 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
                         justifyContent: 'center',
                         color: isOpen ? 'var(--accent-teal)' : 'var(--text-muted)',
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.3s var(--ease-spring)'
+                        transition: 'transform 0.3s var(--ease-spring)',
+                        flexShrink: 0
                       }}
                     >
                       <ChevronDown size={18} />
@@ -81,7 +83,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
 
                   <div className={`accordion-panel ${isOpen ? 'is-open' : ''}`}>
                     <div className="accordion-panel-inner">
-                      <div style={{ padding: '0 2rem 1.75rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.7 }}>
+                      <div style={{ padding: '0 clamp(1rem, 4vw, 2rem) clamp(1rem, 3vw, 1.75rem)', color: 'var(--text-secondary)', fontSize: '0.98rem', lineHeight: 1.65 }}>
                         {faq.a}
                       </div>
                     </div>
@@ -103,17 +105,17 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
           <div
             className="double-bezel-inner"
             style={{
-              padding: '2.5rem',
+              padding: 'clamp(1.25rem, 4vw, 2.5rem)',
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: '1.5rem',
+              gap: '1.25rem',
               background: '#FFFFFF'
             }}
           >
-            <div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
+            <div style={{ flex: '1 1 260px' }}>
+              <h3 style={{ fontSize: 'clamp(1.25rem, 3vw, 1.5rem)', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.4rem' }}>
                 Still have a question?
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
@@ -123,6 +125,7 @@ export const VisitorFaqSection: React.FC<VisitorFaqSectionProps> = ({ onOpenPlan
             <button
               onClick={onOpenPlanVisit}
               className="btn-island btn-teal"
+              style={{ width: 'auto' }}
             >
               <span>Connect With A Host</span>
               <div className="btn-icon-bubble">

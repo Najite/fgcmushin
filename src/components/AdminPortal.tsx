@@ -42,7 +42,9 @@ import type {
   PrayerRequestRow, 
   GivingRecordRow, 
   ServiceAttendanceRow, 
-  StaffUserRow 
+  StaffUserRow,
+  PastoralNoteRow,
+  AuditLogRow
 } from '../types/database';
 import { ROLE_DEFINITIONS } from '../types/iam';
 import type { ChurchRole } from '../types/iam';
@@ -60,7 +62,11 @@ import {
   getStaffUsers,
   updateStaffUser,
   getServiceAttendance,
-  logServiceAttendance
+  logServiceAttendance,
+  getPastoralNotes,
+  addPastoralNote,
+  getAuditLogs,
+  logAuditEvent
 } from '../lib/supabase';
 import './AdminPortal.css';
 
@@ -71,6 +77,7 @@ interface AdminPortalProps {
   events: ChurchEvent[];
   churchSettings: ChurchSettingsRow | null;
   onDataRefresh: () => void;
+  isStandalone?: boolean;
 }
 
 // Fallback staff directory in case of temporary network latency
@@ -138,7 +145,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   sermons,
   events,
   churchSettings,
-  onDataRefresh
+  onDataRefresh,
+  isStandalone = false
 }) => {
   // Staff Directory & Current Profile State
   const [staffUsers, setStaffUsers] = useState<StaffUserRow[]>(DEFAULT_STAFF_USERS);
@@ -155,9 +163,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [passkeyInput, setPasskeyInput] = useState('');
   const [authError, setAuthError] = useState('');
   const [selectedLoginProfileId, setSelectedLoginProfileId] = useState<string>('admin');
+  const [showDevCredentialsHelper, setShowDevCredentialsHelper] = useState(false);
 
   // Active Tab & Mobile Sidebar State
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const role = sessionStorage.getItem('fgc_staff_role');
+    if (role === 'district_overseer') return 'overseer_pulse';
+    if (role === 'resident_pastor') return 'guests';
+    if (role === 'secretariat') return 'events';
+    if (role === 'head_usher') return 'headcount_logger';
+    return 'overview';
+  });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Loading & Notification Notice
@@ -169,6 +185,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequestRow[]>([]);
   const [givingRecords, setGivingRecords] = useState<GivingRecordRow[]>([]);
   const [serviceAttendance, setServiceAttendance] = useState<ServiceAttendanceRow[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditLogRow[]>([]);
+
+  // Pastoral Care History & Notes Drawer State
+  const [activeGuestForNotes, setActiveGuestForNotes] = useState<GuestVisitRow | null>(null);
+  const [guestNotesList, setGuestNotesList] = useState<PastoralNoteRow[]>([]);
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [newNoteCategory, setNewNoteCategory] = useState<string>('follow_up');
+
+  // CMS Live Visual Preview State
+  const [sermonPreviewMode, setSermonPreviewMode] = useState(false);
 
   // Head Usher Headcount Form State
   const [attendanceForm, setAttendanceForm] = useState({
@@ -274,15 +301,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
   }, [churchSettings]);
 
-  // Load staff and attendance data
+  // Load staff, attendance, and audit logs
   const loadPortalData = useCallback(async () => {
     try {
-      const [guests, prayers, giving, loadedStaff, loadedAttendance] = await Promise.all([
+      const [guests, prayers, giving, loadedStaff, loadedAttendance, loadedAuditLogs] = await Promise.all([
         getGuestVisits(),
         getPrayerRequests(),
         getGivingRecords(),
         getStaffUsers(),
-        getServiceAttendance()
+        getServiceAttendance(),
+        getAuditLogs()
       ]);
 
       if (guests) setGuestVisits(guests);
@@ -296,9 +324,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         if (matched) {
           setCurrentUser(matched);
           setActiveRole(matched.role);
+          if (matched.role === 'district_overseer') setActiveTab(t => (t === 'overview' ? 'overseer_pulse' : t));
+          else if (matched.role === 'resident_pastor') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'guests' : t));
+          else if (matched.role === 'secretariat') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'events' : t));
+          else if (matched.role === 'head_usher') setActiveTab(t => (t === 'overview' || t === 'overseer_pulse' ? 'headcount_logger' : t));
         }
       }
       if (loadedAttendance) setServiceAttendance(loadedAttendance);
+      if (loadedAuditLogs) setAuditLogs(loadedAuditLogs);
     } catch (err) {
       console.warn('Portal data fetch warning:', err);
     }
@@ -309,6 +342,13 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       loadPortalData();
     }
   }, [isOpen, loadPortalData]);
+
+  // Draft Auto-Save to localStorage to prevent data loss from Lagos power or network interruptions
+  useEffect(() => {
+    if (isEditingSermon && !sermonForm.id && (sermonForm.title || sermonForm.summary)) {
+      localStorage.setItem('fgc_draft_sermon', JSON.stringify(sermonForm));
+    }
+  }, [isEditingSermon, sermonForm]);
 
   // Authenticate staff member
   const handleLogin = (e?: React.FormEvent) => {
@@ -344,6 +384,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       else if (matchedUser.role === 'head_usher') setActiveTab('headcount_logger');
       else setActiveTab('overview');
 
+      // Record audit event
+      logAuditEvent({
+        staff_id: matchedUser.id,
+        staff_name: matchedUser.name,
+        staff_role: matchedUser.role,
+        action: 'STAFF_LOGIN',
+        entity_type: 'AUTH',
+        details: `Authenticated into ${ROLE_DEFINITIONS[matchedUser.role].title} desk.`
+      }).then(() => loadPortalData()).catch(console.warn);
+
       showNotice(`Welcome, ${matchedUser.name} (${ROLE_DEFINITIONS[matchedUser.role].badge})`);
     } else {
       setAuthError('Invalid administrative passkey. Please check your credentials.');
@@ -351,6 +401,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   };
 
   const handleLogout = () => {
+    if (currentUser) {
+      logAuditEvent({
+        staff_id: currentUser.id,
+        staff_name: currentUser.name,
+        staff_role: currentUser.role,
+        action: 'STAFF_LOGOUT',
+        entity_type: 'AUTH',
+        details: `Signed out from ${ROLE_DEFINITIONS[currentUser.role].title} desk.`
+      }).catch(console.warn);
+    }
     setIsAuthenticated(false);
     sessionStorage.removeItem('fgc_staff_auth');
     sessionStorage.removeItem('fgc_staff_user_id');
@@ -369,6 +429,57 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     else if (targetRole === 'head_usher') setActiveTab('headcount_logger');
     else setActiveTab('overview');
     showNotice(`Switched desk view to: ${ROLE_DEFINITIONS[targetRole].title}`);
+  };
+
+  // --- Pastoral Care Interaction History Handlers ---
+  const handleOpenGuestNotes = async (guest: GuestVisitRow) => {
+    setActiveGuestForNotes(guest);
+    setLoadingNotes(true);
+    try {
+      const notes = await getPastoralNotes(guest.id);
+      setGuestNotesList(notes);
+    } catch (err) {
+      console.warn('Error fetching pastoral notes:', err);
+    } finally {
+      setLoadingNotes(false);
+    }
+  };
+
+  const handleCloseGuestNotes = () => {
+    setActiveGuestForNotes(null);
+    setGuestNotesList([]);
+    setNewNoteText('');
+  };
+
+  const handleCreatePastoralNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeGuestForNotes || !newNoteText.trim()) return;
+    setLoadingNotes(true);
+    const res = await addPastoralNote({
+      guest_id: activeGuestForNotes.id,
+      staff_id: currentUser.id,
+      staff_name: currentUser.name,
+      staff_role: currentUser.role,
+      category: newNoteCategory,
+      note: newNoteText.trim()
+    });
+    setLoadingNotes(false);
+    if (res.success) {
+      showNotice('Pastoral note recorded to guest dossier.');
+      setNewNoteText('');
+      const updatedNotes = await getPastoralNotes(activeGuestForNotes.id);
+      setGuestNotesList(updatedNotes);
+      logAuditEvent({
+        staff_id: currentUser.id,
+        staff_name: currentUser.name,
+        staff_role: currentUser.role,
+        action: 'PASTORAL_NOTE_ADDED',
+        entity_type: 'GUESTS',
+        details: `Recorded ${newNoteCategory.replace('_', ' ')} note for ${activeGuestForNotes.full_name}`
+      }).then(() => loadPortalData()).catch(console.warn);
+    } else {
+      showNotice(`Failed to record pastoral note: ${res.error}`, 'error');
+    }
   };
 
   // --- Sermon Handlers ---
@@ -392,6 +503,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     if (res.success) {
       showNotice(sermonForm.id ? 'Sermon updated successfully.' : 'New sermon published to website.');
       setIsEditingSermon(false);
+      localStorage.removeItem('fgc_draft_sermon');
+      logAuditEvent({
+        staff_id: currentUser.id,
+        staff_name: currentUser.name,
+        staff_role: currentUser.role,
+        action: sermonForm.id ? 'SERMON_UPDATED' : 'SERMON_PUBLISHED',
+        entity_type: 'SERMONS',
+        details: `Saved sermon "${sermonForm.title}" (${sermonForm.speaker})`
+      }).then(() => loadPortalData()).catch(console.warn);
       onDataRefresh();
     } else {
       showNotice(`Failed to save sermon: ${res.error}`, 'error');
@@ -405,6 +525,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     setLoading(false);
     if (res.success) {
       showNotice('Sermon removed.');
+      logAuditEvent({
+        staff_id: currentUser.id,
+        staff_name: currentUser.name,
+        staff_role: currentUser.role,
+        action: 'SERMON_DELETED',
+        entity_type: 'SERMONS',
+        details: `Deleted sermon "${title}"`
+      }).then(() => loadPortalData()).catch(console.warn);
       onDataRefresh();
     } else {
       showNotice(`Could not delete sermon: ${res.error}`, 'error');
@@ -561,11 +689,11 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   return (
     <div 
-      className="admin-portal-root modal-backdrop-animate"
-      role="dialog"
-      aria-modal="true"
+      className={isStandalone ? "admin-workspace-fullscreen" : "admin-portal-root modal-backdrop-animate"}
+      role={isStandalone ? "main" : "dialog"}
+      aria-modal={!isStandalone}
       onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+        if (!isStandalone && e.target === e.currentTarget) onClose();
       }}
     >
       {/* Toast Notice */}
@@ -658,7 +786,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       type="button"
                       onClick={() => {
                         setSelectedLoginProfileId(user.id);
-                        setPasskeyInput(user.passkey);
+                        setPasskeyInput('');
                         setAuthError('');
                       }}
                       style={{
@@ -811,18 +939,68 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </button>
             </form>
 
-            {/* Role Credential Quick Guide */}
+            {/* Enterprise Security Notice & Testing Passkey Accordion */}
             <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
-              <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
-                Assigned Role Passkeys:
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 600 }}>
+                  <Shield size={14} color="var(--fgc-blue)" />
+                  Enterprise RBAC • Protected System
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowDevCredentialsHelper(!showDevCredentialsHelper)}
+                  style={{
+                    fontSize: '0.75rem',
+                    color: 'var(--fgc-blue)',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0
+                  }}
+                >
+                  {showDevCredentialsHelper ? 'Hide Testing Keys' : 'Staff Passkey Reference (Demo)'}
+                </button>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" style={{ fontSize: '0.75rem' }}>
-                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Administrator:</span> <code style={{ color: 'var(--fgc-blue)', fontWeight: 700 }}>fgcmushin2026</code></div>
-                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Senior Pastor:</span> <code style={{ color: 'var(--fgc-gold-dark)', fontWeight: 700 }}>do2026</code></div>
-                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Resident Pastor:</span> <code style={{ color: 'var(--fgc-blue-dark)', fontWeight: 700 }}>pastor2026</code></div>
-                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Secretariat:</span> <code style={{ color: 'var(--fgc-purple-dark)', fontWeight: 700 }}>sec2026</code></div>
-                <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Head Usher:</span> <code style={{ color: 'var(--fgc-red-dark)', fontWeight: 700 }}>usher2026</code></div>
-              </div>
+
+              {showDevCredentialsHelper && (
+                <div style={{ marginTop: '0.85rem', padding: '0.85rem', background: '#F8FAFC', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>
+                    Authorized Local Testing Passkeys:
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2" style={{ fontSize: '0.75rem' }}>
+                    <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Administrator:</span> <code style={{ color: 'var(--fgc-blue)', fontWeight: 700 }}>fgcmushin2026</code></div>
+                    <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Senior Pastor:</span> <code style={{ color: 'var(--fgc-gold-dark)', fontWeight: 700 }}>do2026</code></div>
+                    <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Resident Pastor:</span> <code style={{ color: 'var(--fgc-blue-dark)', fontWeight: 700 }}>pastor2026</code></div>
+                    <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Secretariat:</span> <code style={{ color: 'var(--fgc-purple-dark)', fontWeight: 700 }}>sec2026</code></div>
+                    <div><span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Head Usher:</span> <code style={{ color: 'var(--fgc-red-dark)', fontWeight: 700 }}>usher2026</code></div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Seamless Return to Website */}
+            <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  fontSize: '0.8125rem',
+                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  cursor: 'pointer',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '9999px',
+                  background: 'rgba(0,0,0,0.03)'
+                }}
+              >
+                <ArrowLeft size={14} />
+                Return to Church Website
+              </button>
             </div>
           </div>
         </div>
@@ -927,7 +1105,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
             {/* Left Sidebar */}
             <aside 
-              className={`fixed lg:static top-16 bottom-0 left-0 w-64 bg-slate-900/95 lg:bg-slate-900/60 border-r border-slate-800 flex flex-col justify-between shrink-0 z-40 transition-transform duration-300 lg:translate-x-0 ${
+              className={`admin-sidebar fixed lg:static top-16 bottom-0 left-0 bg-slate-900/95 lg:bg-slate-900/60 border-r border-slate-800 flex flex-col justify-between shrink-0 transition-transform duration-300 lg:translate-x-0 ${
                 mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
@@ -1028,6 +1206,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       <DollarSign className="w-4 h-4" />
                       Stewardship & Giving ({givingRecords.length})
                     </button>
+                    <button
+                      onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'audit_logs' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <ClipboardList className="w-4 h-4 text-emerald-400" />
+                      Audit Trail &amp; Logs ({auditLogs.length})
+                    </button>
                   </>
                 )}
 
@@ -1078,6 +1265,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     >
                       <FileText className="w-4 h-4 text-indigo-400" />
                       Pastoral Team & Directives
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'audit_logs' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <ClipboardList className="w-4 h-4 text-emerald-400" />
+                      Audit Trail &amp; Governance ({auditLogs.length})
                     </button>
                   </>
                 )}
@@ -2092,10 +2288,33 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                   {isEditingSermon ? (
                     <form onSubmit={handleSaveSermon} className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-5">
-                      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                        <h2 className="text-base font-bold text-white">
-                          {sermonForm.id ? 'Edit Sermon Entry' : 'Publish New Sermon Message'}
-                        </h2>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-base font-bold text-white">
+                            {sermonForm.id ? 'Edit Sermon Entry' : 'Publish New Sermon Message'}
+                          </h2>
+                          <div className="inline-flex rounded-xl bg-slate-800/80 p-0.5 border border-slate-700">
+                            <button
+                              type="button"
+                              onClick={() => setSermonPreviewMode(false)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                                !sermonPreviewMode ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              Form Editor
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSermonPreviewMode(true)}
+                              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all flex items-center gap-1 ${
+                                sermonPreviewMode ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              <Eye className="w-3 h-3" />
+                              Live Card Preview
+                            </button>
+                          </div>
+                        </div>
                         <button
                           type="button"
                           onClick={() => setIsEditingSermon(false)}
@@ -2105,84 +2324,127 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         </button>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            Sermon Title *
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.title}
-                            onChange={(e) => setSermonForm({ ...sermonForm, title: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                            placeholder="e.g. Hope In The Storm"
-                            required
-                          />
+                      {sermonPreviewMode ? (
+                        <div className="sermon-live-preview-box my-4">
+                          <div className="text-center text-xs text-slate-400 mb-2">
+                            Studio Live Preview: Exact appearance of sermon on the public church portal.
+                          </div>
+                          <div className="sermon-card-mockup" style={{ maxWidth: '440px', margin: '0 auto' }}>
+                            <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
+                              <img
+                                src={sermonForm.thumbnail || '/images/sermon-series.jpg'}
+                                alt={sermonForm.title || 'Sermon Thumbnail'}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = '/images/sermon-series.jpg';
+                                }}
+                              />
+                              <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'rgba(21, 26, 33, 0.85)', backdropFilter: 'blur(8px)', color: '#FFFFFF', padding: '4px 10px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                                {sermonForm.series || 'SUNDAY CELEBRATION'}
+                              </div>
+                              <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: 'rgba(0,0,0,0.7)', color: '#FFFFFF', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontFamily: 'monospace' }}>
+                                {sermonForm.duration || '35 min'}
+                              </div>
+                            </div>
+                            <div style={{ padding: '1.25rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
+                                <span>{sermonForm.date || 'Recent'}</span>
+                                <span>•</span>
+                                <span style={{ color: 'var(--fgc-blue)', fontWeight: 600 }}>{sermonForm.passage || 'Hebrews 13:8'}</span>
+                              </div>
+                              <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3, marginBottom: '0.35rem' }}>
+                                {sermonForm.title || 'Untitled Sermon Entry'}
+                              </h3>
+                              <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+                                {sermonForm.summary || 'Summary study notes and key preaching points will be displayed here for church members.'}
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
+                                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{sermonForm.speaker || 'Preacher'}</span>
+                                <span style={{ color: 'var(--fgc-blue)', fontWeight: 700 }}>Watch Stream →</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              Sermon Title *
+                            </label>
+                            <input
+                              type="text"
+                              value={sermonForm.title}
+                              onChange={(e) => setSermonForm({ ...sermonForm, title: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                              placeholder="e.g. Hope In The Storm"
+                              required
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            Speaker *
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.speaker}
-                            onChange={(e) => setSermonForm({ ...sermonForm, speaker: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                            required
-                          />
-                        </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              Speaker *
+                            </label>
+                            <input
+                              type="text"
+                              value={sermonForm.speaker}
+                              onChange={(e) => setSermonForm({ ...sermonForm, speaker: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                              required
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            Series Name
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.series}
-                            onChange={(e) => setSermonForm({ ...sermonForm, series: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                          />
-                        </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              Series Name
+                            </label>
+                            <input
+                              type="text"
+                              value={sermonForm.series}
+                              onChange={(e) => setSermonForm({ ...sermonForm, series: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            Scripture Passage
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.passage}
-                            onChange={(e) => setSermonForm({ ...sermonForm, passage: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                            placeholder="e.g. Hebrews 13:8"
-                          />
-                        </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              Scripture Passage
+                            </label>
+                            <input
+                              type="text"
+                              value={sermonForm.passage}
+                              onChange={(e) => setSermonForm({ ...sermonForm, passage: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                              placeholder="e.g. Hebrews 13:8"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            Date Delivered
-                          </label>
-                          <input
-                            type="text"
-                            value={sermonForm.date}
-                            onChange={(e) => setSermonForm({ ...sermonForm, date: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                          />
-                        </div>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              Date Delivered
+                            </label>
+                            <input
+                              type="text"
+                              value={sermonForm.date}
+                              onChange={(e) => setSermonForm({ ...sermonForm, date: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
-                            YouTube / Video Embed URL
-                          </label>
-                          <input
-                            type="url"
-                            value={sermonForm.videoUrl}
-                            onChange={(e) => setSermonForm({ ...sermonForm, videoUrl: e.target.value })}
-                            className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
-                            placeholder="https://www.youtube.com/watch?v=..."
-                          />
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                              YouTube / Video Embed URL
+                            </label>
+                            <input
+                              type="url"
+                              value={sermonForm.videoUrl}
+                              onChange={(e) => setSermonForm({ ...sermonForm, videoUrl: e.target.value })}
+                              className="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white text-xs focus:border-amber-400 focus:outline-none"
+                              placeholder="https://www.youtube.com/watch?v=..."
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
@@ -2578,6 +2840,14 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                                       <Mail className="w-4 h-4" />
                                     </a>
                                     <button
+                                      onClick={() => handleOpenGuestNotes(guest)}
+                                      className="p-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/30 text-amber-500 border border-amber-500/30 transition-colors flex items-center gap-1 text-[11px] font-bold"
+                                      title="Pastoral Notes & History"
+                                    >
+                                      <FileText className="w-3.5 h-3.5" />
+                                      <span>Notes</span>
+                                    </button>
+                                    <button
                                       onClick={() => handleUpdateGuest(guest.id, guest.status === 'welcomed' ? 'pending' : 'welcomed')}
                                       className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-[11px] font-bold text-slate-300 transition-colors"
                                     >
@@ -2592,6 +2862,144 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </tbody>
                     </table>
                   </div>
+
+                  {/* Slide-Over Pastoral Care Interaction Drawer */}
+                  {activeGuestForNotes && (
+                    <div className="pastoral-drawer-backdrop" onClick={handleCloseGuestNotes}>
+                      <div className="pastoral-drawer" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                                Pastoral Care Dossier
+                              </span>
+                              <span className="text-xs text-slate-400 font-mono">
+                                Visit: {activeGuestForNotes.created_at ? new Date(activeGuestForNotes.created_at).toLocaleDateString() : 'Recent'}
+                              </span>
+                            </div>
+                            <h2 className="text-lg font-black text-white">{activeGuestForNotes.full_name}</h2>
+                            <div className="text-xs text-slate-400 mt-0.5">
+                              {activeGuestForNotes.service_time} • {activeGuestForNotes.adults_count || 1} adults
+                            </div>
+                          </div>
+                          <button
+                            onClick={handleCloseGuestNotes}
+                            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Direct Contact Channels Strip */}
+                        <div className="p-4 bg-slate-950/70 border-b border-slate-800 flex items-center justify-between text-xs">
+                          <div>
+                            <div className="text-slate-200 font-semibold">{activeGuestForNotes.email}</div>
+                            <div className="text-slate-400 font-mono mt-0.5">{activeGuestForNotes.phone || 'No phone'}</div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {activeGuestForNotes.phone && (
+                              <a
+                                href={`tel:${activeGuestForNotes.phone}`}
+                                className="p-2 rounded-xl bg-sky-500/15 text-sky-400 hover:bg-sky-500/25 transition-colors"
+                                title="Direct Phone Call"
+                              >
+                                <Phone className="w-4 h-4" />
+                              </a>
+                            )}
+                            <a
+                              href={`mailto:${activeGuestForNotes.email}`}
+                              className="p-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors"
+                              title="Send Email"
+                            >
+                              <Mail className="w-4 h-4" />
+                            </a>
+                          </div>
+                        </div>
+
+                        {/* Existing Notes Stream */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center justify-between">
+                            <span>Pastoral Care History ({guestNotesList.length})</span>
+                            {loadingNotes && <span className="text-amber-400 text-[10px]">Loading...</span>}
+                          </div>
+
+                          {guestNotesList.length === 0 ? (
+                            <div className="p-6 text-center text-xs text-slate-500 bg-slate-900/60 rounded-2xl border border-slate-800">
+                              <ClipboardList className="w-8 h-8 text-slate-600 mx-auto mb-2 opacity-60" />
+                              No pastoral interaction notes recorded yet.
+                              <div className="text-[11px] text-slate-600 mt-1">Record the first follow-up call, counseling, or home visitation below.</div>
+                            </div>
+                          ) : (
+                            guestNotesList.map((note) => (
+                              <div key={note.id} className="pastoral-note-item bg-slate-900/90 border border-slate-800 p-3 rounded-2xl">
+                                <div className="flex items-center justify-between gap-2 mb-1.5 text-xs">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-bold text-white">{note.staff_name}</span>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold uppercase">
+                                      {(ROLE_DEFINITIONS[note.staff_role as ChurchRole] || ROLE_DEFINITIONS.admin).badge}
+                                    </span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-500 font-mono">
+                                    {note.created_at ? new Date(note.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : ''}
+                                  </span>
+                                </div>
+                                <div className="inline-block px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-400 text-[10px] font-bold uppercase tracking-wider mb-2">
+                                  {(note.category || 'general').replace('_', ' ')}
+                                </div>
+                                <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-wrap">
+                                  {note.note}
+                                </p>
+                              </div>
+                            ))
+                          )}
+                        </div>
+
+                        {/* Record New Note Form */}
+                        <form onSubmit={handleCreatePastoralNote} className="p-4 border-t border-slate-800 bg-slate-900/95 space-y-3">
+                          <div>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                              Encounter Category
+                            </label>
+                            <select
+                              value={newNoteCategory}
+                              onChange={(e) => setNewNoteCategory(e.target.value)}
+                              className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                            >
+                              <option value="follow_up">Follow-Up Phone Call</option>
+                              <option value="visitation">Home / Office Visitation</option>
+                              <option value="counseling">Pastoral Counseling Session</option>
+                              <option value="prayer_request">Special Prayer Intercession</option>
+                              <option value="ministry_joined">Inducted into Ministry / Fellowship</option>
+                              <option value="other">General Pastoral Observation</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                              Pastoral Observations &amp; Next Steps
+                            </label>
+                            <textarea
+                              rows={3}
+                              value={newNoteText}
+                              onChange={(e) => setNewNoteText(e.target.value)}
+                              placeholder="Record summary of conversation, prayer needs, family background, or spiritual commitments..."
+                              className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-amber-400"
+                              required
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={loadingNotes || !newNoteText.trim()}
+                            className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span>{loadingNotes ? 'Recording...' : 'Record Pastoral Note'}</span>
+                          </button>
+                        </form>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -2811,6 +3219,85 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       </button>
                     </div>
                   </form>
+                </div>
+              )}
+
+              {/* ---------------------------------------------------- */}
+              {/* TAB: AUDIT LOGS & GOVERNANCE LEDGER                  */}
+              {/* ---------------------------------------------------- */}
+              {activeTab === 'audit_logs' && (
+                <div className="space-y-6 max-w-7xl mx-auto">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h1 className="text-2xl font-black text-white">Immutable Administrative Audit Trail</h1>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Cryptographic operational ledger recording staff logins, CMS modifications, pastoral care encounters, and policy updates.
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span className="text-xs font-bold text-slate-400">{auditLogs.length} Events Logged</span>
+                    </div>
+                  </div>
+
+                  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+                          <th className="py-3 px-4">Timestamp</th>
+                          <th className="py-3 px-4">Staff Officer</th>
+                          <th className="py-3 px-4">Role Desk</th>
+                          <th className="py-3 px-4">Action</th>
+                          <th className="py-3 px-4">Entity</th>
+                          <th className="py-3 px-4">Audit Details</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60">
+                        {auditLogs.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="py-6 text-center text-slate-500">
+                              No audit events recorded yet.
+                            </td>
+                          </tr>
+                        ) : (
+                          auditLogs.map((log) => {
+                            const badgeClass = log.action.includes('DELETE') 
+                              ? 'audit-badge delete' 
+                              : log.action.includes('LOGIN') || log.action.includes('PUBLISHED') || log.action.includes('ADDED')
+                              ? 'audit-badge insert'
+                              : 'audit-badge update';
+
+                            return (
+                              <tr key={log.id} className="hover:bg-slate-800/30">
+                                <td className="py-3 px-4 text-slate-400 font-mono text-[11px] whitespace-nowrap">
+                                  {log.created_at ? new Date(log.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—'}
+                                </td>
+                                <td className="py-3 px-4 font-bold text-white whitespace-nowrap">
+                                  {log.staff_name}
+                                </td>
+                                <td className="py-3 px-4 whitespace-nowrap">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">
+                                    {(ROLE_DEFINITIONS[log.staff_role as ChurchRole] || ROLE_DEFINITIONS.admin).badge}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4 whitespace-nowrap">
+                                  <span className={badgeClass}>
+                                    {log.action}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-4 font-mono text-[11px] text-slate-400 whitespace-nowrap">
+                                  {log.entity_type}
+                                </td>
+                                <td className="py-3 px-4 text-slate-300 text-xs">
+                                  {log.details}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </main>
