@@ -15,7 +15,8 @@ import {
   Sparkles,
   TrendingUp,
   UserCheck,
-  Users
+  Users,
+  Wallet
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type {
@@ -23,7 +24,8 @@ import type {
   PrayerRequestRow,
   ServiceAttendanceRow,
   StaffUserRow,
-  AuditLogRow
+  AuditLogRow,
+  ChurchFinanceRow
 } from '../types/database';
 import { ROLE_DEFINITIONS } from '../types/iam';
 
@@ -36,6 +38,7 @@ export interface AdminDashboardProps {
   sermons: Sermon[];
   events: ChurchEvent[];
   auditLogs: AuditLogRow[];
+  finances?: ChurchFinanceRow[];
   onSetActiveTab: (tab: string) => void;
   onOpenSermonModal: () => void;
 }
@@ -130,6 +133,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           >
             <Shield className="w-4 h-4" />
             Manage Staff IAM
+          </button>
+          <button
+            onClick={() => onSetActiveTab('attendance')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Activity className="w-4 h-4 text-emerald-400" />
+            Attendance Telemetry
+          </button>
+          <button
+            onClick={() => onSetActiveTab('finances')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Wallet className="w-4 h-4 text-amber-400" />
+            Treasury &amp; Finances
           </button>
           <button
             onClick={() => onSetActiveTab('sermons')}
@@ -245,6 +262,7 @@ export interface DistrictOverseerDashboardProps {
   prayerRequests: PrayerRequestRow[];
   sermons: Sermon[];
   staffUsers: StaffUserRow[];
+  finances?: ChurchFinanceRow[];
   onSetActiveTab: (tab: string) => void;
 }
 
@@ -253,9 +271,18 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
   serviceAttendance,
   prayerRequests,
   sermons,
-  staffUsers,
+  staffUsers: _staffUsers,
+  finances = [],
   onSetActiveTab
 }) => {
+  const totalFinancesInflow = finances
+    .filter(f => f.transaction_type === 'inflow')
+    .reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+  const totalFinancesOutflow = finances
+    .filter(f => f.transaction_type === 'outflow')
+    .reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+  const netReserve = totalFinancesInflow - totalFinancesOutflow;
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* DO Header */}
@@ -305,6 +332,19 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 mb-2">
+            <span className="text-xs font-semibold uppercase tracking-wider">Treasury Inflows</span>
+            <Wallet className="w-4 h-4 text-emerald-400" />
+          </div>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
+            ₦{totalFinancesInflow > 0 ? (totalFinancesInflow / 1000000).toFixed(2) + 'M' : '—'}
+          </div>
+          <div className="text-[11px] text-slate-400 mt-1 font-medium">
+            Reserve: <span className="text-white font-mono">₦{netReserve > 0 ? (netReserve / 1000000).toFixed(2) + 'M' : '—'}</span>
+          </div>
+        </div>
+
+        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between text-slate-400 mb-2">
             <span className="text-xs font-semibold uppercase tracking-wider">Pastoral Intercessions</span>
             <Heart className="w-4 h-4 text-rose-400" />
           </div>
@@ -320,15 +360,6 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
           <div className="text-2xl sm:text-3xl font-black text-white">{sermons.length}</div>
           <div className="text-[11px] text-sky-400 mt-1 font-medium">Recorded sermon studies</div>
         </div>
-
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-sm">
-          <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-semibold uppercase tracking-wider">Pastoral Team</span>
-            <Users className="w-4 h-4 text-amber-400" />
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-white">{staffUsers.length}</div>
-          <div className="text-[11px] text-slate-400 mt-1">Department officers active</div>
-        </div>
       </div>
 
       {/* Overseer Dispatch Bar */}
@@ -340,23 +371,30 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
           </div>
           <h3 className="text-lg font-bold text-white">District Pastoral Shepherding &amp; Pulpit Ministry</h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Review confidential prayer care requests, inspect Sunday service attendance, and issue directives to department heads.
+            Review confidential prayer requests, inspect Sunday &amp; Midweek attendance telemetry, and supervise treasury inflows.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => onSetActiveTab('prayers')}
-            className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+            onClick={() => onSetActiveTab('finances')}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <Heart className="w-4 h-4 text-rose-400" />
-            Pastoral Prayers ({prayerRequests.length})
+            <Wallet className="w-4 h-4 text-emerald-400" />
+            Treasury &amp; Finance ({totalFinancesInflow > 0 ? `₦${(totalFinancesInflow / 1000000).toFixed(1)}M` : 'Ledger'})
           </button>
           <button
             onClick={() => onSetActiveTab('attendance')}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <TrendingUp className="w-4 h-4 text-emerald-400" />
-            Attendance Pulse
+            Attendance Telemetry
+          </button>
+          <button
+            onClick={() => onSetActiveTab('prayers')}
+            className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Heart className="w-4 h-4 text-rose-400" />
+            Pastoral Prayers ({prayerRequests.length})
           </button>
           <button
             onClick={() => onSetActiveTab('overseer_directives')}
@@ -370,18 +408,18 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
 
       {/* 2-Column Overseer Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Col 1: Sunday Service Headcount Breakdown Table */}
+        {/* Col 1: Sunday & Midweek Headcount Breakdown Table */}
         <div className="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <h3 className="text-sm font-bold text-white">Sunday Attendance Breakdown</h3>
+              <h3 className="text-sm font-bold text-white">Attendance Pulse (Sunday &amp; Midweek)</h3>
             </div>
             <button
               onClick={() => onSetActiveTab('attendance')}
               className="text-xs text-amber-400 hover:underline font-semibold"
             >
-              All Logs →
+              Full Telemetry →
             </button>
           </div>
           <div className="overflow-x-auto">
@@ -396,18 +434,33 @@ export const DistrictOverseerDashboard: React.FC<DistrictOverseerDashboardProps>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {serviceAttendance.slice(0, 3).map((rec) => (
-                  <tr key={rec.id} className="hover:bg-slate-800/30">
-                    <td className="py-2.5 px-2">
-                      <div className="font-semibold text-white">{rec.service_name}</div>
-                      <div className="text-[10px] text-slate-400">{rec.service_date}</div>
-                    </td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.men_count}</td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.women_count}</td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.children_count}</td>
-                    <td className="py-2.5 px-2 text-right font-bold text-emerald-400">{rec.total_count}</td>
-                  </tr>
-                ))}
+                {serviceAttendance.slice(0, 5).map((rec) => {
+                  const st = (rec.service_type || 'sunday_service').toLowerCase();
+                  const isPrayer = st.includes('prayer');
+                  const isBible = st.includes('bible') || st.includes('study');
+                  const badgeText = isPrayer ? 'Prayer' : isBible ? 'Study' : 'Sunday';
+                  const badgeClass = isPrayer
+                    ? 'bg-sky-500/15 text-sky-400 border-sky-500/30'
+                    : isBible
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+
+                  return (
+                    <tr key={rec.id} className="hover:bg-slate-800/30">
+                      <td className="py-2.5 px-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-white">{rec.service_name}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${badgeClass}`}>{badgeText}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">{rec.service_date}</div>
+                      </td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.men_count}</td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.women_count}</td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.children_count}</td>
+                      <td className="py-2.5 px-2 text-right font-bold text-emerald-400">{rec.total_count}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -464,6 +517,8 @@ export interface ResidentPastorDashboardProps {
   prayerRequests: PrayerRequestRow[];
   guestVisits: GuestVisitRow[];
   sermons: Sermon[];
+  serviceAttendance?: ServiceAttendanceRow[];
+  finances?: ChurchFinanceRow[];
   onSetActiveTab: (tab: string) => void;
   onOpenGuestNotes: (guest: GuestVisitRow) => void;
 }
@@ -473,6 +528,8 @@ export const ResidentPastorDashboard: React.FC<ResidentPastorDashboardProps> = (
   prayerRequests,
   guestVisits,
   sermons,
+  serviceAttendance: _serviceAttendance = [],
+  finances: _finances = [],
   onSetActiveTab,
   onOpenGuestNotes
 }) => {
@@ -546,7 +603,7 @@ export const ResidentPastorDashboard: React.FC<ResidentPastorDashboardProps> = (
           </div>
           <h3 className="text-lg font-bold text-white">Flock Assimilation &amp; Pastoral Counseling</h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Follow up with first-time worshipers, log pastoral counseling notes, and pray for congregant petitions.
+            Follow up with first-time worshipers, inspect midweek prayer &amp; study attendance, and oversee pastoral welfare.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -558,18 +615,25 @@ export const ResidentPastorDashboard: React.FC<ResidentPastorDashboardProps> = (
             First-Time Guest Care ({guestVisits.length})
           </button>
           <button
+            onClick={() => onSetActiveTab('attendance')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Activity className="w-4 h-4 text-emerald-400" />
+            Attendance Telemetry
+          </button>
+          <button
+            onClick={() => onSetActiveTab('finances')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Wallet className="w-4 h-4 text-amber-400" />
+            Welfare &amp; Treasury
+          </button>
+          <button
             onClick={() => onSetActiveTab('prayers')}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Heart className="w-4 h-4 text-rose-400" />
             Pastoral Counseling
-          </button>
-          <button
-            onClick={() => onSetActiveTab('attendance')}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <Activity className="w-4 h-4 text-emerald-400" />
-            Attendance Logs
           </button>
         </div>
       </div>
@@ -808,18 +872,33 @@ export const HeadUsherDashboard: React.FC<HeadUsherDashboardProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {serviceAttendance.slice(0, 4).map((rec) => (
-                  <tr key={rec.id} className="hover:bg-slate-800/30">
-                    <td className="py-2.5 px-2">
-                      <div className="font-semibold text-white">{rec.service_name}</div>
-                      <div className="text-[10px] text-slate-400">{rec.service_date}</div>
-                    </td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.men_count}</td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.women_count}</td>
-                    <td className="py-2.5 px-2 text-right text-slate-300">{rec.children_count}</td>
-                    <td className="py-2.5 px-2 text-right font-bold text-emerald-400">{rec.total_count}</td>
-                  </tr>
-                ))}
+                {serviceAttendance.slice(0, 5).map((rec) => {
+                  const st = (rec.service_type || 'sunday_service').toLowerCase();
+                  const isPrayer = st.includes('prayer');
+                  const isBible = st.includes('bible') || st.includes('study');
+                  const badgeText = isPrayer ? 'Prayer' : isBible ? 'Study' : 'Sunday';
+                  const badgeClass = isPrayer
+                    ? 'bg-sky-500/15 text-sky-400 border-sky-500/30'
+                    : isBible
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/15 text-amber-400 border-amber-500/30';
+
+                  return (
+                    <tr key={rec.id} className="hover:bg-slate-800/30">
+                      <td className="py-2.5 px-2">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-semibold text-white">{rec.service_name}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${badgeClass}`}>{badgeText}</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">{rec.service_date}</div>
+                      </td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.men_count}</td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.women_count}</td>
+                      <td className="py-2.5 px-2 text-right text-slate-300">{rec.children_count}</td>
+                      <td className="py-2.5 px-2 text-right font-bold text-emerald-400">{rec.total_count}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -873,6 +952,8 @@ export interface SecretariatDashboardProps {
   totalRecentSundayHeadcount: number;
   guestVisits: GuestVisitRow[];
   events: ChurchEvent[];
+  serviceAttendance?: ServiceAttendanceRow[];
+  finances?: ChurchFinanceRow[];
   onSetActiveTab: (tab: string) => void;
   onOpenEventModal: () => void;
 }
@@ -881,6 +962,8 @@ export const SecretariatDashboard: React.FC<SecretariatDashboardProps> = ({
   totalRecentSundayHeadcount,
   guestVisits,
   events,
+  serviceAttendance: _serviceAttendance = [],
+  finances: _finances = [],
   onSetActiveTab,
   onOpenEventModal
 }) => {
@@ -954,7 +1037,7 @@ export const SecretariatDashboard: React.FC<SecretariatDashboardProps> = ({
           </div>
           <h3 className="text-lg font-bold text-white">Registry, Visitor Intake &amp; Public Announcements</h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            Process first-time guest intake forms, coordinate district calendar programs, and broadcast official announcements.
+            Process first-time guest intake forms, coordinate district calendar programs, record attendance and financial intakes.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -966,10 +1049,24 @@ export const SecretariatDashboard: React.FC<SecretariatDashboardProps> = ({
             Guest Intake Registry
           </button>
           <button
+            onClick={() => onSetActiveTab('attendance')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Activity className="w-4 h-4 text-emerald-400" />
+            Attendance Records
+          </button>
+          <button
+            onClick={() => onSetActiveTab('finances')}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+          >
+            <Wallet className="w-4 h-4 text-amber-400" />
+            Treasury &amp; Collections
+          </button>
+          <button
             onClick={() => onSetActiveTab('events')}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <Calendar className="w-4 h-4 text-emerald-400" />
+            <Calendar className="w-4 h-4 text-sky-400" />
             Calendar &amp; Events
           </button>
           <button

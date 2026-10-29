@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow, ServiceAttendanceRow, StaffUserRow, PastoralNoteRow, AuditLogRow } from '../types/database';
+import type { Database, SermonRow, EventRow, MinistryRow, ChurchSettingsRow, GuestVisitRow, PrayerRequestRow, GivingRecordRow, ChurchFinanceRow, ServiceAttendanceRow, StaffUserRow, PastoralNoteRow, AuditLogRow } from '../types/database';
 import type { Sermon, ChurchEvent, Ministry } from '../types';
 
 const supabaseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 'https://tmjuucclnumavnbyukmf.supabase.co';
@@ -464,11 +464,68 @@ export async function getServiceAttendance(): Promise<ServiceAttendanceRow[]> {
 }
 
 /**
+ * Fetch church finances records (inflows and outflows)
+ */
+export async function getChurchFinances(): Promise<ChurchFinanceRow[]> {
+  try {
+    const { data, error } = await supabase
+      .from('church_finances')
+      .select('*')
+      .order('transaction_date', { ascending: false });
+
+    if (error) {
+      console.warn('Error fetching church_finances:', error.message);
+      return [];
+    }
+    return (data as unknown as ChurchFinanceRow[]) || [];
+  } catch (err) {
+    console.warn('Network error fetching church_finances:', err);
+    return [];
+  }
+}
+
+/**
+ * Log new financial transaction (Income or Expense)
+ */
+export async function logFinancialTransaction(entry: {
+  transaction_date: string;
+  transaction_type: 'inflow' | 'outflow';
+  category: string;
+  amount: number;
+  payment_method?: string;
+  donor_or_payee?: string;
+  reference_code?: string;
+  notes?: string;
+  recorded_by?: string;
+}): Promise<{ success: boolean; data?: ChurchFinanceRow; error?: string }> {
+  try {
+    const { data, error } = await supabase.from('church_finances').insert({
+      transaction_date: entry.transaction_date,
+      transaction_type: entry.transaction_type,
+      category: entry.category,
+      amount: entry.amount,
+      payment_method: entry.payment_method || 'bank_transfer',
+      donor_or_payee: entry.donor_or_payee || null,
+      reference_code: entry.reference_code || `TXN-${Date.now().toString().slice(-6)}`,
+      notes: entry.notes || null,
+      recorded_by: entry.recorded_by || 'Secretariat & Accounts'
+    }).select().single();
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, data: data as unknown as ChurchFinanceRow };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { success: false, error: message };
+  }
+}
+
+/**
  * Log new service attendance (Head Usher & Protocol)
  */
 export async function logServiceAttendance(entry: {
   service_date: string;
   service_name: string;
+  service_type?: string;
   men_count: number;
   women_count: number;
   children_count: number;
@@ -479,6 +536,7 @@ export async function logServiceAttendance(entry: {
     const { error } = await supabase.from('service_attendance').insert({
       service_date: entry.service_date,
       service_name: entry.service_name,
+      service_type: entry.service_type || 'sunday_service',
       men_count: entry.men_count,
       women_count: entry.women_count,
       children_count: entry.children_count,

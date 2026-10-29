@@ -6,7 +6,6 @@ import {
   BookOpen,
   Users,
   Heart,
-  DollarSign,
   Settings,
   Plus,
   Trash2,
@@ -32,18 +31,19 @@ import {
   Activity,
   ClipboardList,
   Bell,
-  Key
+  Key,
+  Wallet
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type { 
   ChurchSettingsRow, 
   GuestVisitRow, 
   PrayerRequestRow, 
-  GivingRecordRow, 
   ServiceAttendanceRow, 
   StaffUserRow,
   PastoralNoteRow,
-  AuditLogRow
+  AuditLogRow,
+  ChurchFinanceRow
 } from '../types/database';
 import { ROLE_DEFINITIONS } from '../types/iam';
 import type { ChurchRole } from '../types/iam';
@@ -54,6 +54,8 @@ import {
   HeadUsherDashboard,
   SecretariatDashboard
 } from './RoleDashboards';
+import { FinancialAnalytics } from './FinancialAnalytics';
+import { AttendanceAnalytics } from './AttendanceAnalytics';
 import {
   saveSermon,
   deleteSermon,
@@ -62,7 +64,7 @@ import {
   updateChurchSettings,
   getGuestVisits,
   getPrayerRequests,
-  getGivingRecords,
+  getChurchFinances,
   updatePrayerStatus,
   updateGuestVisitStatus,
   getStaffUsers,
@@ -177,12 +179,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   // Loading & Notification Notice
   const [loading, setLoading] = useState(false);
-  const [notice, setNotice] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [notice, setNotice] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Live Operational Data
   const [guestVisits, setGuestVisits] = useState<GuestVisitRow[]>([]);
   const [prayerRequests, setPrayerRequests] = useState<PrayerRequestRow[]>([]);
-  const [givingRecords, setGivingRecords] = useState<GivingRecordRow[]>([]);
+  const [finances, setFinances] = useState<ChurchFinanceRow[]>([]);
   const [serviceAttendance, setServiceAttendance] = useState<ServiceAttendanceRow[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogRow[]>([]);
 
@@ -282,7 +284,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [showPasskeys, setShowPasskeys] = useState<Record<string, boolean>>({});
 
   // Show temporary feedback toast
-  const showNotice = (message: string, type: 'success' | 'error' = 'success') => {
+  const showNotice = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setNotice({ message, type });
     setTimeout(() => setNotice(null), 4000);
   };
@@ -300,21 +302,21 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
     }
   }, [churchSettings]);
 
-  // Load staff, attendance, and audit logs
+  // Load staff, attendance, finances, and audit logs
   const loadPortalData = useCallback(async () => {
     try {
-      const [guests, prayers, giving, loadedStaff, loadedAttendance, loadedAuditLogs] = await Promise.all([
+      const [guests, prayers, loadedStaff, loadedAttendance, loadedAuditLogs, loadedFinances] = await Promise.all([
         getGuestVisits(),
         getPrayerRequests(),
-        getGivingRecords(),
         getStaffUsers(),
         getServiceAttendance(),
-        getAuditLogs()
+        getAuditLogs(),
+        getChurchFinances()
       ]);
 
       if (guests) setGuestVisits(guests);
       if (prayers) setPrayerRequests(prayers);
-      if (giving) setGivingRecords(giving);
+      if (loadedFinances) setFinances(loadedFinances);
       if (loadedStaff && loadedStaff.length > 0) {
         setStaffUsers(loadedStaff);
         // Sync active user if already stored in session
@@ -713,12 +715,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
         <div 
           className="fixed top-5 right-6 z-[999] px-4 py-3 rounded-xl border shadow-xl flex items-center gap-3 animate-fade-in"
           style={{
-            background: notice.type === 'success' ? '#ECFDF5' : '#FFF1F2',
-            borderColor: notice.type === 'success' ? '#10B981' : '#ED3B41',
-            color: notice.type === 'success' ? '#065F46' : '#9F1239'
+            background: notice.type === 'success' ? '#ECFDF5' : notice.type === 'info' ? '#EFF6FF' : '#FFF1F2',
+            borderColor: notice.type === 'success' ? '#10B981' : notice.type === 'info' ? '#3B82F6' : '#ED3B41',
+            color: notice.type === 'success' ? '#065F46' : notice.type === 'info' ? '#1E40AF' : '#9F1239'
           }}
         >
-          {notice.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <AlertCircle className="w-5 h-5 text-rose-500" />}
+          {notice.type === 'success' ? (
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+          ) : notice.type === 'info' ? (
+            <Sparkles className="w-5 h-5 text-blue-500" />
+          ) : (
+            <AlertCircle className="w-5 h-5 text-rose-500" />
+          )}
           <span className="text-sm font-semibold">{notice.message}</span>
         </div>
       )}
@@ -1266,17 +1274,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                         activeTab === 'attendance' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <Activity className="w-4 h-4" />
-                      Service Attendance
+                      <Activity className="w-4 h-4 text-emerald-400" />
+                      Attendance Telemetry (Sun/Wed/Thu)
                     </button>
                     <button
-                      onClick={() => { setActiveTab('giving'); setMobileSidebarOpen(false); }}
+                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'giving' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
                       }`}
                     >
-                      <DollarSign className="w-4 h-4" />
-                      Stewardship & Giving ({givingRecords.length})
+                      <Wallet className="w-4 h-4 text-amber-400" />
+                      Treasury &amp; Financial Analytics
                     </button>
                     <button
                       onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
@@ -1300,7 +1308,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <Award className="w-4 h-4 text-amber-400" />
-                      Overseer Study & Dashboard
+                      Overseer Study &amp; Dashboard
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Wallet className="w-4 h-4 text-emerald-400" />
+                      Treasury &amp; Finance Oversight
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'attendance' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Activity className="w-4 h-4 text-amber-400" />
+                      Multi-Service Attendance Pulse
                     </button>
                     <button
                       onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
@@ -1318,16 +1344,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <BookOpen className="w-4 h-4 text-sky-400" />
-                      Preaching Roster & Series
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-emerald-400" />
-                      Sunday Headcount Pulse
+                      Preaching Roster &amp; Series
                     </button>
                     <button
                       onClick={() => { setActiveTab('overseer_directives'); setMobileSidebarOpen(false); }}
@@ -1336,7 +1353,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <FileText className="w-4 h-4 text-indigo-400" />
-                      Pastoral Team & Directives
+                      Pastoral Team &amp; Directives
                     </button>
                     <button
                       onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
@@ -1360,7 +1377,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <Heart className="w-4 h-4 text-sky-400" />
-                      Shepherding & Care Dashboard
+                      Shepherding &amp; Care Dashboard
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'attendance' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Activity className="w-4 h-4 text-emerald-400" />
+                      Service Attendance (Sun/Wed/Thu)
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Wallet className="w-4 h-4 text-emerald-400" />
+                      Stewardship &amp; Welfare Treasury
                     </button>
                     <button
                       onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
@@ -1378,7 +1413,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <Heart className="w-4 h-4 text-rose-400" />
-                      Pastoral Counseling & Prayers ({prayerRequests.length})
+                      Pastoral Counseling &amp; Prayers ({prayerRequests.length})
                     </button>
                     <button
                       onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
@@ -1387,16 +1422,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <BookOpen className="w-4 h-4 text-amber-400" />
-                      Sermon Recordings & Study ({sermons.length})
-                    </button>
-                    <button
-                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
-                        activeTab === 'attendance' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                      }`}
-                    >
-                      <Activity className="w-4 h-4 text-emerald-400" />
-                      Attendance Logs
+                      Sermon Recordings &amp; Study ({sermons.length})
                     </button>
                   </>
                 )}
@@ -1411,7 +1437,25 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <ClipboardList className="w-4 h-4 text-emerald-400" />
-                      Secretariat & Registry Dashboard
+                      Secretariat &amp; Registry Dashboard
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        (activeTab === 'finances' || activeTab === 'giving') ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Wallet className="w-4 h-4 text-emerald-400" />
+                      Treasury &amp; Collections Ledger
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+                        activeTab === 'attendance' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                      }`}
+                    >
+                      <Activity className="w-4 h-4 text-amber-400" />
+                      Official Attendance Registry
                     </button>
                     <button
                       onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
@@ -1420,7 +1464,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       }`}
                     >
                       <Calendar className="w-4 h-4 text-emerald-400" />
-                      Events & Church Calendar ({events.length})
+                      Events &amp; Church Calendar ({events.length})
                     </button>
                     <button
                       onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
@@ -1511,6 +1555,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       sermons={sermons}
                       events={events}
                       auditLogs={auditLogs}
+                      finances={finances}
                       onSetActiveTab={setActiveTab}
                       onOpenSermonModal={() => {
                         setSermonForm({
@@ -1538,6 +1583,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       prayerRequests={prayerRequests}
                       sermons={sermons}
                       staffUsers={staffUsers}
+                      finances={finances}
                       onSetActiveTab={setActiveTab}
                     />
                   )}
@@ -1548,6 +1594,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       prayerRequests={prayerRequests}
                       guestVisits={guestVisits}
                       sermons={sermons}
+                      serviceAttendance={serviceAttendance}
+                      finances={finances}
                       onSetActiveTab={setActiveTab}
                       onOpenGuestNotes={handleOpenGuestNotes}
                     />
@@ -1568,6 +1616,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       totalRecentSundayHeadcount={totalRecentSundayHeadcount}
                       guestVisits={guestVisits}
                       events={events}
+                      serviceAttendance={serviceAttendance}
+                      finances={finances}
                       onSetActiveTab={setActiveTab}
                       onOpenEventModal={() => {
                         setEventForm({
@@ -1594,6 +1644,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   prayerRequests={prayerRequests}
                   sermons={sermons}
                   staffUsers={staffUsers}
+                  finances={finances}
                   onSetActiveTab={setActiveTab}
                 />
               )}
@@ -1912,65 +1963,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               )}
 
               {/* ---------------------------------------------------- */}
-              {/* TAB: SERVICE ATTENDANCE TELEMETRY                    */}
+              {/* TAB: SERVICE ATTENDANCE & CONGREGATION TELEMETRY     */}
               {/* ---------------------------------------------------- */}
               {activeTab === 'attendance' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                      <h1 className="text-2xl font-black text-white">Sunday Service Attendance Telemetry</h1>
-                      <p className="text-xs text-slate-400 mt-1">Verified headcount records submitted by Head Usher and Protocol.</p>
-                    </div>
-                    {activeRole === 'head_usher' && (
-                      <button
-                        onClick={() => setActiveTab('headcount_logger')}
-                        className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1.5"
-                      >
-                        <Plus className="w-4 h-4" />
-                        Log New Headcount
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
-                          <th className="py-3 px-4">Date</th>
-                          <th className="py-3 px-4">Service</th>
-                          <th className="py-3 px-4 text-right">Men</th>
-                          <th className="py-3 px-4 text-right">Women</th>
-                          <th className="py-3 px-4 text-right">Children</th>
-                          <th className="py-3 px-4 text-right font-bold text-white">Total</th>
-                          <th className="py-3 px-4">Head Usher</th>
-                          <th className="py-3 px-4">Notes</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/60">
-                        {serviceAttendance.length === 0 ? (
-                          <tr>
-                            <td colSpan={8} className="py-6 text-center text-slate-500">
-                              No service attendance logged yet.
-                            </td>
-                          </tr>
-                        ) : (
-                          serviceAttendance.map((rec) => (
-                            <tr key={rec.id} className="hover:bg-slate-800/30">
-                              <td className="py-3 px-4 text-slate-300 font-mono">{rec.service_date}</td>
-                              <td className="py-3 px-4 text-white font-semibold">{rec.service_name}</td>
-                              <td className="py-3 px-4 text-right text-slate-300">{rec.men_count}</td>
-                              <td className="py-3 px-4 text-right text-slate-300">{rec.women_count}</td>
-                              <td className="py-3 px-4 text-right text-slate-300">{rec.children_count}</td>
-                              <td className="py-3 px-4 text-right font-bold text-emerald-400 text-sm">{rec.total_count}</td>
-                              <td className="py-3 px-4 text-slate-400">{rec.head_usher_name || 'Bro. Emmanuel Kalu'}</td>
-                              <td className="py-3 px-4 text-slate-400 text-[11px] max-w-xs">{rec.notes || '—'}</td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                <AttendanceAnalytics
+                  attendanceList={serviceAttendance}
+                  activeRole={activeRole}
+                  onRefresh={loadPortalData}
+                  onShowNotice={showNotice}
+                />
               )}
 
               {/* ---------------------------------------------------- */}
@@ -3070,54 +3071,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               )}
 
               {/* ---------------------------------------------------- */}
-              {/* TAB: GIVING RECORDS (ADMIN & OVERSEER ONLY)          */}
+              {/* TAB: TREASURY & FINANCIAL ANALYTICS                  */}
               {/* ---------------------------------------------------- */}
-              {activeTab === 'giving' && (
-                <div className="space-y-6 max-w-7xl mx-auto">
-                  <div>
-                    <h1 className="text-2xl font-black text-white">Stewardship & Online Giving Ledger</h1>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Real-time records of online tithes, mission offerings, and district pledges.
-                    </p>
-                  </div>
-
-                  <div className="p-6 rounded-3xl bg-slate-900/90 border border-slate-800 shadow-xl overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead>
-                        <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
-                          <th className="py-3 px-4">Date</th>
-                          <th className="py-3 px-4">Donor Name</th>
-                          <th className="py-3 px-4">Fund Type</th>
-                          <th className="py-3 px-4">Frequency</th>
-                          <th className="py-3 px-4 text-right font-bold text-white">Amount (NGN)</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/60">
-                        {givingRecords.length === 0 ? (
-                          <tr>
-                            <td colSpan={5} className="py-6 text-center text-slate-500">
-                              No online transactions logged in current cycle.
-                            </td>
-                          </tr>
-                        ) : (
-                          givingRecords.map((item) => (
-                            <tr key={item.id} className="hover:bg-slate-800/30">
-                              <td className="py-3 px-4 text-slate-400 font-mono">
-                                {item.created_at ? new Date(item.created_at).toLocaleDateString() : '—'}
-                              </td>
-                              <td className="py-3 px-4 font-bold text-white">{item.donor_name || 'Anonymous Donor'}</td>
-                              <td className="py-3 px-4 text-slate-300 font-medium">{item.fund}</td>
-                              <td className="py-3 px-4 text-slate-400 capitalize">{item.frequency}</td>
-                              <td className="py-3 px-4 text-right font-black text-emerald-400">
-                                ₦{item.amount.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+              {(activeTab === 'finances' || activeTab === 'giving') && (
+                <FinancialAnalytics
+                  finances={finances}
+                  activeRole={activeRole}
+                  onRefresh={loadPortalData}
+                  onShowNotice={showNotice}
+                />
               )}
 
               {/* ---------------------------------------------------- */}

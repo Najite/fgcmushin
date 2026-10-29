@@ -125,6 +125,48 @@ export type Database = {
         }
         Relationships: []
       }
+      church_finances: {
+        Row: {
+          id: string
+          transaction_date: string
+          transaction_type: string
+          category: string
+          amount: number
+          payment_method: string
+          donor_or_payee: string | null
+          reference_code: string | null
+          notes: string | null
+          recorded_by: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          transaction_date?: string
+          transaction_type: string
+          category: string
+          amount: number
+          payment_method?: string
+          donor_or_payee?: string | null
+          reference_code?: string | null
+          notes?: string | null
+          recorded_by?: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          transaction_date?: string
+          transaction_type?: string
+          category?: string
+          amount?: number
+          payment_method?: string
+          donor_or_payee?: string | null
+          reference_code?: string | null
+          notes?: string | null
+          recorded_by?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
       guest_visits: {
         Row: {
           adults_count: number | null
@@ -289,6 +331,7 @@ export type Database = {
           id: string
           service_date: string
           service_name: string
+          service_type: string | null
           men_count: number
           women_count: number
           children_count: number
@@ -301,6 +344,7 @@ export type Database = {
           id?: string
           service_date: string
           service_name: string
+          service_type?: string | null
           men_count?: number
           women_count?: number
           children_count?: number
@@ -312,6 +356,7 @@ export type Database = {
           id?: string
           service_date?: string
           service_name?: string
+          service_type?: string | null
           men_count?: number
           women_count?: number
           children_count?: number
@@ -455,11 +500,13 @@ export type MinistryRow = Database['public']['Tables']['ministries']['Row']
 export type PrayerRequestRow = Database['public']['Tables']['prayer_requests']['Row']
 export type GuestVisitRow = Database['public']['Tables']['guest_visits']['Row']
 export type GivingRecordRow = Database['public']['Tables']['giving_records']['Row']
+export type ChurchFinanceRow = Database['public']['Tables']['church_finances']['Row']
 
 export interface ServiceAttendanceRow {
   id: string;
   service_date: string;
   service_name: string;
+  service_type?: 'sunday_service' | 'prayer_meeting' | 'bible_study' | 'special_program' | string;
   men_count: number;
   women_count: number;
   children_count: number;
