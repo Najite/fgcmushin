@@ -31,7 +31,8 @@ import {
   Key,
   Wallet,
   Hash,
-  MessageSquare
+  MessageSquare,
+  Church
 } from 'lucide-react';
 import type { Sermon, ChurchEvent } from '../types';
 import type { 
@@ -1132,21 +1133,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {/* Notification Bell with blue badge '3' */}
                 <button 
                   onClick={() => setActiveTab('prayers')}
-                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer" 
+                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer" 
                   title="Notifications & Petitions (3)"
+                  aria-label="Pending Notifications and Prayer Petitions"
                 >
                   <Bell size={18} />
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#06b6d4] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">3</span>
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#06b6d4] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs tabular-nums">3</span>
                 </button>
 
                 {/* Message bubble with pink badge '2' */}
                 <button 
                   onClick={() => setActiveTab('guests')}
-                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer" 
+                  className="relative p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer" 
                   title="Visitor Registrations (2)"
+                  aria-label="First-Time Guest Registrations"
                 >
                   <MessageSquare size={18} />
-                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#ea1263] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">2</span>
+                  <span className="absolute top-1 right-1 w-4 h-4 bg-[#ea1263] text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs tabular-nums">2</span>
                 </button>
 
                 {/* Executive View Switcher (Only visible to Admin) */}
@@ -1158,6 +1161,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                       value={activeRole}
                       onChange={(e) => handleSwitchRoleView(e.target.value as ChurchRole)}
                       className="bg-transparent text-xs font-bold text-[#ea1263] focus:outline-none cursor-pointer"
+                      aria-label="Switch staff role view"
                     >
                       <option value="admin">Administrator & CMS</option>
                       <option value="district_overseer">District Overseer Study</option>
@@ -1171,8 +1175,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {/* Settings Gear */}
                 <button
                   onClick={() => setActiveTab('settings')}
-                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] transition-colors cursor-pointer"
+                  className="p-2 rounded-xl text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb] active:scale-[0.96] transition-transform duration-150 cursor-pointer"
                   title="Church Settings & Announcements"
+                  aria-label="Church Settings and Announcements"
                 >
                   <Settings size={18} />
                 </button>
@@ -1180,7 +1185,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {/* View Live Site */}
                 <button
                   onClick={onClose}
-                  className="px-3 py-1.5 rounded-xl border border-[#e4d8e8] hover:border-[#d8c8dc] bg-[#faf4fb] hover:bg-[#f5eef8] text-[#4b5262] text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl border border-[#e4d8e8] hover:border-[#d8c8dc] bg-[#faf4fb] hover:bg-[#f5eef8] active:scale-[0.96] text-[#4b5262] text-xs font-bold transition-transform duration-150 flex items-center gap-1.5 cursor-pointer"
+                  aria-label="Return to Live Church Website"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-[#707786]" />
                   <span className="hidden sm:inline">Live Site</span>
@@ -1189,8 +1195,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 {/* Logout / Switch Role */}
                 <button
                   onClick={handleLogout}
-                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#ea1263]/30 hover:border-[#ea1263]/60 bg-[#ea1263]/10 hover:bg-[#ea1263]/20 text-[#ea1263] text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="p-2 sm:px-3 sm:py-1.5 rounded-xl border border-[#ea1263]/30 hover:border-[#ea1263]/60 bg-[#ea1263]/10 hover:bg-[#ea1263]/20 active:scale-[0.96] text-[#ea1263] text-xs font-bold transition-transform duration-150 flex items-center gap-1.5 cursor-pointer"
                   title="Switch Staff Account / Lock"
+                  aria-label="Lock and Switch Staff Account"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden sm:inline">Lock</span>
@@ -1215,17 +1222,17 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               }`}
             >
               <div>
-                {/* Brand Header: Lector style with Church Context */}
+                {/* Brand Header: FGC Mushin District Headquarters */}
                 <div className="p-3.5 border-b border-[#f4ebf6]">
-                  <div className="bg-gradient-to-r from-[#ea1263] via-[#e81977] to-[#ec4899] text-white rounded-xl py-2 px-3 shadow-sm shadow-[#ea1263]/25 flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-[#facc15] text-[#1b212f] flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
-                      ⚡
+                  <div className="bg-gradient-to-r from-[#be123c] via-[#e11d48] to-[#ea1263] text-white rounded-xl py-2 px-3 shadow-sm shadow-[#e11d48]/25 flex items-center gap-2.5">
+                    <div className="w-6 h-6 rounded-full bg-white text-[#be123c] flex items-center justify-center font-black text-xs shrink-0 shadow-sm">
+                      <Church className="w-3.5 h-3.5 text-[#be123c]" />
                     </div>
                     <div className="font-black text-sm tracking-tight text-white flex-1 truncate">
-                      Lector.
+                      FGC Mushin
                     </div>
                     <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-white/20 text-white uppercase tracking-wider">
-                      FGC
+                      DHQ
                     </span>
                   </div>
                 </div>
@@ -1235,7 +1242,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* # Dashboard (Pink Active in Mockup) */}
                   <button
                     onClick={() => { setActiveTab('overview'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'overview'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1248,7 +1255,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Treasury & Finances */}
                   <button
                     onClick={() => { setActiveTab('finances'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       (activeTab === 'finances' || activeTab === 'giving')
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1261,7 +1268,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Attendance Telemetry */}
                   <button
                     onClick={() => { setActiveTab('attendance'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'attendance'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1274,7 +1281,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Log Headcount */}
                   <button
                     onClick={() => { setActiveTab('headcount_logger'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'headcount_logger'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1291,7 +1298,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* First-Time Guests */}
                   <button
                     onClick={() => { setActiveTab('guests'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'guests'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1304,7 +1311,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Pastoral Prayers */}
                   <button
                     onClick={() => { setActiveTab('prayers'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'prayers'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1317,7 +1324,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Sermons CMS */}
                   <button
                     onClick={() => { setActiveTab('sermons'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'sermons'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1330,7 +1337,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Events & Calendar */}
                   <button
                     onClick={() => { setActiveTab('events'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'events'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1347,7 +1354,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Staff IAM */}
                   <button
                     onClick={() => { setActiveTab('iam_staff'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'iam_staff'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1360,7 +1367,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Audit Trail */}
                   <button
                     onClick={() => { setActiveTab('audit_logs'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'audit_logs'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
@@ -1373,7 +1380,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   {/* Church Settings */}
                   <button
                     onClick={() => { setActiveTab('settings'); setMobileSidebarOpen(false); }}
-                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors active:scale-[0.98] duration-150 ease-out cursor-pointer ${
                       activeTab === 'settings'
                         ? 'bg-[#fdf2f7] text-[#ea1263] font-black shadow-xs'
                         : 'text-[#707786] hover:text-[#1f2430] hover:bg-[#faf4fb]'
